@@ -14,6 +14,7 @@ namespace karst {
     struct NetworkTopologyConfig {
 
         enum TypeOfNetTopology  {HEXAGONAL_TOP, TOP_FROM_FILE, TOP_FROM_TRIANGULARIZATION};
+        enum TypeOfMerging      {MERGING_NONE, MERGING_GRAINS};
 
         Int N_x {10};		///< size of regular network
         Int N_y {10};		///< size of regular network
@@ -32,6 +33,16 @@ namespace karst {
         Length gauss_sigma_d {0};    	  ///< if randomness is on this give information about width of the initial diameter distribution (log normal used here)
         Length max_rand_shift_xy {1};     ///< if randomness is on this give information about max shift in positions
 
+        //merging parameters
+        TypeOfMerging type_of_merging {MERGING_NONE}; ///< type of merging
+
+        //addition inlet cut
+        Unitless inlet_cut_factor {1};  ///< factor of an inlet cut (in a cut: d = d*factor)
+        Int inlet_cut_w {0};            ///< width of an inlet cut
+        Int inlet_cut_l {0};		    ///< length of aGn inlet cut
+        bool add_well    = false;       ///< if true additional cut will be added
+        bool point_inlet = false;	    ///< if true the inlet is a point at the top of the crack
+        bool point_outlet = false;	    ///< if true the outlet is a point at the top of the crack
 
     };
 
