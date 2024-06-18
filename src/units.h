@@ -56,6 +56,7 @@ namespace karst {
     using Unitless      = Unit<std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>>;
 
 
+
     // User-defined literals
     inline Time       operator"" _T(long double v) { return Time       (static_cast<double>(v)); }
     inline Mass       operator"" _M(long double v) { return Mass       (static_cast<double>(v)); }
@@ -73,11 +74,11 @@ namespace karst {
     inline Concentration operator"" _C(long double v) { return Concentration (static_cast<double>(v)); }
     inline Unitless      operator"" _U(long double v) { return Unitless      (static_cast<double>(v)); }
 
+    auto x = 7._T;
 
 
 
-
-// Units multiplication
+    // Units multiplication
     template<typename M1, typename L1, typename T1, typename C1, typename T, typename M2, typename L2, typename T2, typename C2>
     auto operator*(const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M2, L2, T2, C2, T>& rhs) {
         return Unit<

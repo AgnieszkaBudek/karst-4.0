@@ -10,8 +10,37 @@
 
 namespace karst {
 
-    enum class TypeOfNetTopology  {HEXAGONAL, FROM_FILE, FROM_TRIANGULARIZATION};
-    enum class TypeOfMerging      {MERGING_NONE, MERGING_GRAINS};
+
+    // enum class for different types of topology
+    enum class TypeOfNetTopology  {HEXAGONAL, FROM_FILE, FROM_TRIANGULATION};
+
+    // Specialization of EnumToString for TypeOfNetTopology
+    template<>
+    const std::map<TypeOfNetTopology, std::string> EnumToString<TypeOfNetTopology>::mapping = {
+            { TypeOfNetTopology::HEXAGONAL, "HEXAGONAL" },
+            { TypeOfNetTopology::FROM_FILE, "FROM_FILE" },
+            { TypeOfNetTopology::FROM_TRIANGULATION, "FROM_TRIANGULATION" }
+    };
+    // Operator << specialization for TypeOfNetTopology
+    std::ostream& operator<<(std::ostream& os, TypeOfNetTopology value) {
+        return os << EnumToString<TypeOfNetTopology>::mapping.at(value);
+    }
+
+
+    // enum class for different types of merging
+    enum class TypeOfMerging { MERGING_NONE, MERGING_GRAINS };
+
+    // Specialization of EnumToString
+    template<>
+    const std::map<TypeOfMerging, std::string> EnumToString<TypeOfMerging>::mapping = {
+            { TypeOfMerging::MERGING_NONE, "MERGING_NONE" },
+            { TypeOfMerging::MERGING_GRAINS, "MERGING_GRAINS" }
+    };
+
+    // Operator << specialization for TypeOfMerging
+    std::ostream& operator<<(std::ostream& os, TypeOfMerging value) {
+        return os << EnumToString<TypeOfMerging>::mapping.at(value);
+    }
 
     struct NetworkTopologyConfig {
 
@@ -24,7 +53,7 @@ namespace karst {
         Int N_z {0};        ///< size of regular network
 
         //type of network
-        TypeOfNetTopology type_of_topology   {TypeOfNetTopology::FROM_TRIANGULARIZATION};
+        TypeOfNetTopology type_of_topology   {TypeOfNetTopology::FROM_TRIANGULATION};
         std::string in_topology_file_name    {"net_0.out"};     ///< file name with input topology of the network
         std::string in_topology_file_name_g  {"net_g_0.out"};   ///< file name with input topology of the network
         std::string in_pore_size_file_name   {"pores_0.out"};   ///<file name with input pore sizes

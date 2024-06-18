@@ -11,13 +11,25 @@
 namespace karst {
 
 
+    enum class PrintingMode {DEBUGGING_PRINT_M, GRAIN_PRINT_M};
+    // Specialization of EnumToString
+    template<>
+    const std::map<PrintingMode, std::string> EnumToString<PrintingMode>::mapping = {
+            { PrintingMode::DEBUGGING_PRINT_M, "DEBUGGING_PRINT_M" },
+            { PrintingMode::GRAIN_PRINT_M, "GRAIN_PRINT_M" }
+    };
+    // Operator << specialization for PrintingMode
+    std::ostream& operator<<(std::ostream& os, PrintingMode value) {
+        return os << EnumToString<PrintingMode>::mapping.at(value);
+    }
+
+
     struct PrintingConfig {
 
         PrintingConfig() = default;
         PrintingConfig(PrintingConfig&&) = default;
         PrintingConfig& operator=(PrintingConfig&&) = default;
 
-        enum PrintingMode       {DEBUGGING_PRINT_M, GRAIN_PRINT_M};
 
         //printing pictures
 
@@ -25,7 +37,7 @@ namespace karst {
         Int pages_tot       {100};		    ///< total nr of pages in the pictures (should be recalculated in future)
         Int pages_saved     {0};	        ///< number of printed pages
 
-        PrintingMode printing_mode  {GRAIN_PRINT_M};      ///< printing network style
+        PrintingMode printing_mode  {PrintingMode::GRAIN_PRINT_M};      ///< printing network style
         Int s_save_data             {50};                 ///< how often save txt and ps files (later will be automatized)
         Unitless print_diss_factor  {4};			      ///< definition of dissolution pattern for printing; only pores with d>d0*print_diss_factor are printed
         Int initial_xy{};                                 ///< initial position of nodes: for printing in grains style

@@ -16,25 +16,17 @@ namespace karst{
         E
     };
 
-    std::ostream& operator<<(std::ostream& os, const SPECIES& s) {
-        switch (s) {
-            case SPECIES::A:
-                os << "A";
-                break;
-            case SPECIES::B:
-                os << "B";
-                break;
-            case SPECIES::C:
-                os << "C";
-                break;
-            case SPECIES::E:
-                os << "E";
-                break;
-            default:
-                os << "Unknown";
-                break;
-        }
-        return os;
+    template<>
+    const std::map<SPECIES, std::string> EnumToString<SPECIES>::mapping = {
+            { SPECIES::A, "A" },
+            { SPECIES::B, "B" },
+            { SPECIES::C, "C" },
+            { SPECIES::E, "E" },
+    };
+
+    // Operator << specialization for SPECIES
+    std::ostream& operator<<(std::ostream& os, SPECIES value) {
+        return os << EnumToString<SPECIES>::mapping.at(value);
     }
 
 

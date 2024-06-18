@@ -33,6 +33,24 @@ namespace karst {
 
 
 
+    template<typename T>
+    struct EnumToString {
+        static const std::map<T, std::string> mapping;
+    };
+
+
+    template<typename T>
+    auto operator<<(std::ostream& os, T value) -> decltype(enumToString(value), os){
+        const auto& mapping = EnumToString<T>::mapping;
+        auto it = mapping.find(value);
+        if (it != mapping.end()) {
+            os << it->second;
+        } else {
+            os << "Unknown enum value :/";
+        }
+        return os;
+    }
+
 }
 
 #endif       //KARST_4_0_UTILS_H
