@@ -13,6 +13,10 @@ namespace karst {
 
     struct PrintingConfig {
 
+        PrintingConfig() = default;
+        PrintingConfig(PrintingConfig&&) = default;
+        PrintingConfig& operator=(PrintingConfig&&) = default;
+
         enum PrintingMode       {DEBUGGING_PRINT_M, GRAIN_PRINT_M};
 
         //printing pictures

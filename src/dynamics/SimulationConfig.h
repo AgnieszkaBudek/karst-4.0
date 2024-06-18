@@ -13,6 +13,10 @@ namespace karst {
 
     struct SimulationConfig {
 
+        SimulationConfig() = default;
+        SimulationConfig(SimulationConfig&&) = default;
+        SimulationConfig& operator=(SimulationConfig&&) = default;
+
         //evolution parameters
         Long T_max       {10};     	    ///< maximal number of time steps
 

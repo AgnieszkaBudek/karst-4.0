@@ -5,27 +5,80 @@
 #ifndef KARST_4_0_REACTION_CONFIG_H
 #define KARST_4_0_REACTION_CONFIG_H
 
+#include "src/utils.h"
+
 namespace karst{
 
-    enum SolidChemical{
-        SPECIES_A,
-        SPECIES_E
+     enum class SPECIES{
+        A,
+        B,
+        C,
+        E
     };
 
-    enum SolubleChemical{
-        SPECIES_B,
-        SPECIES_C
+    std::ostream& operator<<(std::ostream& os, const SPECIES& s) {
+        switch (s) {
+            case SPECIES::A:
+                os << "A";
+                break;
+            case SPECIES::B:
+                os << "B";
+                break;
+            case SPECIES::C:
+                os << "C";
+                break;
+            case SPECIES::E:
+                os << "E";
+                break;
+            default:
+                os << "Unknown";
+                break;
+        }
+        return os;
+    }
+
+
+    inline static const std::deque<SPECIES>  solubleS {SPECIES::B, SPECIES::C};
+    inline static const std::deque<SPECIES>  solidS   {SPECIES::A, SPECIES::E};
+
+    struct ChemicalReaction{
+        const std::deque<SPECIES>  substrates;
+        const std::deque<SPECIES>  products;
+
+        const std::deque<SPECIES> tracked_concentrations;
+
+        const bool is_linear;    // is linear
+        const Velocity k;        // reaction rate
+        const double c_eq;
+        //const double K;             // reaction coefficient1
+        //const double O;             // reaction coefficient2
     };
 
-    enum ChemicalReaction{
-        DISSOLUTION_R,
-        PRECIPITATION_R
 
-    };
+    const auto DISSOLUTION = ChemicalReaction {
+        .substrates = {SPECIES::A, SPECIES::B},
+        .products   = {SPECIES::C},
+        .tracked_concentrations = {SPECIES::B},
+        .is_linear = true,
+        .k = 1._v,
+        .c_eq = 0};
+        // .K = INFINITY,
+        // .O = 0};
 
+    const auto PRECIPITATION = ChemicalReaction {
+            .substrates = {SPECIES::C},
+            .products   = {SPECIES::E},
+            .tracked_concentrations = {SPECIES::C},
+            .is_linear = true,
+            .k = 1._v,
+            .c_eq = 0};
+            // .K = INFINITY,
+            // .O = 0};
 
+    inline const auto allReactions = std::deque<ChemicalReaction> {DISSOLUTION, PRECIPITATION};
 
-}
+    }
+
 
 
 #endif //KARST_4_0_REACTION_CONFIG_H

@@ -10,78 +10,74 @@
 
 namespace karst{
 
-
-
     /**
  * Generic class representing one module of models logics.
  * The module consists of Input and Output subclasses.
  * The module may, but doesn't have to be connected with particular symbol. In this case members sym_info and sym_params are filled.
  */
+
+    enum ElementType {
+        NODE,
+        PORE,
+        GRAIN
+    };
+
+    struct ElementConfig{
+
+        const ElementType type;       ///< element type
+        const Int name;               ///< element name
+        std::ostream* log;            ///< log file
+    };
+
+
+    struct ElementTopoProperties{
+        bool connected_to_percolation   {false};
+        bool checked_for_percolation    {false};
+        bool active                     {true};
+    };
+
+
     template < typename Element, typename ElementState>
     class GenericElement
     {
 
 
-        enum ElementType {
-            NODE,
-            PORE,
-            GRAIN
-        };
-
-        struct ElementConfig{
-
-            const ElementType type;         ///< element type
-            const Int name;                 ///< element name
-            const std::ostream& log;        ///< log file
-        };
-
-        const ElementConfig config;
-
-
-        struct ElementTopoProperties{
-            bool connected_to_percolation   {false};
-            bool checked_for_percolation    {false};
-            bool active                     {false};
-        };
-
-
     public:
 
-        explicit GenericElement(const Network &S0, const Int name0, const std::ostream& log0, const ElementConfig& config0) :
+        explicit GenericElement(const Network &S0, const ElementConfig config0) :
                 S{ S0 }, config{ config0}
         {}
 
-        //virtual ~GenericElement() = default; //TODO Pamietac by sprawdzac czy nie pamietaja o nim inni
+        ~GenericElement() {
+//            if(config.log)   //TODO: chack if this works
+//                *(config.log)<<"Deleting element"<<*this;
+        }
 
+
+
+        friend auto createHexagonalNetwork(Network& S, Int N, Int M)->void;
+        friend Network;
 
         // getting and updating element state
+        inline auto set_state(ElementState&& s1)    ->  void { s=std::move(s1); }
 
+        inline auto set_oldstate(ElementState&& s1) ->  void { s_old=std::move(s1); }
 
-        auto get_state() -> const ElementState&
+        inline auto update_state(ElementState& s1, long new_step) ->  void
         {
-            return s;
+            assert (new_step>=step);
+            s_old = std::move(s);
+            s     = std::move(s1);
+            step = new_step;
         }
 
-        auto get_old_state() -> const ElementState&
-        {
-            return s_old;
-        }
+        inline auto get_state() const             -> ElementState& { return s; }
 
-        auto update_state(const ElementState& s0) -> void
-        {
-            s = s0;
-        }
+        inline auto get_old_state() const         -> ElementState& { return s_old; }
 
+        inline auto update_time_step(long step0)  -> void          { step = step0; }
 
-        auto update_old_state(const ElementState & s0) -> void
-        {
-            s_old = s0;
-        }
-
-        auto update_time_step(long step0) -> void
-        {
-            step = step0;
-        }
+        inline auto get_time_step () const        -> long          { return step; }
 
 
         //Saving info
@@ -90,27 +86,16 @@ namespace karst{
 
         auto save_topology() -> void {}
 
-        auto log_state(const std::ostream& log_file) ->void {}
+        auto log_state(const std::ostream& log_file)    ->  void {}
 
-        auto log_topology(const std::ostream& log_file) ->void {}
+        auto log_topology(const std::ostream& log_file) ->  void {}
 
 
         //Setting the topology
 
-        auto set_nodes (const std::deque<Node* >& n0) -> void
-        {
-            n.assign(n0.begin(), n0.end());
-        }
-
-        auto set_pores (const std::deque<Pore* >& p0) -> void
-        {
-            p.assign(p0.begin(), p0.end());
-        }
-
-        auto set_grains (const std::deque<Grain* >& g0) -> void
-        {
-            g.assign(g0.begin(), g0.end());
-        }
+        auto set_nodes  (std::deque<Node*  >&& n0) -> void { n = std::move(n0); }
+        auto set_pores  (std::deque<Pore*  >&& p0) -> void { p = std::move(p0); }
+        auto set_grains (std::deque<Grain* >&& g0) -> void { g = std::move(g0); }
 
 
 
@@ -155,21 +140,21 @@ namespace karst{
             return remove_element_from_connected(n0,n);
         }
 
+    public:
 
+        std::deque<Node* >     n{};		///< list of nodes connected to the element
+        std::deque<Pore* >     p{};		///< list of pores connected to the element
+        std::deque<Grain* >    g{};		///< list of grains connected to the element
 
     protected:
 
         const Network& S;            ///< Network
+        const ElementConfig config;  ///< Config
 
         Long step{0};                ///< time step the element has been updated the last time
         ElementTopoProperties  x{};  ///< temporal properties of an element
         ElementState    s{};         ///< current state of an element
         ElementState    s_old{};     ///< state of an element in previous time step
-
-
-        std::deque<const Node* >     n{};		///< list of nodes connected to the element
-        std::deque<const Pore* >     p{};		///< list of pores connected to the element
-        std::deque<const Grain* >    g{};		///< list of grains connected to the element
 
 
     };

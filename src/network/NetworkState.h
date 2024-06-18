@@ -22,6 +22,7 @@ namespace karst {
 
 
         // chemical properties
+        std::map <SolubleChemical,Concentration> C_0 ;	///< inlet concentration of all soluble chemicals
         std::map <SolidChemical, Volume> V_tot {};      ///< total volume of all species
 
     };

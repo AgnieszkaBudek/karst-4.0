@@ -10,18 +10,21 @@
 
 namespace karst {
 
+    enum class TypeOfNetTopology  {HEXAGONAL, FROM_FILE, FROM_TRIANGULARIZATION};
+    enum class TypeOfMerging      {MERGING_NONE, MERGING_GRAINS};
 
     struct NetworkTopologyConfig {
 
-        enum TypeOfNetTopology  {HEXAGONAL_TOP, TOP_FROM_FILE, TOP_FROM_TRIANGULARIZATION};
-        enum TypeOfMerging      {MERGING_NONE, MERGING_GRAINS};
+        NetworkTopologyConfig() = default;
+        NetworkTopologyConfig(NetworkTopologyConfig&&) = default;
+        NetworkTopologyConfig& operator=(NetworkTopologyConfig&&) = default;
 
         Int N_x {10};		///< size of regular network
         Int N_y {10};		///< size of regular network
         Int N_z {0};        ///< size of regular network
 
         //type of network
-        TypeOfNetTopology type_of_topology   {TOP_FROM_TRIANGULARIZATION};
+        TypeOfNetTopology type_of_topology   {TypeOfNetTopology::FROM_TRIANGULARIZATION};
         std::string in_topology_file_name    {"net_0.out"};     ///< file name with input topology of the network
         std::string in_topology_file_name_g  {"net_g_0.out"};   ///< file name with input topology of the network
         std::string in_pore_size_file_name   {"pores_0.out"};   ///<file name with input pore sizes
@@ -34,7 +37,7 @@ namespace karst {
         Length max_rand_shift_xy {1};     ///< if randomness is on this give information about max shift in positions
 
         //merging parameters
-        TypeOfMerging type_of_merging {MERGING_NONE}; ///< type of merging
+        TypeOfMerging type_of_merging {TypeOfMerging::MERGING_NONE}; ///< type of merging
 
         //addition inlet cut
         Unitless inlet_cut_factor {1};  ///< factor of an inlet cut (in a cut: d = d*factor)
