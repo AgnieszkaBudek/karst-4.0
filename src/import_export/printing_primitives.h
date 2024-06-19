@@ -68,7 +68,7 @@ namespace karst {
     // 3. Line3D
     struct Line3D {
 
-        Point3D a{}, b{};
+        const Point3D a{}, b{};
         Area w {0.1};         // cross-section
     };
 
@@ -80,7 +80,7 @@ namespace karst {
     // 4. Pore3D
     struct Pore3D {
 
-        Pore&  p;
+        const Pore&  p;
         double name {NaN};
         Color  k    {};
     };
@@ -131,7 +131,7 @@ namespace karst {
     // 6. Node3D
     struct Node3D {
 
-        Node & n;
+        const Node & n;
         Color k{};
         double name{NaN};
         Length r{0.1};
@@ -166,7 +166,7 @@ namespace karst {
     // 7. Triangle 3D
     struct Triangle3D {
 
-        Node &n1, &n2, &n3;
+        const Node &n1, &n2, &n3;
         double name{NaN};
         Color k{};
     };
@@ -196,7 +196,7 @@ namespace karst {
 
     struct Polygon3D {
 
-        std::deque<Node*> n;
+        std::deque<Node const *> n;
         double name {NaN};
         Color k{};
 

@@ -30,7 +30,7 @@ namespace karst {
         friend void createHexagonalNetwork(Network&,Int,Int);
 
         explicit Network (const NetworkConfig&  conf, const NetworkTopologyConfig&  t_conf, const PrintingConfig& p_conf):
-        config{conf},t_config{t_conf}, io_mod{p_conf}
+        config{conf},t_config{t_conf}, io_mod{*this, p_conf}
         {}
 
 
@@ -38,6 +38,11 @@ namespace karst {
 
             std::cerr << "Deleting network..." << std::endl;
         }
+
+        auto save_network_state() ->void { do_save_network_state();}
+        auto get_nodes()  const -> const std::deque<Node>&   {  return n; }
+        auto get_pores()  const -> const std::deque<Pore>&   {  return p; }
+        auto get_grains() const -> const std::deque<Grain>&  {  return g; }
 
         auto init() -> void {
 
@@ -101,6 +106,13 @@ namespace karst {
         std::deque<Node*> n_outlet;
 
         PrintingModule io_mod;
+
+
+        auto do_save_network_state() -> void   //TODO: zastanowić się czy nie może to być jednak funkcja const?
+        {
+            if(io_mod.config.do_save_ps)
+                io_mod.print_net_ps();
+        }
 
     };
 

@@ -31,7 +31,7 @@ namespace karst {
             {TimeAdaptationMode::DECREASE,  "DECREASE" },
             {TimeAdaptationMode::NEUTRAL,   "NEUTRAL" }
     };
-//    // Operator << specialization for SimulationStateType     F//TODO: wyrzucić potem
+//    // Operator << specialization for SimulationStateType     //TODO: wyrzucić potem
 //    std::ostream& operator<<(std::ostream& os, TimeAdaptationMode value) {
 //        return os << EnumToString<TimeAdaptationMode>::mapping.at(value);
 //    }
@@ -43,6 +43,7 @@ namespace karst {
 
         // simulation state
         Long sim_step    {0};           ///< nr of simulation steps already done
+        Time T           {0};           ///< Total time from the begging of simulation
         Time dt          {NaN} ;       	///< time step (in dimensionless units [2 k1 * gamma_1/d0])
 
         TimeAdaptationMode   set_new_dt  {TimeAdaptationMode::NEUTRAL};    ///< if change the time step

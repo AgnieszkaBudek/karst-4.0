@@ -68,7 +68,7 @@ namespace karst {
         return enumVar;
     }
 //
-//    // boll<<str interface //TODO: niepotrzebne, bo mam std::strinstream >> bool, wykorzystać to!!!
+//    // boll<<str interface //TODO: niepotrzebne, bo mam std::strinstream >> bool, wykorzystać to!!! ale tam problem z potrzebą bool
 //    bool& operator <<(bool& b, const std::string& str){
 //        if (str == "true")
 //            b = true;

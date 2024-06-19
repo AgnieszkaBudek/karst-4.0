@@ -10,6 +10,7 @@
 
 namespace karst {
 
+    enum class INTEGRATION_METHOD  {EULER, LEAP_FROG};
 
     struct SimulationConfig {
 
@@ -22,6 +23,7 @@ namespace karst {
 
         Long tot_steps   {0};           ///< total nr of steps in simulation
         Time tot_time    {0.0};         ///< total time in simulation
+        Time dt0         {0.00001};     ///< initial time step
 
         Length d_d_max   {0.1};	        ///< maximal change of pore diameter in one step (in %; if obtained then dt = 2/3 dt)
         Length d_d_min   {0.01};	    ///< minimal change of pore diameter in one step (in %; if not obtained then dt = 1.2dt)
@@ -33,7 +35,8 @@ namespace karst {
         Unitless time_factor_after_b {1.5};                  ///< how long after breakthrough run simulation (as a fraction fof tot_steps)
 
         //dynamics
-        bool do_leapfrog                          {false};       ///< if true frog leap instead of Euler algorithm is used in evolution (not implemented yet)
+        INTEGRATION_METHOD integration_mode       {INTEGRATION_METHOD::EULER};
+        bool do_leapfrog                          {false};       ///< if true frog leap instead of Euler algorithm is used in evolution (not implemented yet) //TODO: get rid of ot later
         bool do_full_dissolution                  {true};        ///< if true evolution stops when system is fully dissolved
         bool do_system_dissolved                  {false};       ///< check if system is dissolved (fulfilling condition given by d_d_diss)
         bool do_adaptive_dt                       {true}; 	     ///< adapting dt according to d_d_max and d_d_min;
