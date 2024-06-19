@@ -114,6 +114,12 @@ namespace karst {
         return Unit<M1, L1, T1, C1, T>(lhs.value - rhs.value);
     }
 
+    // Units times -1
+    template<typename M1, typename L1, typename T1, typename C1, typename T>
+    auto operator-(const Unit<M1, L1, T1, C1, T>& u) {
+        return Unit<M1, L1, T1, C1, T>(-u.value);
+    }
+
 // Units comparison
     template<typename M1, typename L1, typename T1, typename C1, typename T>
     auto operator < (const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) ->bool {
@@ -138,6 +144,23 @@ namespace karst {
     template<typename M1, typename L1, typename T1, typename C1, typename T>
     auto operator == (const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) ->bool {
         return lhs.value == rhs.value;
+    }
+
+//    template<typename M1, typename L1, typename T1, typename C1, typename T>  //TODO: lepiej korzystac z istniejącego std::istream& operator >> double, to wykasować
+//    auto operator << (Unit<M1, L1, T1, C1, T>& lhs, const std::string& str)  {
+//        try {
+//            lhs.value = std::stod(str);
+//        }
+//        catch (const std::invalid_argument &ia) {
+//            std::cerr << "Invalid string -> double conversion: " << str << std::endl;
+//        }
+//        return lhs;
+//    }
+
+    template<typename M1, typename L1, typename T1, typename C1, typename T>
+    std::istream& operator >> (std::istream& is,Unit<M1, L1, T1, C1, T>& lhs)  {
+        is >> lhs.value;
+        return lhs;
     }
 
 

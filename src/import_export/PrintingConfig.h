@@ -18,10 +18,10 @@ namespace karst {
             { PrintingMode::DEBUGGING_PRINT_M, "DEBUGGING_PRINT_M" },
             { PrintingMode::GRAIN_PRINT_M, "GRAIN_PRINT_M" }
     };
-    // Operator << specialization for PrintingMode
-    std::ostream& operator<<(std::ostream& os, PrintingMode value) {
-        return os << EnumToString<PrintingMode>::mapping.at(value);
-    }
+//    // Operator << specialization for PrintingMode  //TODO: wyrzucić potem
+//    std::ostream& operator<<(std::ostream& os, PrintingMode value) {
+//        return os << EnumToString<PrintingMode>::mapping.at(value);
+//    }
 
 
     struct PrintingConfig {

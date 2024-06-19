@@ -20,18 +20,19 @@ namespace karst {
             const NetworkConfig           net_conf;
             const NetworkTopologyConfig   net_topo_conf;
             const PrintingConfig          print_conf;
-            const SimulationConfig        sym_conf;
+            const SimulationConfig        sim_conf;
 
 
             Configs(NetworkConfig&& net,
                     NetworkTopologyConfig&& net_topo,
                     PrintingConfig&& print,
-                    SimulationConfig&& sym)
+                    SimulationConfig&& sim)
                     :
                     net_conf(std::move(net)),
                     net_topo_conf(std::move(net_topo)),
                     print_conf(std::move(print)),
-                    sym_conf(std::move(sym)) {}
+                    sim_conf(std::move(sim))
+                    {}
         };
 
 
@@ -40,7 +41,7 @@ namespace karst {
         const Configs confs;
 
     auto init() -> void {
-
+        S.init();
     }
 
     protected:

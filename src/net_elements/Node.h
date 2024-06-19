@@ -16,10 +16,30 @@
 namespace karst {
 
 
+    enum class NodeType {
+        INPUT,
+        OUTPUT,
+        NORMAL,
+        NOT_CONNECTED
+    };
+    // Specialization of EnumToString
+    template<>
+    const std::map<NodeType, std::string> EnumToString<NodeType>::mapping = {
+            { NodeType::NORMAL,         "NORMAL"        },
+            { NodeType::NOT_CONNECTED,  "NOT_CONNECTED" },
+            { NodeType::INPUT,          "INPUT"         },
+            { NodeType::OUTPUT,         "OUTPUT"        }
+    };
+//    // Operator << specialization for NodeType   //TODO: wyrzucić potem
+//    std::ostream& operator<<(std::ostream& os, NodeType value) {
+//        return os << EnumToString<NodeType>::mapping.at(value);
+//    }
+
+
     struct NodeState {
 
-        Pressure u;
-        std::map <SPECIES, Concentration> c ;              ///< concentration of specific species
+        Pressure u{};
+        std::map <SPECIES, Concentration> c;              ///< concentration of specific species
     };
 
 
@@ -27,26 +47,25 @@ namespace karst {
 
     public:
 
-        enum class NodeType {
-            INPUT,
-            OUTPUT,
-            NORMAL,
-            NOT_CONNECTED
-        };
-
-        explicit Node  (const Network &S0, const ElementConfig& config0) : GenericElement<Node, NodeState>(S0,config0){}
+        explicit Node  (Network &S0, const ElementConfig config0) : GenericElement<Node, NodeState>(S0,config0){}
 
         friend  GenericElement <Node, NodeState>;
 
 
         inline auto set_type (NodeType t0) -> void      { type = t0;   }
+
         inline auto get_type () const      -> NodeType  { return type; }
+
         inline auto set_pos (Point3D p0)   -> void      { pos = p0;    }
+
         inline auto get_pos () const       -> Point3D   { return pos;  }
+
         inline auto set_u (Pressure u0)    -> void      { s.u = u0;    }
+
         inline auto get_u () const         -> Pressure  { return s.u;  }
 
         inline auto set_c (SPECIES sp, Concentration c)  -> void {s.c[sp] = c;}
+
         inline auto get_c (SPECIES sp) const             -> Concentration{
             assert(s.c.find(sp) != c.c.end() && "Key not found in the map");
             return s.c.at(sp);
@@ -56,11 +75,10 @@ namespace karst {
         auto init() -> void
         {
             for (auto sp : solubleS)
-                if (type == Node::NodeType::INPUT){
+                if (type == NodeType::INPUT){
                     assert(S.config.inlet_c.find(sp) != S.config.inlet_c.end() && "Key not found in the map");
                     s.c[sp] = S.config.inlet_c.at(sp);
                 }
-
                 else
                     s.c[sp] = Concentration{0};
         }

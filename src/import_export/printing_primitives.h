@@ -33,9 +33,9 @@ namespace karst {
 
     inline auto operator - (const Point3D&  p1, const Point3D&  p2) -> Length {  //return distance between two points
         return Length(
-                sqrt(pow(p1.x - p2.x, 2) +
-                     pow(p1.y - p2.y, 2) +
-                     pow(p1.z - p2.z, 2))
+                sqrt(pow(double(p1.x - p2.x), 2) +
+                     pow(double(p1.y - p2.y), 2) +
+                     pow(double(p1.z - p2.z), 2))
                      );
     }
 
@@ -56,7 +56,7 @@ namespace karst {
 
 
     ofstream_ps & operator<< (ofstream_ps &os, const Point3D& p) {
-        if(p.z==0) os<<std::setprecision(4)<<std::setw(12)<<p.x<<std::setw(12)<<-p.y<<" ";
+        if(p.z==0._L) os<<std::setprecision(4)<<std::setw(12)<<p.x<<std::setw(12)<<-p.y<<" ";
         else       os<<std::setw(12)<<p.x<<std::setw(12)<<p.y<<std::setw(12)<<p.z<<" ";
         return os;}
 
@@ -143,9 +143,9 @@ namespace karst {
         auto pos_tmp = n3D.n.get_pos();
 
         if (k_tmp.r==NaN or k_tmp.g==NaN || k_tmp.b==NaN) {
-            if      (n3D.n.get_type() == Node::NodeType::NORMAL) k_tmp = Color{0.7, 0.7, 0.7};
-            else if (n3D.n.get_type() == Node::NodeType::INPUT ) k_tmp = Color{1, 0, 0};
-            else if (n3D.n.get_type() == Node::NodeType::OUTPUT) k_tmp = Color{0, 0, 1};
+            if      (n3D.n.get_type() == NodeType::NORMAL) k_tmp = Color{0.7, 0.7, 0.7};
+            else if (n3D.n.get_type() == NodeType::INPUT ) k_tmp = Color{1, 0, 0};
+            else if (n3D.n.get_type() == NodeType::OUTPUT) k_tmp = Color{0, 0, 1};
         }
 
         os << k_tmp;

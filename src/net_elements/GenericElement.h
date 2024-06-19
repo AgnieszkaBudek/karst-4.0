@@ -16,11 +16,23 @@ namespace karst{
  * The module may, but doesn't have to be connected with particular symbol. In this case members sym_info and sym_params are filled.
  */
 
-    enum ElementType {
+    enum class ElementType {
         NODE,
         PORE,
         GRAIN
     };
+    // Specialization of EnumToString
+    template<>
+    const std::map<ElementType, std::string> EnumToString<ElementType>::mapping = {
+            { ElementType::NODE,   "NODE"  },
+            { ElementType::PORE,   "PORE"  },
+            { ElementType::GRAIN,  "GRAIN" }
+    };
+//    // Operator << specialization for ElementType                 //TODO: wyrzucić potem
+//    std::ostream& operator<<(std::ostream& os, ElementType value) {
+//        return os << EnumToString<ElementType>::mapping.at(value);
+//    }
+
 
     struct ElementConfig{
 
@@ -44,7 +56,7 @@ namespace karst{
 
     public:
 
-        explicit GenericElement(const Network &S0, const ElementConfig config0) :
+        explicit GenericElement(Network &S0, const ElementConfig config0) :
                 S{ S0 }, config{ config0}
         {}
 
@@ -148,7 +160,7 @@ namespace karst{
 
     protected:
 
-        const Network& S;            ///< Network
+        Network& S;            ///< Network
         const ElementConfig config;  ///< Config
 
         Long step{0};                ///< time step the element has been updated the last time

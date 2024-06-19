@@ -21,10 +21,10 @@ namespace karst {
             { TypeOfNetTopology::FROM_FILE, "FROM_FILE" },
             { TypeOfNetTopology::FROM_TRIANGULATION, "FROM_TRIANGULATION" }
     };
-    // Operator << specialization for TypeOfNetTopology
-    std::ostream& operator<<(std::ostream& os, TypeOfNetTopology value) {
-        return os << EnumToString<TypeOfNetTopology>::mapping.at(value);
-    }
+//    // Operator << specialization for TypeOfNetTopology
+//    std::ostream& operator<<(std::ostream& os, TypeOfNetTopology value) {
+//        return os << EnumToString<TypeOfNetTopology>::mapping.at(value);
+//    }
 
 
     // enum class for different types of merging
@@ -33,14 +33,14 @@ namespace karst {
     // Specialization of EnumToString
     template<>
     const std::map<TypeOfMerging, std::string> EnumToString<TypeOfMerging>::mapping = {
-            { TypeOfMerging::MERGING_NONE, "MERGING_NONE" },
+            { TypeOfMerging::MERGING_NONE,   "MERGING_NONE" },
             { TypeOfMerging::MERGING_GRAINS, "MERGING_GRAINS" }
     };
 
-    // Operator << specialization for TypeOfMerging
-    std::ostream& operator<<(std::ostream& os, TypeOfMerging value) {
-        return os << EnumToString<TypeOfMerging>::mapping.at(value);
-    }
+//    // Operator << specialization for TypeOfMerging  //TODO: wyrzucić potem
+//    std::ostream& operator<<(std::ostream& os, TypeOfMerging value) {
+//        return os << EnumToString<TypeOfMerging>::mapping.at(value);
+//    }
 
     struct NetworkTopologyConfig {
 

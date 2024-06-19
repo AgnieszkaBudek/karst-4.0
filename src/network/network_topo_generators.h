@@ -29,13 +29,13 @@ namespace karst {
 // Creating all network elements: nodes, pores and grains
 
         for (auto i=0; i<N*M; i++)
-            S.n.emplace_back(S, ElementConfig{.type=NODE,.name=i,.log = &std::cerr});
+            S.n.emplace_back(S, ElementConfig{.type=ElementType::NODE,.name=i,.log = &std::cerr});
 
         for (auto i=0; i<N*M*3; i++)
-            S.p.emplace_back(S, ElementConfig{.type=PORE,.name=i,.log = &std::cerr});
+            S.p.emplace_back(S, ElementConfig{.type=ElementType::PORE,.name=i,.log = &std::cerr});
 
         for (auto i=0; i<N*M*2; i++)
-            S.g.emplace_back(S, ElementConfig{.type=PORE,.name=i,.log = &std::cerr});
+            S.g.emplace_back(S, ElementConfig{.type=ElementType::PORE,.name=i,.log = &std::cerr});
 
 
         //pore and node connections
@@ -79,9 +79,9 @@ namespace karst {
 
         for (auto i = 0; i < N; i++) {
             S.n_inlet.push_back(&S.n[i]);
-            S.n[i].set_type(Node::NodeType::INPUT);
+            S.n[i].set_type(NodeType::INPUT);
             S.n_outlet.push_back(&S.n[N * M - 1 - i]);
-            S.n[N * M - 1 - i].set_type (Node::NodeType::OUTPUT);
+            S.n[N * M - 1 - i].set_type (NodeType::OUTPUT);
         }
 
         //adding rest of the topology info
@@ -116,7 +116,7 @@ namespace karst {
         //adding node Positions:
         for (auto i = 0; i < N; i++)
             for (auto j = 0; j < M; j++) {
-                S.n[N * j + i].set_pos (Unitless(S.config.l0) * Point3D(Length(i - j % 2 * 0.5), Length(j * sqrt(3) / 2), 0._L));
+                S.n[N * j + i].set_pos (Unitless(double(S.config.l0)) * Point3D(Length(i - j % 2 * 0.5), Length(j * sqrt(3) / 2), 0._L));
             }
 
 //        //random distribution  //TODO: add randomness to the node positions

@@ -50,7 +50,7 @@ namespace karst {
                 case TypeOfNetTopology::FROM_FILE:
                     std::cerr << "Not implemented yet!" << std::endl;
                     break;
-                case TypeOfNetTopology::FROM_TRIANGULARIZATION:
+                case TypeOfNetTopology::FROM_TRIANGULATION:
                     std::cerr << "Not implemented yet." << std::endl;
                     break;
                 default:
@@ -70,20 +70,20 @@ namespace karst {
             // 3. Add boundary conditions
             if (!t_config.do_periodic_bc)
                 for (auto& p_tmp : p)
-                    if (p_tmp.n.back()->get_pos() - p_tmp.n.front()->get_pos() > 5 * config.l0)
+                    if (p_tmp.n.back()->get_pos() - p_tmp.n.front()->get_pos() > 5._U * config.l0)
                         p_tmp.s.d = Length(0);
 
             // 4. Delete unused elements
 
             if (t_config.do_clear_unused_pores) {
                 std::cerr << "Clearing unused pores:" << std::endl;
-                clear_unused_pores();
+                // clear_unused_pores();  //TODO: implement it
                 std::cerr << "Clearing unused nodes:" << std::endl;
-                clear_unused_nodes();
+                // clear_unused_nodes();    //TODO: implement it
                 std::cerr << "Clearing unused grains:" << std::endl;
-                clear_unused_grains();
+                // clear_unused_grains();   //TODO: implement it
                 std::cerr << std::endl;
-                check_network_connections();
+                // check_network_connections(); //TODO: implement it
             }
 
         }

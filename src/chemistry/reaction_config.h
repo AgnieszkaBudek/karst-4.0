@@ -23,11 +23,11 @@ namespace karst{
             { SPECIES::C, "C" },
             { SPECIES::E, "E" },
     };
-
-    // Operator << specialization for SPECIES
-    std::ostream& operator<<(std::ostream& os, SPECIES value) {
-        return os << EnumToString<SPECIES>::mapping.at(value);
-    }
+//
+//    // Operator << specialization for SPECIES  //TODO: wyrzucić potem
+//    std::ostream& operator<<(std::ostream& os, SPECIES value) {
+//        return os << EnumToString<SPECIES>::mapping.at(value);
+//    }
 
 
     inline static const std::deque<SPECIES>  solubleS {SPECIES::B, SPECIES::C};

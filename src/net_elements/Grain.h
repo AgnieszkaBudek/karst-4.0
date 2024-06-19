@@ -21,7 +21,7 @@ namespace karst {
 
         public:
 
-            explicit Grain  (const Network &S0, const ElementConfig config0) : GenericElement<Grain, GrainState>(S0,config0){}
+            explicit Grain  (Network &S0, const ElementConfig config0) : GenericElement<Grain, GrainState>(S0,config0){}
 
 
             friend  GenericElement <Grain, GrainState>;

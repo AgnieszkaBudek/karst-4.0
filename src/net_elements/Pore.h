@@ -24,7 +24,7 @@ namespace karst {
 
     public:
 
-        explicit Pore  (const Network &S0, const ElementConfig config0) : GenericElement<Pore, PoreState>(S0,config0){}
+        explicit Pore  (Network &S0, const ElementConfig config0) : GenericElement<Pore, PoreState>(S0,config0){}
 
         friend  GenericElement <Pore, PoreState>;
 
@@ -52,9 +52,9 @@ namespace karst {
             //add randomness to diamaeters //TODO: add randomness to init diameters
 
             //add barrier between inlet and outlet (cutting vertical boundary conditions)
-            if( std::abs(n[0]->get_pos().y - n[1]->get_pos().y) > S.t_config.N_y/2.)
+            if( std::abs(double(n[0]->get_pos().y - n[1]->get_pos().y)) > S.t_config.N_y/2.)
                 s.d = Length(0);
-            if( n[0]->get_type() != Node::NodeType::NORMAL &&  n[0]->get_type() != Node::NodeType::NORMAL)
+            if( n[0]->get_type() != NodeType::NORMAL &&  n[0]->get_type() != NodeType::NORMAL)
                 s.d = Length(0);
 
         }
@@ -68,8 +68,8 @@ namespace karst {
             return os;
         }
 
-        friend ofstream_ps_pores &operator <<(ofstream_ps_pores &stream, const Pore &p){}     //TODO: implement it
-        friend ofstream_ps_grains &operator<<(ofstream_ps_grains &stream, const Pore &p){}    //TODO: implement it
+        friend ofstream_ps_pores  &operator <<(ofstream_ps_pores &stream, const Pore &p){}     //TODO: implement it
+        friend ofstream_ps_grains &operator<<(ofstream_ps_grains &stream, const Pore &p){}     //TODO: implement it
 
     protected:
 

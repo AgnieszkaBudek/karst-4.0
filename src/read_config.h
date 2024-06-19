@@ -23,7 +23,9 @@ namespace karst {
 
 
         // Parser config map
-         std::map<std::string, std::function<void(const std::string&)>> config_map = {
+        //TODO ; przepisać ten kawałek tak, by mieć tylko mapę łączątą stringi ze wskaźnikami oraz dla każdego typu przeładowanie typ<< string!!!
+
+        std::map<std::string, std::function<void(const std::string&)>> config_map = {
                  {"N_x", [&](const std::string& value) {
                      net_top_conf.N_x = std::stoi(value);
                      net_conf.Q_tot = Flow(2 * net_top_conf.N_x);
@@ -43,16 +45,8 @@ namespace karst {
                      std::cerr << "Additionally setting Q_tot = " << net_conf.Q_tot << std::endl;
                  }},
                  {"type_of_topology", [&](const std::string& value) {
-                     auto& myMap = EnumToString<TypeOfNetTopology>::mapping;
-                     auto it = std::find_if(myMap.begin(), myMap.end(), [&](const auto& pair) {
-                         return pair.second == value;
-                     });
-                     if (it != myMap.end()) {
-                         net_top_conf.type_of_topology = it->first;
-                         std::cerr << "Setting net_top_conf.type_of_topology = " << net_top_conf.type_of_topology << std::endl;
-                     } else {
-                         std::cerr << "Invalid value for type_of_topology" << std::endl;
-                     }
+                     net_top_conf.type_of_topology<<value;
+                     std::cerr << "Setting net_top_conf.type_of_topology = " << net_top_conf.type_of_topology << std::endl;
                  }},
                  {"in_topology_file_name", [&](const std::string& value) {
                      net_top_conf.in_topology_file_name = value;
@@ -95,16 +89,8 @@ namespace karst {
                      std::cerr << "Setting net_top_conf.max_rand_shift_xy = " << net_top_conf.max_rand_shift_xy << std::endl;
                  }},
                  {"type_of_merging", [&](const std::string& value) {
-                     auto& myMap = EnumToString<TypeOfMerging>::mapping;
-                     auto it = std::find_if(myMap.begin(), myMap.end(), [&](const auto& pair) {
-                         return pair.second == value;
-                     });
-                     if (it != myMap.end()) {
-                         net_top_conf.type_of_merging = it->first;
-                         std::cerr << "Setting net_top_conf.type_of_merging = " << net_top_conf.type_of_merging << std::endl;
-                     } else {
-                         std::cerr << "Invalid value for type_of_merging" << std::endl;
-                     }
+                     net_top_conf.type_of_merging << value;
+                     std::cerr << "Setting net_top_conf.type_of_merging = " << net_top_conf.type_of_merging << std::endl;
                  }},
                  {"inlet_cut_factor", [&](const std::string& value) {
                      net_top_conf.inlet_cut_factor = Unitless(std::stod(value));
@@ -199,16 +185,8 @@ namespace karst {
                      std::cerr << "Setting print_conf.pages_saved = " << print_conf.pages_saved << std::endl;
                  }},
                  {"printing_mode", [&](const std::string& value) {
-                     auto& myMap = EnumToString<PrintingMode>::mapping;
-                     auto it = std::find_if(myMap.begin(), myMap.end(), [&](const auto& pair) {
-                         return pair.second == value;
-                     });
-                     if (it != myMap.end()) {
-                         print_conf.printing_mode = it->first;
-                         std::cerr << "Setting print_conf.printing_mode = " << print_conf.printing_mode << std::endl;
-                     } else {
-                         std::cerr << "Invalid value for printing_mode."<< std::endl;
-                     }
+                     print_conf.printing_mode<<value;
+                     std::cerr << "Setting print_conf.printing_mode = " << print_conf.printing_mode << std::endl;
                  }},
                  {"s_save_data", [&](const std::string& value) {
                      print_conf.s_save_data = Int(std::stoi(value));
@@ -371,33 +349,15 @@ namespace karst {
                      std::cerr << "Setting sim_conf.do_recalculate_physical_parameters = " << std::boolalpha << sim_conf.do_recalculate_physical_parameters << std::endl;
                  }},
                  {"do_smarter_calculation_of_pressure", [&](const std::string& value) {
-                     if (value == "true")
-                         sim_conf.do_smarter_calculation_of_pressure = true;
-                     else if (value == "false")
-                         sim_conf.do_smarter_calculation_of_pressure = false;
-                     else
-                         std::cerr << "WARNING: Wrong value of variable sim_conf.do_smarter_calculation_of_pressure. Set true or false." << std::endl;
-
+                     std::stringstream (value) >> std::boolalpha >> sim_conf.do_smarter_calculation_of_pressure;
                      std::cerr << "Setting sim_conf.do_smarter_calculation_of_pressure = " << std::boolalpha << sim_conf.do_smarter_calculation_of_pressure << std::endl;
                  }},
                  {"do_dynamical_length", [&](const std::string& value) {
-                     if (value == "true")
-                         sim_conf.do_dynamical_length = true;
-                     else if (value == "false")
-                         sim_conf.do_dynamical_length = false;
-                     else
-                         std::cerr << "WARNING: Wrong value of variable sim_conf.do_dynamical_length. Set true or false." << std::endl;
-
+                     std::stringstream (value) >> std::boolalpha >> sim_conf.do_dynamical_length;
                      std::cerr << "Setting sim_conf.do_dynamical_length = " << std::boolalpha << sim_conf.do_dynamical_length << std::endl;
                  }},
                  {"do_cut_d_min", [&](const std::string& value) {
-                     if (value == "true")
-                         sim_conf.do_cut_d_min = true;
-                     else if (value == "false")
-                         sim_conf.do_cut_d_min = false;
-                     else
-                         std::cerr << "WARNING: Wrong value of variable sim_conf.do_cut_d_min. Set true or false." << std::endl;
-
+                     std::stringstream (value) >> std::boolalpha >> sim_conf.do_cut_d_min;
                      std::cerr << "Setting sim_conf.do_cut_d_min = " << std::boolalpha << sim_conf.do_cut_d_min << std::endl;
                  }},
                  {"d_max_for_u", [&](const std::string& value) {
@@ -452,7 +412,7 @@ namespace karst {
 
 
 
-        // reading config file:
+         // reading config file:
 
          std::ifstream fp_setup(f_path);
          if (!fp_setup) {
@@ -484,18 +444,19 @@ namespace karst {
              }
 
              // Search for a proper entry in config_map
-           if (config_map.find(name) != config_map.end()) {
-               try {
-                   config_map[value](value);
-               }
-               catch (const std::invalid_argument &ia) {
-                   std::cerr << "Invalid value for " << name << " in line nr " << i << std::endl;
-               }
-           }
-           else {
-               std::cerr << "Problem with parsing line nr " << i << ": ";
-               std::cerr << "Key " << name << " not found in config_map." << std::endl;
-           }
+             if (config_map.find(name) != config_map.end()) {
+                 try {
+                     config_map[value](value);  //TODO: przepisać to tak, by mieć tutaj  std::stringstream(value) >> config_map[value];
+                 }
+                 catch (const std::invalid_argument &ia) {
+                     std::cerr << "Invalid value for " << name << " in line nr " << i << std::endl;
+                 }
+             }
+                 //TODO: dopisać tutaj elseif dla mapy z parsowaniem wyrażeń regularnych!!!
+             else {
+                 std::cerr << "Problem with parsing line nr " << i << ": ";
+                 std::cerr << "Key " << name << " not found in config_map." << std::endl;
+             }
          }
 
         return {std::move(net_conf), std::move(net_top_conf), std::move(print_conf), std::move(sim_conf)};
