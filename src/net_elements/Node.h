@@ -6,15 +6,16 @@
 #define KARST_4_0_NODE_H
 
 #include "src/utils.h"
+
 #include "src/units.h"
 #include "src/net_elements/GenericElement.h"
 #include "src/import_export/printing_primitives.h"
 
 
 
-
 namespace karst {
 
+    class Point3D;
 
     enum class NodeType {
         INPUT,
@@ -47,7 +48,7 @@ namespace karst {
 
     public:
 
-        explicit Node  (Network &S0, const ElementConfig config0) : GenericElement<Node, NodeState>(S0,config0){}
+        explicit Node  (const NetworkConfig& net_conf0, const NetworkTopologyConfig &topo_conf0, const ElementConfig config0) : GenericElement<Node, NodeState>(net_conf0,topo_conf0,config0){}
 
         friend  GenericElement <Node, NodeState>;
 
@@ -67,7 +68,7 @@ namespace karst {
         inline auto set_c (SPECIES sp, Concentration c)  -> void {s.c[sp] = c;}
 
         inline auto get_c (SPECIES sp) const             -> Concentration{
-            assert(s.c.find(sp) != c.c.end() && "Key not found in the map");
+            assert(s.c.find(sp) != s.c.end() && "Key not found in the map");
             return s.c.at(sp);
         }
 
@@ -76,8 +77,8 @@ namespace karst {
         {
             for (auto sp : solubleS)
                 if (type == NodeType::INPUT){
-                    assert(S.config.inlet_c.find(sp) != S.config.inlet_c.end() && "Key not found in the map");
-                    s.c[sp] = S.config.inlet_c.at(sp);
+                    assert(net_config.inlet_c.find(sp) != net_config.inlet_c.end() && "Key not found in the map");
+                    s.c[sp] = net_config.inlet_c.at(sp);
                 }
                 else
                     s.c[sp] = Concentration{0};
@@ -97,8 +98,8 @@ namespace karst {
             return os;
         }
 
-        friend ofstream_ps_pores &operator <<(ofstream_ps_pores &stream, const Node &n){}     //TODO: implement it
-        friend ofstream_ps_grains &operator<<(ofstream_ps_grains &stream, const Node &n){}    //TODO: implement it
+        //friend ofstream_ps_pores &operator <<(ofstream_ps_pores &stream, const Node &n){}     //TODO: implement it
+        //friend ofstream_ps_grains &operator<<(ofstream_ps_grains &stream, const Node &n){}    //TODO: implement it
 
 
 

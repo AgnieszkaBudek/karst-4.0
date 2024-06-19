@@ -6,6 +6,9 @@
 #define KARST_4_0_GENERICELEMENT_H
 #include "src/utils.h"
 #include "src/units.h"
+#include "src/chemistry/reaction_config.h"
+#include "src/network/NetworkConfig.h"
+#include "src/network/NetworkTopologyConfig.h"
 
 
 namespace karst{
@@ -15,6 +18,10 @@ namespace karst{
  * The module consists of Input and Output subclasses.
  * The module may, but doesn't have to be connected with particular symbol. In this case members sym_info and sym_params are filled.
  */
+    class Network;
+    class Node;
+    class Pore;
+    class Grain;
 
     enum class ElementType {
         NODE,
@@ -56,8 +63,8 @@ namespace karst{
 
     public:
 
-        explicit GenericElement(Network &S0, const ElementConfig config0) :
-                S{ S0 }, config{ config0}
+        explicit GenericElement(const NetworkConfig& netconf0, const NetworkTopologyConfig &topo_conf0, const ElementConfig config0) :
+                net_config{ netconf0 }, topo_config{ topo_conf0}, config{ config0}
         {}
 
         ~GenericElement() {
@@ -160,7 +167,9 @@ namespace karst{
 
     protected:
 
-        Network& S;            ///< Network
+        const NetworkConfig& net_config;   ///< NetworkConfig   //zmienićpotem na const Network* const S;
+        const NetworkTopologyConfig& topo_config;
+
         const ElementConfig config;  ///< Config
 
         Long step{0};                ///< time step the element has been updated the last time

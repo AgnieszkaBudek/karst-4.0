@@ -8,12 +8,16 @@
 #include <functional>
 #include "src/utils.h"
 #include "src/units.h"
-#include "src/dynamics/Simulation.h"
+#include "src/network/NetworkConfig.h"
+#include "src/network/NetworkTopologyConfig.h"
+#include "src/dynamics/SimulationConfig.h"
+#include "src/import_export/PrintingConfig.h"
 
 namespace karst {
 
-     auto read_configs(const std::string& f_path) -> Simulation::Configs {
+     inline auto read_configs(const std::string& f_path) -> std::tuple<NetworkConfig, NetworkTopologyConfig, PrintingConfig, SimulationConfig> {
 
+         std::cerr << "Zaczynam parsowac plik konfiguracyjny" << std::endl;
 
         // Creating all configs
         NetworkConfig           net_conf        {};
@@ -442,6 +446,8 @@ namespace karst {
                  std::cerr << "Problem with parsing line nr " << i << std::endl;
                  continue;
              }
+
+             std::cerr<<"Parsuję takie coś: "<<name<<std::endl;
 
              // Search for a proper entry in config_map
              if (config_map.find(name) != config_map.end()) {

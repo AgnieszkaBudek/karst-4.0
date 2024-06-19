@@ -8,11 +8,12 @@
 
 #include "src/utils.h"
 #include "src/units.h"
-#include "src/network/NetworkTopologyConfig.h"
-#include "src/network/NetworkConfig.h"
-#include "src/network/Network.h"
 #include "PrintingConfig.h"
+#include "src/network/NetworkConfig.h"
+#include "src/network/NetworkTopologyConfig.h"
 #include "src/import_export/printing_primitives.h"
+#include "src/import_export/printing_net_elements.h"
+
 
 
 namespace karst {
@@ -22,7 +23,7 @@ namespace karst {
 
     public:
 
-        explicit PrintingModule(const Network& S0, const PrintingConfig& config0): S{S0}, config{config0}
+        explicit PrintingModule(const NetworkTopologyConfig & net_conf0, const PrintingConfig& config0): net_topo_config{net_conf0}, config{config0}
         {
             if (config.do_save_table){
                 d_out .open("d.out", std::ios_base::out | std::ios_base::trunc );
@@ -49,14 +50,17 @@ namespace karst {
 
         }
 
-        auto print_net_ps() -> void {
-            do_print_net_ps( net_pores_ps); }
+        auto print_net_ps(
+                const std::deque<Node>  &n={},
+                const std::deque<Pore>  &p={},
+                const std::deque<Grain> &g={}) -> void {
+            do_print_net_ps( net_pores_ps,n,p,g); }
 
         const PrintingConfig& config;
 
     protected:
 
-        const Network & S;
+        const NetworkTopologyConfig & net_topo_config;
 
         // output files
         ofstream_ps_pores 	net_pores_ps;
@@ -71,14 +75,17 @@ namespace karst {
 
 
 
-        auto do_print_net_ps(std::ostream &stream) -> void {
+        auto do_print_net_ps(std::ostream &stream,
+                             const std::deque<Node>  &n={},
+                             const std::deque<Pore>  &p={},
+                             const std::deque<Grain> &g={}) -> void {
 
             std::cerr << "Printing network..." << std::endl;
 
             //if(S.print_diss_factor) S.check_diss_pattern(S.print_diss_factor);
 
-            int N = (S.t_config.N_x);
-            int M = (S.t_config.N_y);
+            int N = (net_topo_config.N_x);
+            int M = (net_topo_config.N_y);
             double scale_tmp = 400. / (double(config.L_out) * std::max(N, M));
             double x_zero = 100. / scale_tmp;
             double y_zero = 750. / scale_tmp;
@@ -101,14 +108,14 @@ namespace karst {
             //stream << "0 0 ("<<S.description_note<<") ashow
             stream << " stroke" << std::endl << std::endl;
 
-            for (const auto& n_tmp : S.get_nodes())
+            for (const auto& n_tmp : n)
                 stream << Node3D{.n = n_tmp};
 
-            for (const auto& p_tmp : S.get_pores())
+            for (const auto& p_tmp : p)
                 stream << Pore3D{.p = p_tmp};
 
-            for (const auto& p_tmp : S.get_pores())
-                stream << Pore3D{.p = p_tmp};
+            for (const auto& g_tmp : g)
+                stream << Polygon3D{.n = g_tmp.n};
 
         }
 

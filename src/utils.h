@@ -12,17 +12,13 @@
 #include <numeric>
 #include <cassert>
 
-#include "src/units.h"
-#include "src/chemistry/reaction_config.h"
+
+#include "src/all_enums.h"
 
 namespace karst {
 
-    class Network;
-    class Pore;
-    class Node;
-    class Grain;
 
-    const double NaN = std::numeric_limits<double>::quiet_NaN();
+    inline const double NaN = std::numeric_limits<double>::quiet_NaN();
 
 
     class ofstream_ps         : public std::ofstream  {};
@@ -32,41 +28,14 @@ namespace karst {
     class log_stream          : public std::ostream   {};   ///< log files
 
 
-    // Enum <-> string interface
 
-    template<typename T>
-    struct EnumToString {
-        static const std::map<T, std::string> mapping;
-    };
-
-    template<typename T>
-    typename std::enable_if<std::is_enum<T>::value, std::ostream&>::type
-    operator<<(std::ostream& os, T value) {
-        const auto& mapping = EnumToString<T>::mapping;
-        auto it = mapping.find(value);
-        if (it != mapping.end()) {
-            os << it->second;
-        } else {
-            os << "Unknown enum value :/";
-        }
-        return os;
+    // Tuple to Struct template...
+    template <typename T, typename Tuple>
+    T tupleToStruct(Tuple&& tuple) {
+        return std::apply([](auto&&... args) { return T{std::forward<decltype(args)>(args)...}; }, std::forward<Tuple>(tuple));
     }
 
 
-    template<typename T>
-    typename std::enable_if<std::is_enum<T>::value, T&>::type
-    operator<<(T& enumVar, const std::string& str) {
-        const auto& mapping = EnumToString<T>::mapping;
-        auto it = std::find_if(mapping.begin(), mapping.end(), [&str](const auto& pair) {
-            return pair.second == str;
-        });
-        if (it != mapping.end()) {
-            enumVar = it->first;
-        } else {
-            throw std::invalid_argument("Unknown string value for enum: " + str);
-        }
-        return enumVar;
-    }
 //
 //    // boll<<str interface //TODO: niepotrzebne, bo mam std::strinstream >> bool, wykorzystać to!!! ale tam problem z potrzebą bool
 //    bool& operator <<(bool& b, const std::string& str){

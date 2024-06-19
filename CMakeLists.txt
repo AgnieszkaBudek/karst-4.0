@@ -36,5 +36,20 @@ add_executable(karst_4_0 main.cpp
         src/network/network_topo_generators.h
         src/import_export/printing_ps.h
         src/import_export/printing_primitives.h
+        src/all_enums.h
+        src/import_export/printing_net_elements.h
 
+)
+
+
+message(STATUS "CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
+
+# Path to build
+set(BUILD_DIRECTORY ./build)
+
+# Tworzenie niestandardowego celu do kopiowania pliku wykonywalnego
+add_custom_target(copy_executable ALL
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:karst_4_0> ${BUILD_DIRECTORY}
+        DEPENDS karst_4_0
+        COMMENT "Copying my_executable to build directory"
 )

@@ -4,10 +4,8 @@
 
 #include "src/utils.h"
 #include "src/units.h"
-#include "src/net_elements/Node.h"
-#include "src/network/Network.h"
-
 #include "src/net_elements/GenericElement.h"
+#include "src/import_export/printing_primitives.h"
 
 namespace karst {
 
@@ -24,12 +22,12 @@ namespace karst {
 
     public:
 
-        explicit Pore  (Network &S0, const ElementConfig config0) : GenericElement<Pore, PoreState>(S0,config0){}
+        explicit Pore  (const NetworkConfig &net_conf,const NetworkTopologyConfig &topo_conf0 , const ElementConfig config0) : GenericElement<Pore, PoreState>(net_conf,topo_conf0,config0){}
 
         friend  GenericElement <Pore, PoreState>;
 
 
-        inline auto check_if_active() const  -> bool  {}   //TODO: implement it
+        inline auto check_if_active() const  -> bool  { return true;}   //TODO: implement it
 
         inline auto check_if_space_left() const-> bool    { return s.d > 0._L; }
 
@@ -45,14 +43,14 @@ namespace karst {
         auto init() -> void
         {
             s = (PoreState{
-                    .d = S.config.d0,
+                    .d = net_config.d0,
                     .l = n[0]->get_pos() - n[1]->get_pos(),
                     .q = Flow(NaN)});
 
             //add randomness to diamaeters //TODO: add randomness to init diameters
 
             //add barrier between inlet and outlet (cutting vertical boundary conditions)
-            if( std::abs(double(n[0]->get_pos().y - n[1]->get_pos().y)) > S.t_config.N_y/2.)
+            if( std::abs(double(n[0]->get_pos().y - n[1]->get_pos().y)) > topo_config.N_y/2.)
                 s.d = Length(0);
             if( n[0]->get_type() != NodeType::NORMAL &&  n[0]->get_type() != NodeType::NORMAL)
                 s.d = Length(0);
@@ -68,8 +66,8 @@ namespace karst {
             return os;
         }
 
-        friend ofstream_ps_pores  &operator <<(ofstream_ps_pores &stream, const Pore &p){}     //TODO: implement it
-        friend ofstream_ps_grains &operator<<(ofstream_ps_grains &stream, const Pore &p){}     //TODO: implement it
+        //friend ofstream_ps_pores  &operator <<(ofstream_ps_pores &stream, const Pore &p){}     //TODO: implement it
+        //friend ofstream_ps_grains &operator<<(ofstream_ps_grains &stream, const Pore &p){}     //TODO: implement it
 
     protected:
 

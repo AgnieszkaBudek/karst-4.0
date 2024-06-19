@@ -9,14 +9,11 @@
 #include "src/utils.h"
 #include "src/units.h"
 #include "src/network/Network.h"
-#include "src/net_elements/GenericElement.h"
-#include "src/net_elements/Node.h"
-#include "src/net_elements/Pore.h"
-#include "src/net_elements/Grain.h"
+
 
 namespace karst {
 
-    void createHexagonalNetwork(Network& S, Int N, Int M) {
+    inline void createHexagonalNetwork(Network& S, Int N, Int M) {
 
         if (M % 2 == 1) {
             std::cerr << "ERROR: N_y must be even in hexagonal network!" << std::endl;
@@ -29,13 +26,13 @@ namespace karst {
 // Creating all network elements: nodes, pores and grains
 
         for (auto i=0; i<N*M; i++)
-            S.n.emplace_back(S, ElementConfig{.type=ElementType::NODE,.name=i,.log = &std::cerr});
+            S.n.emplace_back(S.config, S.t_config, ElementConfig{.type=ElementType::NODE,.name=i,.log = &std::cerr});
 
         for (auto i=0; i<N*M*3; i++)
-            S.p.emplace_back(S, ElementConfig{.type=ElementType::PORE,.name=i,.log = &std::cerr});
+            S.p.emplace_back(S.config, S.t_config, ElementConfig{.type=ElementType::PORE,.name=i,.log = &std::cerr});
 
         for (auto i=0; i<N*M*2; i++)
-            S.g.emplace_back(S, ElementConfig{.type=ElementType::PORE,.name=i,.log = &std::cerr});
+            S.g.emplace_back(S.config, S.t_config,  ElementConfig{.type=ElementType::GRAIN,.name=i,.log = &std::cerr});
 
 
         //pore and node connections

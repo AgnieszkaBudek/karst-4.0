@@ -3,19 +3,19 @@
 //
 
 
-#include "utils.h"
+#include "src/utils.h"
 #include "src/dynamics/Simulation.h"
+#include "src/network/network_topo_generators.h"
 
-namespace karst {
+using namespace karst;
 
-    int main() {
+int main() {
 
-        std::string config_name = "config.txt";
-        Simulation simulation{config_name};
-        simulation.init();
+    std::string config_name = "config.txt";
+    Simulation simulation{config_name};
+    simulation.init();
 
 
-        return 0;
-    }
-
+    return 0;
 }
+

@@ -6,16 +6,11 @@
 #define KARST_4_0_REACTION_CONFIG_H
 
 #include "src/utils.h"
+#include "src/units.h"
 
 namespace karst{
 
-     enum class SPECIES{
-        A,
-        B,
-        C,
-        E
-    };
-
+    enum class SPECIES {A, B, C, E};
     template<>
     const std::map<SPECIES, std::string> EnumToString<SPECIES>::mapping = {
             { SPECIES::A, "A" },
@@ -23,12 +18,6 @@ namespace karst{
             { SPECIES::C, "C" },
             { SPECIES::E, "E" },
     };
-//
-//    // Operator << specialization for SPECIES  //TODO: wyrzucić potem
-//    std::ostream& operator<<(std::ostream& os, SPECIES value) {
-//        return os << EnumToString<SPECIES>::mapping.at(value);
-//    }
-
 
     inline static const std::deque<SPECIES>  solubleS {SPECIES::B, SPECIES::C};
     inline static const std::deque<SPECIES>  solidS   {SPECIES::A, SPECIES::E};
@@ -47,7 +36,7 @@ namespace karst{
     };
 
 
-    const auto DISSOLUTION = ChemicalReaction {
+    inline const auto DISSOLUTION = ChemicalReaction {
         .substrates = {SPECIES::A, SPECIES::B},
         .products   = {SPECIES::C},
         .tracked_concentrations = {SPECIES::B},
@@ -57,7 +46,7 @@ namespace karst{
         // .K = INFINITY,
         // .O = 0};
 
-    const auto PRECIPITATION = ChemicalReaction {
+    inline const auto PRECIPITATION = ChemicalReaction {
             .substrates = {SPECIES::C},
             .products   = {SPECIES::E},
             .tracked_concentrations = {SPECIES::C},

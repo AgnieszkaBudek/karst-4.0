@@ -4,7 +4,7 @@
 #include "src/utils.h"
 #include "src/units.h"
 #include "src/net_elements/GenericElement.h"
-#include "src/import_export/printing_primitives.h"
+//#include "src/import_export/printing_primitives.h"
 
 namespace karst {
 
@@ -21,13 +21,13 @@ namespace karst {
 
         public:
 
-            explicit Grain  (Network &S0, const ElementConfig config0) : GenericElement<Grain, GrainState>(S0,config0){}
+            explicit Grain  (const NetworkConfig & net_conf0, const NetworkTopologyConfig &topo_conf0, const ElementConfig config0) : GenericElement<Grain, GrainState>(net_conf0,topo_conf0,config0){}
 
 
             friend  GenericElement <Grain, GrainState>;
 
 
-            inline auto check_if_active() const    -> bool  {}       //TODO: implement it
+            inline auto check_if_active() const    -> bool  { return true;}       //TODO: implement it
 
             inline auto check_if_space_left() const -> bool   { return s.tot_volume < s.max_volume; }
 
@@ -57,8 +57,8 @@ namespace karst {
 
             auto init() -> void
             {
-                s.max_volume = area(n);
-                s.v = {{SPECIES::A, calculate_initial_vol()}};
+                //s.max_volume = area(n);
+                //s.v = {{SPECIES::A, calculate_initial_vol()}};
                 for (auto sp : solidS){
                     if (sp != SPECIES::A)
                         s.v[sp] = 0._V;
@@ -78,8 +78,8 @@ namespace karst {
                 return os;
             }
 
-            friend ofstream_ps_pores &operator <<(ofstream_ps_pores &stream, const Grain &g){}     //TODO: implement it
-            friend ofstream_ps_grains &operator<<(ofstream_ps_grains &stream, const Grain &g){}    //TODO: implement it
+            //friend ofstream_ps_pores &operator <<(ofstream_ps_pores &stream, const Grain &g){}     //TODO: implement it
+            //friend ofstream_ps_grains &operator<<(ofstream_ps_grains &stream, const Grain &g){}    //TODO: implement it
 
 
     protected:

@@ -10,32 +10,6 @@
 
 namespace karst {
 
-    enum class SimulationStateType          {WARNING, NORMAL, BREAKTHROUGH};
-    // Specialization of EnumToString
-    template<>
-    const std::map<SimulationStateType, std::string> EnumToString<SimulationStateType>::mapping = {
-            {SimulationStateType::WARNING,      "WARNING" },
-            {SimulationStateType::NORMAL,       "NORMAL" },
-            {SimulationStateType::BREAKTHROUGH, "BREAKTHROUGH" }
-    };
-//    // Operator << specialization for SimulationStateType     //TODO: wyrzucić potem
-//    std::ostream& operator<<(std::ostream& os, SimulationStateType value) {
-//        return os << EnumToString<SimulationStateType>::mapping.at(value);
-//    }
-
-
-    enum class TimeAdaptationMode {INCREASE, DECREASE, NEUTRAL};
-    template<>
-    const std::map<TimeAdaptationMode, std::string> EnumToString<TimeAdaptationMode>::mapping = {
-            {TimeAdaptationMode::INCREASE,  "INCREASE" },
-            {TimeAdaptationMode::DECREASE,  "DECREASE" },
-            {TimeAdaptationMode::NEUTRAL,   "NEUTRAL" }
-    };
-//    // Operator << specialization for SimulationStateType     //TODO: wyrzucić potem
-//    std::ostream& operator<<(std::ostream& os, TimeAdaptationMode value) {
-//        return os << EnumToString<TimeAdaptationMode>::mapping.at(value);
-//    }
-
 
 
     struct SimulationState {

@@ -11,7 +11,11 @@
 #include "src/dynamics/SimulationConfig.h"
 #include "src/dynamics/SimulationState.h"
 #include "src/read_config.h"
+
+
 namespace karst {
+
+
 
     class Simulation {
 
@@ -36,7 +40,8 @@ namespace karst {
         };
 
 
-    explicit Simulation(const std::string& cfile_name) : confs(read_configs(cfile_name)) {
+
+    explicit Simulation(const std::string& cfile_name) : confs(tupleToStruct<Simulation::Configs>(read_configs(cfile_name))) {
 //        switch (confs.sim_conf.integration_mode) { //TODO: figure out how to choose the integration method...
 //            case (INTEGRATION_METHOD::EULER) :
 //

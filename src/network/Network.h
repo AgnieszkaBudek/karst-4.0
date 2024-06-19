@@ -17,11 +17,12 @@
 #include "src/network/NetworkTopologyConfig.h"
 #include "src/network/NetworkConfig.h"
 #include "src/network/NetworkState.h"
-#include "src/network/network_topo_generators.h"
+
 
 
 namespace karst {
 
+    void createHexagonalNetwork(Network& S, Int N, Int M);
 
     class Network {
 
@@ -30,7 +31,7 @@ namespace karst {
         friend void createHexagonalNetwork(Network&,Int,Int);
 
         explicit Network (const NetworkConfig&  conf, const NetworkTopologyConfig&  t_conf, const PrintingConfig& p_conf):
-        config{conf},t_config{t_conf}, io_mod{*this, p_conf}
+        config{conf},t_config{t_conf}, io_mod{t_conf, p_conf}
         {}
 
 
