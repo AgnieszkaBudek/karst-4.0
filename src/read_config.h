@@ -447,15 +447,19 @@ namespace karst {
                  continue;
              }
 
-             std::cerr<<"Parsuję takie coś: "<<name<<std::endl;
 
              // Search for a proper entry in config_map
              if (config_map.find(name) != config_map.end()) {
+
                  try {
-                     config_map[value](value);  //TODO: przepisać to tak, by mieć tutaj  std::stringstream(value) >> config_map[value];
+                     auto& func = config_map.at(name); // Pobierz referencję do funkcji za pomocą at(), aby sprawdzić, czy klucz istnieje
+                     func(value); // Wywołaj funkcję z parametrem value
                  }
                  catch (const std::invalid_argument &ia) {
                      std::cerr << "Invalid value for " << name << " in line nr " << i << std::endl;
+                 }
+                 catch (const std::bad_function_call &bfc) {
+                     std::cerr << "Error calling function for key " << name << ": " << bfc.what() << std::endl;
                  }
              }
                  //TODO: dopisać tutaj elseif dla mapy z parsowaniem wyrażeń regularnych!!!

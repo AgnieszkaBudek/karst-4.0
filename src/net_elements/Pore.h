@@ -51,15 +51,17 @@ namespace karst {
 
             //add barrier between inlet and outlet (cutting vertical boundary conditions)
             if( std::abs(double(n[0]->get_pos().y - n[1]->get_pos().y)) > topo_config.N_y/2.)
-                s.d = Length(0);
-            if( n[0]->get_type() != NodeType::NORMAL &&  n[0]->get_type() != NodeType::NORMAL)
-                s.d = Length(0);
+                s.d = Length(0.);
+            if( n[0]->get_type() != NodeType::NORMAL and n[1]->get_type() != NodeType::NORMAL)
+                s.d = Length(0.);
+
+            std::cerr << "Initializing Pore " << *this;
 
         }
 
 
         //export functions:
-        friend log_stream& operator<<(log_stream& os, const Pore& obj) {
+        inline friend std::ostream& operator<<(std::ostream& os, const Pore& obj) {
             os <<  obj.config.type << ": "<< obj.config.name << std::endl;
             os <<"\td = "<<obj.s.d<<"\tl = "<<obj.s.l<<"\tq = "<<obj.s.q;
             os << std::endl << std::endl;

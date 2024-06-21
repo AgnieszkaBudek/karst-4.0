@@ -18,20 +18,33 @@ namespace karst {
 
         const Pore&  p;
         double name {NaN};
-        Color  k    {};
+        Color  k    {0.5,0.5,0.5};
     };
 
     inline std::ostream & operator<< (std::ostream &os, const Pore3D& l) {
+        Point3D  pt0 = {l.p.get_nodes()[0]->get_pos()};
+        Point3D  pt1 = {l.p.get_nodes()[1]->get_pos()};
 
+        // do not draw pores with d==0
+        if (l.p.get_d() == 0._L or ! l.p.check_if_active())
+            return os;
+
+        //do not draw pores at periodic boundary conditions
+        if (pt0 - pt1 > Unitless (l.p.topo_config.N_x) * 0.5_U * l.p.net_config.l0){
+            return os;
+        }
+
+        //os <<"! Drukuje porek"<< l.p.config.name<<std::endl;
         os << std::setprecision(4) << l.k;
         os << l.p.get_d() << " setlinewidth" << std::endl;
-        os << l.p.n[0] << " moveto " << l.p.n[1] << "lineto stroke" << std::endl;
+        //os << "newpath " << pt0 << " moveto " << pt1 << "lineto stroke" << std::endl;
+        os << pt0 << " moveto " << pt1 << "lineto stroke" << std::endl;
 
         // printing label
-        if (l.name != NaN){
-            os << "/Times-Bold findfont " << (l.p.n[0]->get_pos() - l.p.n[1]->get_pos()) / 7._U << " scalefont setfont "
+        if (!std::isnan(l.name)){
+            os << "/Times-Bold findfont " << (pt0 - pt1) / 7._U << " scalefont setfont "
                << Color(0, 0, 1) << std::endl;
-            os << l.p.n[0]->get_pos() * l.p.n[1]->get_pos() << "moveto" << std::endl;
+            os << pt0 * pt1 << "moveto" << std::endl;
             os << "0 0 (" << std::setprecision(3) << l.name << ") ashow stroke" << std::endl;
         }
 
@@ -43,7 +56,7 @@ namespace karst {
     struct Node3D {
 
         const Node & n;
-        Color k{};
+        Color k{NaN};
         double name{NaN};
         Length r{0.1};
     };
@@ -53,17 +66,17 @@ namespace karst {
         auto k_tmp = n3D.k;
         auto pos_tmp = n3D.n.get_pos();
 
-        if (k_tmp.r==NaN or k_tmp.g==NaN || k_tmp.b==NaN) {
+        if (std::isnan(k_tmp.r) or std::isnan(k_tmp.g) or std::isnan(k_tmp.b)) {
             if      (n3D.n.get_type() == NodeType::NORMAL) k_tmp = Color{0.7, 0.7, 0.7};
-            else if (n3D.n.get_type() == NodeType::INPUT ) k_tmp = Color{1, 0, 0};
-            else if (n3D.n.get_type() == NodeType::OUTPUT) k_tmp = Color{0, 0, 1};
+            else if (n3D.n.get_type() == NodeType::INPUT ) k_tmp = Color{0.8, 0, 0};
+            else if (n3D.n.get_type() == NodeType::OUTPUT) k_tmp = Color{0, 0, 0.8};
         }
 
         os << k_tmp;
         os << pos_tmp << n3D.r << " 0 360 arc fill closepath" << std::endl;
 
         // printing label
-        if (n3D.name != NaN){
+        if (!std::isnan(n3D.name)){
             os << Color(0.8,0,0);
             os << "/Times-Bold findfont " << n3D.r << " scalefont setfont" << std::endl;
             os << Point3D(pos_tmp.x - n3D.r/3._U , pos_tmp.y - n3D.r/3._U) << "moveto" << std::endl;
@@ -85,13 +98,17 @@ namespace karst {
 
     inline std::ostream & operator<< (std::ostream &os, const Triangle3D& tr) {
 
+        Color k_tmp = tr.k;
+        if (isnan(k_tmp))
+            k_tmp = Color{0,0.8,0};
 
-        os << tr.k;
+
+        os << k_tmp;
         os << tr.n1.get_pos() << "moveto " << tr.n2.get_pos() << "lineto " << tr.n3.get_pos()
            << "lineto closepath fill stroke" << std::endl;
 
         //printing label
-        if (tr.name != NaN) {
+        if (!std::isnan(tr.name)) {
             os << Color(0, 0, 0);
             os << "/Times-Bold findfont " << 0.1 << " scalefont setfont" << std::endl;
             os << Point3D(
@@ -109,20 +126,33 @@ namespace karst {
 
         const std::deque<Node *> n;       //TODO: POprawić potem na const std::deque<const Node *> n;
         double name {NaN};
-        Color k{};
+        Color k{NaN};
 
     };
 
-    inline std::ostream & operator<< (std::ostream &os, const Polygon3D& w) {
+    inline std::ostream & operator<< (std::ostream &os, const Polygon3D& w) {       //TODO: dodać skalowanie ziarna i kolorowanie ładne
 
-        os << w.k;
+        //don't draw polygons crossing periodic boundary
+        auto max_l = 0._L;          //maximal distance between consecutive nodes;
+        for(auto it = w.n.begin(); it<w.n.end()-1; ++it)
+            if((*it)->get_pos() -(*(it+1))->get_pos() > max_l )
+                max_l = (*it)->get_pos() -(*(it+1))->get_pos();
+        if(max_l > Unitless (w.n[0]->topo_config.N_x) * 0.5_U * w.n[0]->net_config.l0)
+            return os;
+
+        // set default color
+        Color k_tmp = w.k;
+        if (isnan(k_tmp))
+            k_tmp = Color{0,0.8,0};
+
+        os << k_tmp;
         os << w.n[0]->get_pos() << "moveto ";
         for (auto n_tmp : std::ranges::subrange(std::next(w.n.begin()), w.n.end()))
             os << n_tmp->get_pos() << "lineto ";
         os << "closepath fill stroke" << std::endl;
 
         //printing label
-        if (w.name != NaN) {
+        if (!std::isnan(w.name)) {
             os << Color(0, 0, 0);
             os << "/Times-Bold findfont " << 0.1 << " scalefont setfont" << std::endl;
             auto sr = Point3D{0._L, 0._L, 0._L};
@@ -135,8 +165,6 @@ namespace karst {
 
         return os;
     }
-
-
 
     //ofstream_ps &print_grain_with_scaling(ofstream_ps &stream, Grain &g, Network &S); //TODO implement it
 

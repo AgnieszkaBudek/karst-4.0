@@ -34,8 +34,11 @@ namespace karst {
                 l_out .open("l.out", std::ios_base::out | std::ios_base::trunc );
             }
 
+            if (config.do_save_ps){
+                net_pores_ps  .open("net_pores.ps", std::ios_base::out | std::ios_base::trunc );
+                net_grains_ps .open("net_pores.ps", std::ios_base::out | std::ios_base::trunc );
+            }
         };
-
 
 
         ~PrintingModule() {
@@ -47,13 +50,16 @@ namespace karst {
                 V_out .close();
                 l_out .close();
             }
-
+            if (config.do_save_ps) {
+                net_pores_ps    .close();
+                net_grains_ps   .close();
+            }
         }
 
         auto print_net_ps(
-                const std::deque<Node>  &n={},
-                const std::deque<Pore>  &p={},
-                const std::deque<Grain> &g={}) -> void {
+                const std::deque<Node>  &n,
+                const std::deque<Pore>  &p,
+                const std::deque<Grain> &g) -> void {
             do_print_net_ps( net_pores_ps,n,p,g); }
 
         const PrintingConfig& config;
@@ -75,14 +81,27 @@ namespace karst {
 
 
 
-        auto do_print_net_ps(std::ostream &stream,
-                             const std::deque<Node>  &n={},
-                             const std::deque<Pore>  &p={},
-                             const std::deque<Grain> &g={}) -> void {
+        auto do_print_net_ps(ofstream_ps &stream,
+                             const std::deque<Node>  &n,
+                             const std::deque<Pore>  &p,
+                             const std::deque<Grain> &g) -> void {
 
-            std::cerr << "Printing network..." << std::endl;
+            std::cerr << "Printing postscript..." << std::endl;
 
-            //if(S.print_diss_factor) S.check_diss_pattern(S.print_diss_factor);
+            do_print_ps_headlines(stream,1,"Debugging...");
+
+            for (const auto& g_tmp : g)
+                stream << Polygon3D{.n = g_tmp.get_nodes(),.name = double(g_tmp.config.name)};
+
+            for (const auto& p_tmp : p)
+                stream << Pore3D{.p = p_tmp,.name = double(p_tmp.config.name)};
+
+            for (const auto& n_tmp : n)
+                stream << Node3D{.n = n_tmp,.name = double(n_tmp.config.name)};
+
+        }
+
+        auto do_print_ps_headlines (std::ostream& stream, int page_nr, const std::string& description_note) -> void{
 
             int N = (net_topo_config.N_x);
             int M = (net_topo_config.N_y);
@@ -90,10 +109,11 @@ namespace karst {
             double x_zero = 100. / scale_tmp;
             double y_zero = 750. / scale_tmp;
 
+            if(page_nr==1)
+                stream << "%!PS-Adobe-3.0"<<std::endl;
 
-            //if(S.pages_saved==0) stream << "%!PS-Adobe-3.0" << endl<<"%%Pages:"<<S.pages_tot<<endl<<endl;
-
-            //stream <<"%%Page: "<<S.pages_saved+1<<" "<<S.pages_saved+1<<endl<<endl;
+            stream << "%%Page: " << page_nr << " " << page_nr << std::endl << std::endl;
+            stream << "%!PS-Adobe-3.0" << std::endl;
             stream << "1 setlinejoin 1 setlinecap 0.02 setlinewidth" << std::endl;
 
             stream << scale_tmp << "\t" << scale_tmp << " scale" << std::endl;
@@ -105,22 +125,9 @@ namespace karst {
             stream << Color(0,0,0);
             stream << "/Times-Bold findfont " << 20. / scale_tmp << " scalefont setfont" << std::endl;
             stream << "0 " << -450. / scale_tmp << " moveto" << std::endl;
-            //stream << "0 0 ("<<S.description_note<<") ashow
+            stream << "0 0 ("<<description_note<<") ashow"<<std::endl;
             stream << " stroke" << std::endl << std::endl;
-
-            for (const auto& n_tmp : n)
-                stream << Node3D{.n = n_tmp};
-
-            for (const auto& p_tmp : p)
-                stream << Pore3D{.p = p_tmp};
-
-            for (const auto& g_tmp : g)
-                stream << Polygon3D{.n = g_tmp.n};
-
         }
-
-
-
     };
 }
 

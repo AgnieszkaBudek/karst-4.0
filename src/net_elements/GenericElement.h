@@ -35,10 +35,7 @@ namespace karst{
             { ElementType::PORE,   "PORE"  },
             { ElementType::GRAIN,  "GRAIN" }
     };
-//    // Operator << specialization for ElementType                 //TODO: wyrzucić potem
-//    std::ostream& operator<<(std::ostream& os, ElementType value) {
-//        return os << EnumToString<ElementType>::mapping.at(value);
-//    }
+
 
 
     struct ElementConfig{
@@ -116,6 +113,10 @@ namespace karst{
         auto set_pores  (std::deque<Pore*  >&& p0) -> void { p = std::move(p0); }
         auto set_grains (std::deque<Grain* >&& g0) -> void { g = std::move(g0); }
 
+        auto get_nodes  () const ->  const std::deque<Node*  >&  { return n; }
+        auto get_pores  () const ->  const std::deque<Pore*  >&  { return p; }
+        auto get_grains () const ->  const std::deque<Grain* >&  { return g; }
+
 
 
         //checking the topology
@@ -159,18 +160,20 @@ namespace karst{
             return remove_element_from_connected(n0,n);
         }
 
-    public:
+    public:         //TODO: later make it protected
+
+
+
+
+        const NetworkConfig& net_config;   ///< NetworkConfig   //zmienićpotem na const Network* const S;
+        const NetworkTopologyConfig& topo_config;
+        const ElementConfig config;  ///< Config
+
+    protected:
 
         std::deque<Node* >     n{};		///< list of nodes connected to the element
         std::deque<Pore* >     p{};		///< list of pores connected to the element
         std::deque<Grain* >    g{};		///< list of grains connected to the element
-
-    protected:
-
-        const NetworkConfig& net_config;   ///< NetworkConfig   //zmienićpotem na const Network* const S;
-        const NetworkTopologyConfig& topo_config;
-
-        const ElementConfig config;  ///< Config
 
         Long step{0};                ///< time step the element has been updated the last time
         ElementTopoProperties  x{};  ///< temporal properties of an element

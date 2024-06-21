@@ -51,6 +51,7 @@ namespace karst {
         const Configs confs;
 
     auto init() -> void {
+        std::cerr<<"Initializing simulation..."<<std::endl;
         S.init();
         s.dt = confs.sim_conf.dt0;
 
@@ -79,8 +80,6 @@ namespace karst {
 
                 s.T = s.T + s.dt;
                 s.sim_step++;
-
-
 
                 save_results();
                 check_simulation_state();

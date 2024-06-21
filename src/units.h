@@ -74,9 +74,6 @@ namespace karst {
     inline Concentration operator"" _C(long double v) { return Concentration (static_cast<double>(v)); }
     inline Unitless      operator"" _U(long double v) { return Unitless      (static_cast<double>(v)); }
 
-    auto x = 7._T;
-
-
 
     // Units multiplication
     template<typename M1, typename L1, typename T1, typename C1, typename T, typename M2, typename L2, typename T2, typename C2>

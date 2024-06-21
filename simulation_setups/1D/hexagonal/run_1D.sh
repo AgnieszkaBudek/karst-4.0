@@ -30,4 +30,5 @@ cp /Users/agnieszka/Desktop/KARST/karst_4.0/simulation_setups/1D/hexagonal/confi
 printf "Running the simulation...\n\n"
 
 
-  /Users/agnieszka/Desktop/KARST/karst_4.0/build/karst config.txt >wyjscie.out 2>bledy.out &
+  # /Users/agnieszka/Desktop/KARST/karst_4.0/build/karst config.txt >wyjscie.out 2>bledy.out &
+  /Users/agnieszka/Desktop/KARST/karst_4.0/cmake-build-debug_aga/karst_4_0 config.txt  #>wyjscie.out 2>bledy.out &

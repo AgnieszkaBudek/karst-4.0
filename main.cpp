@@ -15,6 +15,10 @@ int main() {
     Simulation simulation{config_name};
     simulation.init();
 
+    std::cerr<<"Preparing pictures..."<<std::endl;
+    system("ps2pdf net_pores.ps");
+    system("open net_pores.pdf");
+
 
     return 0;
 }

@@ -113,7 +113,7 @@ namespace karst {
         //adding node Positions:
         for (auto i = 0; i < N; i++)
             for (auto j = 0; j < M; j++) {
-                S.n[N * j + i].set_pos (Unitless(double(S.config.l0)) * Point3D(Length(i - j % 2 * 0.5), Length(j * sqrt(3) / 2), 0._L));
+                S.n[N * j + i].set_pos (Unitless(double(S.config.l0)) * Point3D({.x=Length(i - j % 2 * 0.5), .y=Length(j * sqrt(3) / 2),.z=0._L}));
             }
 
 //        //random distribution  //TODO: add randomness to the node positions

@@ -47,6 +47,7 @@ namespace karst {
 
         auto init() -> void {
 
+            std::cerr<<"Initializing network..."<<std::endl;
 
             // 1. create geometry
             switch (t_config.type_of_topology) {
@@ -54,10 +55,10 @@ namespace karst {
                     createHexagonalNetwork(*this,t_config.N_x,t_config.N_y);
                     break;
                 case TypeOfNetTopology::FROM_FILE:
-                    std::cerr << "Not implemented yet!" << std::endl;
+                    std::cerr << "TypeOfNetTopology::FROM_FILE Not implemented yet!" << std::endl;
                     break;
                 case TypeOfNetTopology::FROM_TRIANGULATION:
-                    std::cerr << "Not implemented yet." << std::endl;
+                    std::cerr << "TypeOfNetTopology::FROM_TRIANGULATION Not implemented yet." << std::endl;
                     break;
                 default:
                     std::cerr << "Unknown geometry." << std::endl;
@@ -111,8 +112,10 @@ namespace karst {
 
         auto do_save_network_state() -> void   //TODO: zastanowić się czy nie może to być jednak funkcja const?
         {
+            std::cerr<<"Saving network state..."<<std::endl;
+            std::cerr<<"Saving print_net_ps..."<<std::endl;
             if(io_mod.config.do_save_ps)
-                io_mod.print_net_ps();
+                io_mod.print_net_ps(n,p,g);
         }
 
     };

@@ -12,21 +12,27 @@ namespace karst {
     // 1. Color:
     struct Color {
 
-        double r {0}, g {0}, b{0};
+        double r {0.5}, g {0.5}, b{0.5};
     };
 
     inline std::ostream &operator <<(std::ostream &os, const Color &k) {
-        os<<"("<<k.r<<","<<k.g<<","<<k.b<<")";
-        return os;}
-
-    inline ofstream_ps &operator <<(ofstream_ps &os, const Color &k){
+        //os<<"("<<k.r<<","<<k.g<<","<<k.b<<")";                                //TODO: poprawić rozpoznawanie rodziajó∑ strumieni wyjściowych
         os<<k.r<<" "<<k.g<<" "<<k.b<<" setrgbcolor"<<std::endl;
         return os;}
+
+//    inline ofstream_ps &operator <<(ofstream_ps &os, const Color &k){
+//        os<<k.r<<" "<<k.g<<" "<<k.b<<" setrgbcolor"<<std::endl;
+//        return os;}
+
+
+    inline auto isnan(Color k) -> bool{
+        return (std::isnan(k.r) or std::isnan(k.g) or std::isnan(k.b));
+    }
 
     // 2. Point3D
     struct Point3D {
 
-        Length x{0}, y{0}, z{0};
+        Length x{0.}, y{0.}, z{0.};
     };
 
     inline auto operator - (const Point3D&  p1, const Point3D&  p2) -> Length {  //return distance between two points
@@ -53,13 +59,15 @@ namespace karst {
         return Point3D(a*p.x, a*p.y, a*p.z);}
 
 
-    inline ofstream_ps & operator<< (ofstream_ps &os, const Point3D& p) {
-        if(p.z==0._L) os<<std::setprecision(4)<<std::setw(12)<<p.x<<std::setw(12)<<-p.y<<" ";
-        else       os<<std::setw(12)<<p.x<<std::setw(12)<<p.y<<std::setw(12)<<p.z<<" ";
-        return os;}
+//    inline ofstream_ps & operator<< (ofstream_ps &os, const Point3D& p) {
+//        if(p.z==0._L) os<<std::setprecision(4)<<std::setw(12)<<p.x<<std::setw(12)<<-p.y<<" ";
+//        else       os<<std::setw(12)<<p.x<<std::setw(12)<<p.y<<std::setw(12)<<p.z<<" ";
+//        return os;}
 
     inline std::ostream & operator<< (std::ostream &os, const Point3D& p) {
-        os<<"("<<std::setw(12)<<std::setprecision(4)<<p.x<<std::setw(12)<<p.y<<std::setw(12)<<p.z<<")";
+        //os<<"("<<std::setw(12)<<std::setprecision(4)<<p.x<<std::setw(12)<<p.y<<std::setw(12)<<p.z<<")";       //TODO: poprawić obsługę różnych strumieni wyjśćiowych
+        if(p.z==0._L) os<<std::setprecision(4)<<std::setw(12)<<p.x<<std::setw(12)<<-p.y<<" ";
+        else       os<<std::setw(12)<<p.x<<std::setw(12)<<p.y<<std::setw(12)<<p.z<<" ";
         return os;}
 
 
