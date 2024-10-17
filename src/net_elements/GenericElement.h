@@ -14,9 +14,7 @@
 namespace karst{
 
     /**
- * Generic class representing one module of models logics.
- * The module consists of Input and Output subclasses.
- * The module may, but doesn't have to be connected with particular symbol. In this case members sym_info and sym_params are filled.
+ * Generic class for material network element: pore, grain or node
  */
     class Network;
     class Node;
@@ -35,7 +33,6 @@ namespace karst{
             { ElementType::PORE,   "PORE"  },
             { ElementType::GRAIN,  "GRAIN" }
     };
-
 
 
     struct ElementConfig{
@@ -57,10 +54,9 @@ namespace karst{
     class GenericElement
     {
 
-
     public:
 
-        explicit GenericElement(const NetworkConfig& netconf0, const NetworkTopologyConfig &topo_conf0, const ElementConfig config0) :
+        explicit GenericElement(const NetworkConfig& netconf0, const NetworkTopologyConfig& topo_conf0, const ElementConfig config0) :
                 net_config{ netconf0 }, topo_config{ topo_conf0}, config{ config0}
         {}
 
@@ -75,19 +71,19 @@ namespace karst{
         friend Network;
 
         // getting and updating element state
-        inline auto set_state(ElementState&& s1)    ->  void { s=std::move(s1); }
+        inline auto set_state(ElementState&& s1)    ->  void { state=std::move(s1); }
 
         inline auto set_oldstate(ElementState&& s1) ->  void { s_old=std::move(s1); }
 
         inline auto update_state(ElementState& s1, long new_step) ->  void
         {
             assert (new_step>=step);
-            s_old = std::move(s);
-            s     = std::move(s1);
+            s_old = std::move(state);
+            state     = std::move(s1);
             step = new_step;
         }
 
-        inline auto get_state() const             -> ElementState& { return s; }
+        inline auto get_state() const             -> ElementState& { return state; }
 
         inline auto get_old_state() const         -> ElementState& { return s_old; }
 
@@ -98,7 +94,7 @@ namespace karst{
 
         //Saving info
 
-        auto save_state() -> void {}
+        auto save_state()    -> void {}
 
         auto save_topology() -> void {}
 
@@ -109,13 +105,13 @@ namespace karst{
 
         //Setting the topology
 
-        auto set_nodes  (std::deque<Node*  >&& n0) -> void { n = std::move(n0); }
-        auto set_pores  (std::deque<Pore*  >&& p0) -> void { p = std::move(p0); }
-        auto set_grains (std::deque<Grain* >&& g0) -> void { g = std::move(g0); }
+        auto set_nodes  (std::deque<Node*  >&& n0) -> void { nodes = std::move(n0); }
+        auto set_pores  (std::deque<Pore*  >&& p0) -> void { pores = std::move(p0); }
+        auto set_grains (std::deque<Grain* >&& g0) -> void { grains = std::move(g0); }
 
-        auto get_nodes  () const ->  const std::deque<Node*  >&  { return n; }
-        auto get_pores  () const ->  const std::deque<Pore*  >&  { return p; }
-        auto get_grains () const ->  const std::deque<Grain* >&  { return g; }
+        auto get_nodes  () const ->  const std::deque<Node*  >&  { return nodes; }
+        auto get_pores  () const ->  const std::deque<Pore*  >&  { return pores; }
+        auto get_grains () const ->  const std::deque<Grain* >&  { return grains; }
 
 
 
@@ -129,15 +125,15 @@ namespace karst{
         }
 
         auto check_if_node_connected(const Node& n0) -> bool {
-            return check_if_element_connected(n0,n);
+            return check_if_element_connected(n0, nodes);
         }
 
         auto check_if_pore_connected(const Pore& p0) -> bool {
-            return check_if_element_connected(p0,p);
+            return check_if_element_connected(p0, pores);
         }
 
         auto check_if_grain_connected(const Grain& g0) -> bool {
-            return check_if_element_connected(g0,g);
+            return check_if_element_connected(g0, grains);
         }
 
         //removing an element
@@ -149,36 +145,34 @@ namespace karst{
         }
 
         auto remove_grain_from_connected(const Grain& g0) -> void {
-            return remove_element_from_connected(g0,g);
+            return remove_element_from_connected(g0, grains);
         }
 
         auto remove_pore_from_connected(const Pore& p0) -> void {
-            return remove_element_from_connected(p0,p);
+            return remove_element_from_connected(p0, pores);
         }
 
         auto remove_node_from_connected(const Node& n0) -> void {
-            return remove_element_from_connected(n0,n);
+            return remove_element_from_connected(n0, nodes);
         }
 
     public:         //TODO: later make it protected
 
 
-
-
-        const NetworkConfig& net_config;   ///< NetworkConfig   //zmienićpotem na const Network* const S;
+        const NetworkConfig& net_config;               ///< NetworkConfig   //zmienićpotem na const Network* const S;
         const NetworkTopologyConfig& topo_config;
-        const ElementConfig config;  ///< Config
+        const ElementConfig config;                  ///< Config
 
     protected:
 
-        std::deque<Node* >     n{};		///< list of nodes connected to the element
-        std::deque<Pore* >     p{};		///< list of pores connected to the element
-        std::deque<Grain* >    g{};		///< list of grains connected to the element
+        std::deque<Node* >     nodes{};		///< list of nodes connected to the element
+        std::deque<Pore* >     pores{};		///< list of pores connected to the element
+        std::deque<Grain* >    grains{};    ///< list of grains connected to the element
 
-        Long step{0};                ///< time step the element has been updated the last time
-        ElementTopoProperties  x{};  ///< temporal properties of an element
-        ElementState    s{};         ///< current state of an element
-        ElementState    s_old{};     ///< state of an element in previous time step
+        Long step{0};                    ///< time step the element has been updated the last time
+        ElementTopoProperties  topo_s{}; ///< temporal properties of an element
+        ElementState    state{};         ///< current state of an element
+        ElementState    s_old{};         ///< state of an element in previous time step
 
 
     };

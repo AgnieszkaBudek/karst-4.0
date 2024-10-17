@@ -53,8 +53,6 @@ namespace karst {
         std::map<SPECIES,Concentration>       inlet_c = {{SPECIES::B,1._C}, {SPECIES::C,0._C}};   ///< capacity number for reactions  //TODO: to musi byćdopiero wczytywane z pliku konfiguracyjnego
 
 
-
-
     };
 
 

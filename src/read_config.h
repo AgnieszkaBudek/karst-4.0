@@ -17,7 +17,7 @@ namespace karst {
 
      inline auto read_configs(const std::string& f_path) -> std::tuple<NetworkConfig, NetworkTopologyConfig, PrintingConfig, SimulationConfig> {
 
-         std::cerr << "Zaczynam parsowac plik konfiguracyjny" << std::endl;
+         std::cerr << "Parsing the configuration file..." << std::endl;
 
         // Creating all configs
         NetworkConfig           net_conf        {};

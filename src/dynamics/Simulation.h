@@ -20,12 +20,12 @@ namespace karst {
     class Simulation {
 
     public:
+
         struct Configs{
             const NetworkConfig           net_conf;
             const NetworkTopologyConfig   net_topo_conf;
             const PrintingConfig          print_conf;
             const SimulationConfig        sim_conf;
-
 
             Configs(NetworkConfig&& net,
                     NetworkTopologyConfig&& net_topo,
@@ -48,7 +48,8 @@ namespace karst {
 //        }
     }
 
-        const Configs confs;
+
+    const Configs confs;
 
     auto init() -> void {
         std::cerr<<"Initializing simulation..."<<std::endl;

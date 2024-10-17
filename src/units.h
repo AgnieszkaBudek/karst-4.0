@@ -75,6 +75,7 @@ namespace karst {
     inline Unitless      operator"" _U(long double v) { return Unitless      (static_cast<double>(v)); }
 
 
+
     // Units multiplication
     template<typename M1, typename L1, typename T1, typename C1, typename T, typename M2, typename L2, typename T2, typename C2>
     auto operator*(const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M2, L2, T2, C2, T>& rhs) {

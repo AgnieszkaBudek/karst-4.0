@@ -41,9 +41,9 @@ namespace karst {
         }
 
         auto save_network_state() ->void { do_save_network_state();}
-        auto get_nodes()  const -> const std::deque<Node>&   {  return n; }
-        auto get_pores()  const -> const std::deque<Pore>&   {  return p; }
-        auto get_grains() const -> const std::deque<Grain>&  {  return g; }
+        auto get_nodes()  const -> const std::deque<Node>&   {  return nodes; }
+        auto get_pores()  const -> const std::deque<Pore>&   {  return pores; }
+        auto get_grains() const -> const std::deque<Grain>&  {  return grains; }
 
         auto init() -> void {
 
@@ -69,16 +69,17 @@ namespace karst {
 
             // 2. Set initial element state
 
-            for (auto& p_tmp : p)  p_tmp.init();
-            for (auto& g_tmp : g)  g_tmp.init();
-            for (auto& n_tmp : n)  n_tmp.init();
+            for (auto& p : pores)   p.init();
+            for (auto& g : grains)  g.init();
+            for (auto& n : nodes)   n.init();
 
 
             // 3. Add boundary conditions
             if (!t_config.do_periodic_bc)
-                for (auto& p_tmp : p)
-                    if (p_tmp.n.back()->get_pos() - p_tmp.n.front()->get_pos() > 5._U * config.l0)
-                        p_tmp.s.d = Length(0);
+                for (auto& p : pores)
+                    if (p.nodes.back()->get_pos() - p.nodes.front()->get_pos() > 5._U * config.l0)
+                        p.state.d = Length(0);
+
 
             // 4. Delete unused elements
 
@@ -100,9 +101,11 @@ namespace karst {
 
     protected:
 
-        std::deque<Node>  n;
-        std::deque<Pore>  p;
-        std::deque<Grain> g;
+        NetworkState      state;
+
+        std::deque<Node>  nodes;
+        std::deque<Pore>  pores;
+        std::deque<Grain> grains;
 
         std::deque<Node*> n_inlet;
         std::deque<Node*> n_outlet;
@@ -115,7 +118,7 @@ namespace karst {
             std::cerr<<"Saving network state..."<<std::endl;
             std::cerr<<"Saving print_net_ps..."<<std::endl;
             if(io_mod.config.do_save_ps)
-                io_mod.print_net_ps(n,p,g);
+                io_mod.print_net_ps(nodes, pores, grains);
         }
 
     };

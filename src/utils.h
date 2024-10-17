@@ -32,7 +32,8 @@ namespace karst {
     // Tuple to Struct template...
     template <typename T, typename Tuple>
     T tupleToStruct(Tuple&& tuple) {
-        return std::apply([](auto&&... args) { return T{std::forward<decltype(args)>(args)...}; }, std::forward<Tuple>(tuple));
+        return std::apply([](auto&&... args) {
+            return T{std::forward<decltype(args)>(args)...}; }, std::forward<Tuple>(tuple));
     }
 
 

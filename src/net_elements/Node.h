@@ -61,15 +61,15 @@ namespace karst {
 
         inline auto get_pos () const       -> Point3D   { return pos;  }
 
-        inline auto set_u (Pressure u0)    -> void      { s.u = u0;    }
+        inline auto set_u (Pressure u0)    -> void      { state.u = u0;    }
 
-        inline auto get_u () const         -> Pressure  { return s.u;  }
+        inline auto get_u () const         -> Pressure  { return state.u;  }
 
-        inline auto set_c (SPECIES sp, Concentration c)  -> void {s.c[sp] = c;}
+        inline auto set_c (SPECIES sp, Concentration c)  -> void { state.c[sp] = c;}
 
         inline auto get_c (SPECIES sp) const             -> Concentration{
-            assert(s.c.find(sp) != s.c.end() && "Key not found in the map");
-            return s.c.at(sp);
+            assert(state.c.find(sp) != state.c.end() && "Key not found in the map");
+            return state.c.at(sp);
         }
 
 
@@ -78,10 +78,10 @@ namespace karst {
             for (auto sp : solubleS)
                 if (type == NodeType::INPUT){
                     assert(net_config.inlet_c.find(sp) != net_config.inlet_c.end() && "Key not found in the map");
-                    s.c[sp] = net_config.inlet_c.at(sp);
+                    state.c[sp] = net_config.inlet_c.at(sp);
                 }
                 else
-                    s.c[sp] = Concentration{0};
+                    state.c[sp] = Concentration{0.0};
         }
 
 
@@ -92,7 +92,7 @@ namespace karst {
         {
             os <<  obj.config.type << ": "<< obj.config.name << std::endl;
             os <<"\tConcentration: ";
-            for(auto&[key,value]: obj.s.c)
+            for(auto&[key,value]: obj.state.c)
                 os << key <<" <-> "<<value<<"\t";
             os << std::endl;
             return os;

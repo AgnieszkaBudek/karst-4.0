@@ -29,33 +29,33 @@ namespace karst {
 
         inline auto check_if_active() const  -> bool  { return true;}   //TODO: implement it
 
-        inline auto check_if_space_left() const-> bool    { return s.d > 0._L; }
+        inline auto check_if_space_left() const-> bool    { return state.d > 0._L; }
 
-        inline auto get_d() const -> Length  { return s.d; }
+        inline auto get_d() const -> Length  { return state.d; }
 
-        inline auto get_l() const -> Length  { return s.l; }
+        inline auto get_l() const -> Length  { return state.l; }
 
-        inline auto get_q() const -> Flow    { return s.q; }
+        inline auto get_q() const -> Flow    { return state.q; }
 
 
 
         //init function
         auto init() -> void
         {
-            s = (PoreState{
+            state = (PoreState{
                     .d = net_config.d0,
-                    .l = n[0]->get_pos() - n[1]->get_pos(),
+                    .l = nodes[0]->get_pos() - nodes[1]->get_pos(),
                     .q = Flow(NaN)});
 
             //add randomness to diamaeters //TODO: add randomness to init diameters
 
             //add barrier between inlet and outlet (cutting vertical boundary conditions)
-            if( std::abs(double(n[0]->get_pos().y - n[1]->get_pos().y)) > topo_config.N_y/2.)
-                s.d = Length(0.);
-            if( n[0]->get_type() != NodeType::NORMAL and n[1]->get_type() != NodeType::NORMAL)
-                s.d = Length(0.);
+            if(std::abs(double(nodes[0]->get_pos().y - nodes[1]->get_pos().y)) > topo_config.N_y / 2.)
+                state.d = Length(0.);
+            if(nodes[0]->get_type() != NodeType::NORMAL and nodes[1]->get_type() != NodeType::NORMAL)
+                state.d = Length(0.);
 
-            std::cerr << "Initializing Pore " << *this;
+            std::cerr << "Initializing Pore: " << *this;
 
         }
 
@@ -63,7 +63,7 @@ namespace karst {
         //export functions:
         inline friend std::ostream& operator<<(std::ostream& os, const Pore& obj) {
             os <<  obj.config.type << ": "<< obj.config.name << std::endl;
-            os <<"\td = "<<obj.s.d<<"\tl = "<<obj.s.l<<"\tq = "<<obj.s.q;
+            os << "\td = " << obj.state.d << "\tl = " << obj.state.l << "\tq = " << obj.state.q;
             os << std::endl << std::endl;
             return os;
         }
@@ -74,8 +74,6 @@ namespace karst {
     protected:
 
         };
-
-
 
 
 

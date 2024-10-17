@@ -2,5 +2,6 @@
 #  Size of the netwrok
 
 N_x = 10         # size of the regular network
-N_y = 20      # size of the regular network
+N_y = 20         # size of the regular network
+
 type_of_topology = HEXAGONAL

@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 3.27)
 project(karst_4_0)
 
 set(CMAKE_CXX_STANDARD 20)
-include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}
+                    src/external_algorithms
+                    src/external_algorithms/triangulation
+)
 
 add_executable(karst_4_0 main.cpp
         src/utils.h
@@ -21,8 +24,8 @@ add_executable(karst_4_0 main.cpp
         src/dynamics/SimulationState.h
         src/import_export/PrintingConfig.h
         src/read_config.h
-        src/analizing/AnalizePatternConfig.h
-        src/analizing/AnalizePattern.h
+        src/analyzing/AnalizePatternConfig.h
+        src/analyzing/AnalizePattern.h
         src/dynamics/SimulationSteps/SimulateFlow.h
         src/dynamics/SimulationSteps/SimulateConcentration.h
         src/dynamics/SimulationSteps/SimulateSizes.h
@@ -32,12 +35,13 @@ add_executable(karst_4_0 main.cpp
         src/dynamics/LeapFrogStep.h
         src/import_export/PrintingModule.h
         src/import_export/read_net_from_files.h
-        src/analizing/percolation.h
+        src/analyzing/percolation.h
         src/network/network_topo_generators.h
         src/import_export/printing_ps.h
         src/import_export/printing_primitives.h
         src/all_enums.h
         src/import_export/printing_net_elements.h
+        src/external_algorithms/triangulation/triangulation.h
 
 )
 

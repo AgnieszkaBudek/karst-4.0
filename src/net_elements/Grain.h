@@ -29,28 +29,28 @@ namespace karst {
 
             inline auto check_if_active() const    -> bool  { return true;}       //TODO: implement it
 
-            inline auto check_if_space_left() const -> bool   { return s.tot_volume < s.max_volume; }
+            inline auto check_if_space_left() const -> bool   { return state.tot_volume < state.max_volume; }
 
-            inline auto get_max_volume() const   -> Volume    { return s.max_volume; }
+            inline auto get_max_volume() const   -> Volume    { return state.max_volume; }
 
-            inline auto get_tot_v() const        -> Volume    { return s.tot_volume; }
+            inline auto get_tot_v() const        -> Volume    { return state.tot_volume; }
 
             inline auto get_v(SPECIES sp)  const -> Volume {
-                assert(s.v.find(sp) != s.v.end() && "Key not found in the map");
-                return s.v.at(sp);
+                assert(state.v.find(sp) != state.v.end() && "Key not found in the map");
+                return state.v.at(sp);
             }
 
-            inline auto set_v(SPECIES sp, Volume v_new) -> void { s.v[sp] = v_new; }
+            inline auto set_v(SPECIES sp, Volume v_new) -> void { state.v[sp] = v_new; }
 
 
 
-            inline auto calculate_tot_c () -> Volume
+            inline auto calculate_tot_v () -> Volume
             {
                 return std::accumulate(
-                    s.v.begin(),
-                    s.v.end(),
-                    Volume(0.0),
-                    [](Volume value, const std::pair<SPECIES, Volume>& p) {
+                        state.v.begin(),
+                        state.v.end(),
+                        Volume(0.0),
+                        [](Volume value, const std::pair<SPECIES, Volume>& p) {
                         return value + p.second;
                     });
             }
@@ -61,7 +61,7 @@ namespace karst {
                 //s.v = {{SPECIES::A, calculate_initial_vol()}};
                 for (auto sp : solidS){
                     if (sp != SPECIES::A)
-                        s.v[sp] = 0._V;
+                        state.v[sp] = 0.0_V;
                 }
             }
 
@@ -71,9 +71,9 @@ namespace karst {
             friend log_stream& operator<<(log_stream& os, const Grain& obj) {
                 os <<  obj.config.type << ": "<< obj.config.name << std::endl;
                 os <<"\tVolume";
-                for(auto&[key,value]: obj.s.v)
+                for(auto&[key,value]: obj.state.v)
                     os << key <<" <-> "<<value<<"\t";
-                os << "max_volume = "<<obj.s.max_volume <<" tot_volume"<<obj.s.tot_volume;
+                os << "max_volume = " << obj.state.max_volume << " tot_volume" << obj.state.tot_volume;
                 os << std::endl<<std::endl;
                 return os;
             }
