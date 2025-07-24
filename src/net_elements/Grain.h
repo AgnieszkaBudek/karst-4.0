@@ -11,7 +11,7 @@ namespace karst {
     struct GrainState {
 
         std::map <SPECIES, Volume> v;      ///< Volume of specific species
-        Volume max_volume {NaN};           ///< maximal volume of a grain
+        Volume max_volume {NaN};           ///< maximal volume of a grain (corresponding to zero porosity)
         Volume tot_volume {NaN};           ///< total volume of a grain
 
     };
@@ -26,8 +26,7 @@ namespace karst {
 
             friend  GenericElement <Grain, GrainState>;
 
-
-            inline auto check_if_active() const    -> bool  { return true;}       //TODO: implement it
+            void disconnect_from_network();
 
             inline auto check_if_space_left() const -> bool   { return state.tot_volume < state.max_volume; }
 

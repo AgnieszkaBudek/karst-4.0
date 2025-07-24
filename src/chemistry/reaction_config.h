@@ -19,14 +19,14 @@ namespace karst{
             { SPECIES::E, "E" },
     };
 
-    inline static const std::deque<SPECIES>  solubleS {SPECIES::B, SPECIES::C};
-    inline static const std::deque<SPECIES>  solidS   {SPECIES::A, SPECIES::E};
+    inline static const std::vector<SPECIES>  solubleS {SPECIES::B, SPECIES::C};
+    inline static const std::vector<SPECIES>  solidS   {SPECIES::A, SPECIES::E};
 
     struct ChemicalReaction{
-        const std::deque<SPECIES>  substrates;
-        const std::deque<SPECIES>  products;
+        const std::vector<SPECIES>  substrates;
+        const std::vector<SPECIES>  products;
 
-        const std::deque<SPECIES> tracked_concentrations;
+        const std::vector<SPECIES> tracked_concentrations;
 
         const bool is_linear;    // is linear
         const Velocity k;        // reaction rate
@@ -56,7 +56,7 @@ namespace karst{
             // .K = INFINITY,
             // .O = 0};
 
-    inline const auto allReactions = std::deque<ChemicalReaction> {DISSOLUTION, PRECIPITATION};
+    inline const auto allReactions = std::vector<ChemicalReaction> {DISSOLUTION, PRECIPITATION};
 
     }
 

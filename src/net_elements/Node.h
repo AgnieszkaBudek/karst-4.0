@@ -39,19 +39,27 @@ namespace karst {
 
     struct NodeState {
 
-        Pressure u{};
+        Pressure u{NaN};
         std::map <SPECIES, Concentration> c;              ///< concentration of specific species
     };
 
+    struct NodePore{
+        Node* n{};
+        Pore* p{};
+    };
 
     class Node : public GenericElement <Node, NodeState> {
 
     public:
 
-        explicit Node  (const NetworkConfig& net_conf0, const NetworkTopologyConfig &topo_conf0, const ElementConfig config0) : GenericElement<Node, NodeState>(net_conf0,topo_conf0,config0){}
+
+        explicit Node  (const NetworkConfig& net_conf0, const NetworkTopologyConfig &topo_conf0, const ElementConfig config0)
+        : GenericElement<Node, NodeState>(net_conf0,topo_conf0,config0) {}
 
         friend  GenericElement <Node, NodeState>;
 
+
+        void disconnect_from_network();
 
         inline auto set_type (NodeType t0) -> void      { type = t0;   }
 
@@ -72,6 +80,20 @@ namespace karst {
             return state.c.at(sp);
         }
 
+        inline auto set_node_pores() -> void{
+            auto it2 = nodes.begin();
+            for(auto it = pores.begin(); it < pores.end() ; ++it) {
+                if(it2==nodes.end()){
+                    std::cerr<<"Problem with set_nodes_and_pores;"<<std::endl;
+                    return;
+                }
+                nodePores.push_back({.n = (*it2), .p = (*it)});
+                ++it2;
+            }
+        }
+
+
+
 
         auto init() -> void
         {
@@ -85,9 +107,16 @@ namespace karst {
         }
 
 
+//        void disconnect_from_network() {
+//            for (Node* n : nodes)
+//                erase_if(n->nodes,[this](auto x)->bool{return x==this;});
+//            for (Pore* p : pores)
+//                erase_if(p->nodes,[this](auto x)->bool{return x==this;});
+//
+//        }
+
 
         //export functions
-
         friend auto operator<<(log_stream& os, const Node& obj) -> log_stream&
         {
             os <<  obj.config.type << ": "<< obj.config.name << std::endl;
@@ -103,12 +132,10 @@ namespace karst {
 
 
 
-    protected:
-
+    public:  //FIXME: should be protected but somehow
+        std::vector<NodePore> nodePores;
         NodeType type {NodeType::NORMAL};
         Point3D  pos  {Length(NaN),Length(NaN),Length(NaN)};
-
-
     };
 } // namespace karst
 

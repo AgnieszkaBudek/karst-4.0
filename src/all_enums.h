@@ -87,7 +87,6 @@ namespace karst{
 
     // enum class for different types of merging
     enum class TypeOfMerging { MERGING_NONE, MERGING_GRAINS };
-
     // Specialization of EnumToString
     template<>
     const std::map<TypeOfMerging, std::string> EnumToString<TypeOfMerging>::mapping = {

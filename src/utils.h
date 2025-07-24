@@ -11,6 +11,7 @@
 #include <map>
 #include <numeric>
 #include <cassert>
+#include <functional>
 
 
 #include "src/all_enums.h"

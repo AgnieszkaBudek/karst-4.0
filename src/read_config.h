@@ -73,8 +73,8 @@ namespace karst {
                      std::cerr << "Setting net_top_conf.do_randomness_in_regular_net = " << std::boolalpha << net_top_conf.do_randomness_in_regular_net << std::endl;
                  }},
                  {"do_clear_unused_pores", [&](const std::string& value) {
-                     net_top_conf.do_clear_unused_pores = (value == "true");
-                     std::cerr << "Setting net_top_conf.do_clear_unused_pores = " << std::boolalpha << net_top_conf.do_clear_unused_pores << std::endl;
+                     net_top_conf.do_clean_unused_pores = (value == "true");
+                     std::cerr << "Setting net_top_conf.do_clear_unused_pores = " << std::boolalpha << net_top_conf.do_clean_unused_pores << std::endl;
                  }},
                  {"do_periodic_bc", [&](const std::string& value) {
                      net_top_conf.do_periodic_bc = (value == "true");
@@ -89,8 +89,8 @@ namespace karst {
                      std::cerr << "Setting net_top_conf.gauss_sigma_d = " << net_top_conf.gauss_sigma_d << std::endl;
                  }},
                  {"max_rand_shift_xy", [&](const std::string& value) {
-                     net_top_conf.max_rand_shift_xy = Length(std::stod(value));
-                     std::cerr << "Setting net_top_conf.max_rand_shift_xy = " << net_top_conf.max_rand_shift_xy << std::endl;
+                     net_top_conf.max_rand_shift = Unitless (std::stod(value));
+                     std::cerr << "Setting net_top_conf.max_rand_shift_xy = " << net_top_conf.max_rand_shift << std::endl;
                  }},
                  {"type_of_merging", [&](const std::string& value) {
                      net_top_conf.type_of_merging << value;
@@ -107,10 +107,6 @@ namespace karst {
                  {"inlet_cut_l", [&](const std::string& value) {
                      net_top_conf.inlet_cut_l = Int(std::stoi(value));
                      std::cerr << "Setting net_top_conf.inlet_cut_l = " << net_top_conf.inlet_cut_l << std::endl;
-                 }},
-                 {"add_well", [&](const std::string& value) {
-                     net_top_conf.add_well = (value == "true");
-                     std::cerr << "Setting net_top_conf.add_well = " << std::boolalpha << net_top_conf.add_well << std::endl;
                  }},
                  {"point_inlet", [&](const std::string& value) {
                      net_top_conf.point_inlet = (value == "true");

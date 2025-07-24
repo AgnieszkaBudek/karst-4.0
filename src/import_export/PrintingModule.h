@@ -57,9 +57,9 @@ namespace karst {
         }
 
         auto print_net_ps(
-                const std::deque<Node>  &n,
-                const std::deque<Pore>  &p,
-                const std::deque<Grain> &g) -> void {
+                const std::vector<Node>  &n,
+                const std::vector<Pore>  &p,
+                const std::vector<Grain> &g) -> void {
             do_print_net_ps( net_pores_ps,n,p,g); }
 
         const PrintingConfig& config;
@@ -82,22 +82,25 @@ namespace karst {
 
 
         auto do_print_net_ps(ofstream_ps &stream,
-                             const std::deque<Node>  &n,
-                             const std::deque<Pore>  &p,
-                             const std::deque<Grain> &g) -> void {
+                             const std::vector<Node>  &nodes,
+                             const std::vector<Pore>  &pores,
+                             const std::vector<Grain> &grains) -> void {
 
             std::cerr << "Printing postscript..." << std::endl;
 
             do_print_ps_headlines(stream,1,"Debugging...");
 
-            for (const auto& g_tmp : g)
-                stream << Polygon3D{.n = g_tmp.get_nodes(),.name = double(g_tmp.config.name)};
+            for (const auto& g_tmp : grains)
+                if(g_tmp.check_if_active())
+                    stream << Polygon3D{.n = g_tmp.get_nodes(),.name = double(g_tmp.config.name)};
 
-            for (const auto& p_tmp : p)
-                stream << Pore3D{.p = p_tmp,.name = double(p_tmp.config.name)};
+            for (const auto& p_tmp : pores)
+                if(p_tmp.check_if_active())
+                    stream << Pore3D{.p = p_tmp,.name = double(p_tmp.config.name)};
 
-            for (const auto& n_tmp : n)
-                stream << Node3D{.n = n_tmp,.name = double(n_tmp.config.name)};
+            for (const auto& n_tmp : nodes)
+                if(n_tmp.check_if_active())
+                    stream << Node3D{.n = n_tmp,.name = double(n_tmp.config.name)};
 
         }
 

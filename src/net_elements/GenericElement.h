@@ -44,10 +44,10 @@ namespace karst{
 
 
     struct ElementTopoProperties{
-        bool connected_to_percolation   {false};
-        bool checked_for_percolation    {false};
-        bool active                     {true};
+        bool connected_to_percolation_cluster   {false};
+        bool checked_for_percolation            {false};
     };
+
 
 
     template < typename Element, typename ElementState>
@@ -57,17 +57,35 @@ namespace karst{
     public:
 
         explicit GenericElement(const NetworkConfig& netconf0, const NetworkTopologyConfig& topo_conf0, const ElementConfig config0) :
-                net_config{ netconf0 }, topo_config{ topo_conf0}, config{ config0}
+                net_config{ netconf0 },
+                topo_config{ topo_conf0},
+                config{ config0}
         {}
 
+
+
         ~GenericElement() {
-//            if(config.log)   //TODO: chack if this works
-//                *(config.log)<<"Deleting element"<<*this;
+           // std::cerr<<"Deleting element: "<<config.type<<" -> "<<config.name<<std::endl;
+        }
+
+        auto remove_element_from(std::vector<Element*> elV) -> void{ //FIXME other version implemented later, check which one ins better.
+            erase_if(elV,[this](auto x)->bool{return x==this;});
+        }
+
+
+        auto remove_element_from_a_network() -> void{ //FIXME other version implemented later, check which one ins better.
+
+            static_cast<Element*>(this)->disconnect_from_network();
+
+            pores.clear();
+            nodes.clear();
+            grains.clear();
+//            state={};
         }
 
 
 
-        friend auto createHexagonalNetwork(Network& S, Int N, Int M)->void;
+        friend auto createHexagonalNetwork(Network& S, Int N_x, Int N_y)->void;
         friend Network;
 
         // getting and updating element state
@@ -79,8 +97,8 @@ namespace karst{
         {
             assert (new_step>=step);
             s_old = std::move(state);
-            state     = std::move(s1);
-            step = new_step;
+            state = std::move(s1);
+            step  = new_step;
         }
 
         inline auto get_state() const             -> ElementState& { return state; }
@@ -105,70 +123,50 @@ namespace karst{
 
         //Setting the topology
 
-        auto set_nodes  (std::deque<Node*  >&& n0) -> void { nodes = std::move(n0); }
-        auto set_pores  (std::deque<Pore*  >&& p0) -> void { pores = std::move(p0); }
-        auto set_grains (std::deque<Grain* >&& g0) -> void { grains = std::move(g0); }
+        auto set_nodes  (std::vector<Node*  >&& n0) -> void { nodes = std::move(n0); }
+        auto set_pores  (std::vector<Pore*  >&& p0) -> void { pores = std::move(p0); }
+        auto set_grains (std::vector<Grain* >&& g0) -> void { grains = std::move(g0); }
 
-        auto get_nodes  () const ->  const std::deque<Node*  >&  { return nodes; }
-        auto get_pores  () const ->  const std::deque<Pore*  >&  { return pores; }
-        auto get_grains () const ->  const std::deque<Grain* >&  { return grains; }
+        auto get_nodes  () const ->  const std::vector<Node*  >&  { return nodes; }
+        auto get_pores  () const ->  const std::vector<Pore*  >&  { return pores; }
+        auto get_grains () const ->  const std::vector<Grain* >&  { return grains; }
 
+        auto check_if_active () const -> const bool {return active;}
+        auto deactivate () -> void {
+            active = false;
+            remove_element_from_a_network();
+        }
 
 
         //checking the topology
         template <typename T>
-        auto check_if_element_connected(const T& element, std::deque<const T*>& list_of_elements) ->bool {
+        auto check_if_element_connected(const T& element, std::vector<const T*>& list_of_elements) ->bool {
             auto it = std::find_if(list_of_elements.begin(), list_of_elements.end(), [element](T* e) {
                 return e->name == element.name;
             });
             return it != list_of_elements.end();
         }
 
-        auto check_if_node_connected(const Node& n0) -> bool {
-            return check_if_element_connected(n0, nodes);
-        }
+//        auto check_if_node_connected(const Node& n0) -> bool {    //FIXME: check if needed; maybe only the template version is enough
+//            return check_if_element_connected(n0, nodes);
+//        }
 
-        auto check_if_pore_connected(const Pore& p0) -> bool {
-            return check_if_element_connected(p0, pores);
-        }
 
-        auto check_if_grain_connected(const Grain& g0) -> bool {
-            return check_if_element_connected(g0, grains);
-        }
-
-        //removing an element
-        template <typename T>
-        auto remove_element_from_connected(const T& element, std::deque<const T*>& list_of_elements) -> void {
-            list_of_elements.erase(std::remove_if(list_of_elements.begin(), list_of_elements.end(), [element](T* e) {
-                return e->name == element.name;
-            }), list_of_elements.end());
-        }
-
-        auto remove_grain_from_connected(const Grain& g0) -> void {
-            return remove_element_from_connected(g0, grains);
-        }
-
-        auto remove_pore_from_connected(const Pore& p0) -> void {
-            return remove_element_from_connected(p0, pores);
-        }
-
-        auto remove_node_from_connected(const Node& n0) -> void {
-            return remove_element_from_connected(n0, nodes);
-        }
 
     public:         //TODO: later make it protected
 
 
-        const NetworkConfig& net_config;               ///< NetworkConfig   //zmienićpotem na const Network* const S;
+        const NetworkConfig& net_config;               ///< NetworkConfig   //zmienić potem na const Network* const S;
         const NetworkTopologyConfig& topo_config;
         const ElementConfig config;                  ///< Config
 
-    protected:
+//    protected:
 
-        std::deque<Node* >     nodes{};		///< list of nodes connected to the element
-        std::deque<Pore* >     pores{};		///< list of pores connected to the element
-        std::deque<Grain* >    grains{};    ///< list of grains connected to the element
+        std::vector<Node*>     nodes{};		///< list of nodes connected to the element
+        std::vector<Pore*>     pores{};		///< list of pores connected to the element
+        std::vector<Grain*>    grains{};    ///< list of grains connected to the element
 
+        bool active{true};               ///< if the element is still part of the network
         Long step{0};                    ///< time step the element has been updated the last time
         ElementTopoProperties  topo_s{}; ///< temporal properties of an element
         ElementState    state{};         ///< current state of an element

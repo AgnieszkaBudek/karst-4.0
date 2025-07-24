@@ -124,7 +124,7 @@ namespace karst {
     // 4. Polygon
     struct Polygon3D {
 
-        const std::deque<Node *> n;       //TODO: POprawić potem na const std::deque<const Node *> n;
+        const std::vector<Node *> n;       //TODO: Poprawić potem na const std::vector<const Node *> n;
         double name {NaN};
         Color k{NaN};
 

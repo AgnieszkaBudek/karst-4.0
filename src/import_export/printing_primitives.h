@@ -1,5 +1,5 @@
-#ifndef DRUKOWANIE_H
-#define DRUKOWANIE_H 
+#ifndef PRINTING_PRIMITIVES_H
+#define PRINTING_PRIMITIVES_H
 
 #include <iomanip>
 #include "src/utils.h"
@@ -56,6 +56,9 @@ namespace karst {
     }
 
     inline auto  operator * (Unitless a,  const Point3D &p ) -> Point3D {
+        return Point3D(a*p.x, a*p.y, a*p.z);}
+
+    inline auto  operator * (double a,  const Point3D &p ) -> Point3D {
         return Point3D(a*p.x, a*p.y, a*p.z);}
 
 

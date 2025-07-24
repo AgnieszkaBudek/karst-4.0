@@ -74,6 +74,16 @@ namespace karst {
     inline Concentration operator"" _C(long double v) { return Concentration (static_cast<double>(v)); }
     inline Unitless      operator"" _U(long double v) { return Unitless      (static_cast<double>(v)); }
 
+    // Unit multiplication by double
+    template<typename M1, typename L1, typename T1, typename C1, typename T>
+    auto operator*(const Unit<M1, L1, T1, C1, T>& lhs, const double rhs) {
+        return Unit<M1, L1, T1, C1, T>(lhs.value * rhs);
+    }
+    // Unit multiplication by double
+    template<typename M1, typename L1, typename T1, typename C1, typename T>
+    auto operator*(const double lhs, const Unit<M1, L1, T1, C1, T>& rhs) {
+        return Unit<M1, L1, T1, C1, T>(rhs.value * lhs);
+    }
 
 
     // Units multiplication
@@ -144,16 +154,6 @@ namespace karst {
         return lhs.value == rhs.value;
     }
 
-//    template<typename M1, typename L1, typename T1, typename C1, typename T>  //TODO: lepiej korzystac z istniejącego std::istream& operator >> double, to wykasować
-//    auto operator << (Unit<M1, L1, T1, C1, T>& lhs, const std::string& str)  {
-//        try {
-//            lhs.value = std::stod(str);
-//        }
-//        catch (const std::invalid_argument &ia) {
-//            std::cerr << "Invalid string -> double conversion: " << str << std::endl;
-//        }
-//        return lhs;
-//    }
 
     template<typename M1, typename L1, typename T1, typename C1, typename T>
     std::istream& operator >> (std::istream& is,Unit<M1, L1, T1, C1, T>& lhs)  {

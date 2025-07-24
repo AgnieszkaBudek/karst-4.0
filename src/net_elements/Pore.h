@@ -26,6 +26,7 @@ namespace karst {
 
         friend  GenericElement <Pore, PoreState>;
 
+        void disconnect_from_network();
 
         inline auto check_if_active() const  -> bool  { return true;}   //TODO: implement it
 
@@ -55,7 +56,7 @@ namespace karst {
             if(nodes[0]->get_type() != NodeType::NORMAL and nodes[1]->get_type() != NodeType::NORMAL)
                 state.d = Length(0.);
 
-            std::cerr << "Initializing Pore: " << *this;
+            //std::cerr << "Initializing Pore: " << *this;
 
         }
 
