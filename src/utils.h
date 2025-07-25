@@ -12,6 +12,7 @@
 #include <numeric>
 #include <cassert>
 #include <functional>
+#include <ranges>
 
 
 #include "src/all_enums.h"

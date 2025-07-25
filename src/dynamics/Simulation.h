@@ -12,6 +12,8 @@
 #include "src/dynamics/SimulationState.h"
 #include "src/read_config.h"
 
+#include "src/network/network_topo_generator/network_topo_generator.h"
+
 
 namespace karst {
 

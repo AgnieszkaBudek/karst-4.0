@@ -22,7 +22,10 @@ namespace karst {
 
     public:
 
-        explicit Pore  (const NetworkConfig &net_conf,const NetworkTopologyConfig &topo_conf0 , const ElementConfig config0) : GenericElement<Pore, PoreState>(net_conf,topo_conf0,config0){}
+        explicit Pore  (const NetworkConfig &net_conf,
+                        const NetworkTopologyConfig &topo_conf0,
+                        const ElementConfig config0)
+                        : GenericElement<Pore, PoreState>(net_conf,topo_conf0,config0){}
 
         friend  GenericElement <Pore, PoreState>;
 
@@ -49,12 +52,6 @@ namespace karst {
                     .q = Flow(NaN)});
 
             //add randomness to diamaeters //TODO: add randomness to init diameters
-
-            //add barrier between inlet and outlet (cutting vertical boundary conditions)
-            if(std::abs(double(nodes[0]->get_pos().y - nodes[1]->get_pos().y)) > topo_config.N_y / 2.)
-                state.d = Length(0.);
-            if(nodes[0]->get_type() != NodeType::NORMAL and nodes[1]->get_type() != NodeType::NORMAL)
-                state.d = Length(0.);
 
             //std::cerr << "Initializing Pore: " << *this;
 

@@ -2,8 +2,8 @@
 // Created by Agnieszka on 24/05/2024.
 //
 
-#ifndef KARST_4_0_NETWORK_TOPO_GENERATORS_H
-#define KARST_4_0_NETWORK_TOPO_GENERATORS_H
+#ifndef KARST_4_0_CREATE_HEXAGONAL_NETWORK_H
+#define KARST_4_0_CREATE_HEXAGONAL_NETWORK_H
 
 #include <random>
 #include "src/utils.h"
@@ -15,11 +15,13 @@ namespace karst {
 
     inline void createHexagonalNetwork(Network& S, Int N_x, Int N_y) {
 
+        std::cerr << "Creating hexagonal network..." << std::endl;
+
+
         if (N_y % 2 == 1) {
             std::cerr << "ERROR: N_y must be even in hexagonal network!" << std::endl;
         }
 
-        std::cerr << "Creating hexagonal network..." << std::endl;
 
         S.nodes.reserve(N_x*N_y);
         S.pores.reserve(N_x*N_y*3);
@@ -175,4 +177,4 @@ namespace karst {
 }
 
 
-#endif //KARST_4_0_NETWORK_TOPO_GENERATORS_H
+#endif //KARST_4_0_CREATE_HEXAGONAL_NETWORK_H

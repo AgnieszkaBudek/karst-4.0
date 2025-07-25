@@ -8,7 +8,8 @@ include_directories(${CMAKE_SOURCE_DIR}
 )
 
 add_executable(karst_4_0 ./main.cpp
-        src/net_elements/GenericElement_impl.h)
+        src/net_elements/GenericElement_impl.h
+        src/network/network_topo_generator/network_topo_generator.h)
 
 
 message(STATUS "CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")

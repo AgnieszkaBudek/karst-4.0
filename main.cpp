@@ -5,7 +5,7 @@
 
 #include "src/utils.h"
 #include "src/dynamics/Simulation.h"
-#include "src/network/network_topo_generators.h"
+#include "src/network/network_topo_generator/create_hexagonal_network.h"
 
 using namespace karst;
 

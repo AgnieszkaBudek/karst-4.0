@@ -68,12 +68,12 @@ namespace karst{
            // std::cerr<<"Deleting element: "<<config.type<<" -> "<<config.name<<std::endl;
         }
 
-        auto remove_element_from(std::vector<Element*> elV) -> void{ //FIXME other version implemented later, check which one ins better.
+        auto remove_element_from(std::vector<Element*> elV) -> void{
             erase_if(elV,[this](auto x)->bool{return x==this;});
         }
 
 
-        auto remove_element_from_a_network() -> void{ //FIXME other version implemented later, check which one ins better.
+        auto remove_element_from_a_network() -> void{
 
             static_cast<Element*>(this)->disconnect_from_network();
 
@@ -87,6 +87,9 @@ namespace karst{
 
         friend auto createHexagonalNetwork(Network& S, Int N_x, Int N_y)->void;
         friend Network;
+        friend Node;
+        friend Pore;
+        friend Grain;
 
         // getting and updating element state
         inline auto set_state(ElementState&& s1)    ->  void { state=std::move(s1); }
@@ -160,7 +163,7 @@ namespace karst{
         const NetworkTopologyConfig& topo_config;
         const ElementConfig config;                  ///< Config
 
-//    protected:
+    protected:
 
         std::vector<Node*>     nodes{};		///< list of nodes connected to the element
         std::vector<Pore*>     pores{};		///< list of pores connected to the element

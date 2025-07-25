@@ -27,8 +27,13 @@ namespace karst {
 
     inline void Pore::disconnect_from_network() {
         for (auto n: nodes) {
-            erase_if(n->pores,     [this](auto x) { return x == this;   });
+            for( auto [n0,p0] : n->nodePores)
+                if(p0 == this)
+                    erase_if(n->nodes, [n0](auto x) { return x == n0; });
+
             erase_if(n->nodePores, [this](auto x) { return x.p == this; });
+            erase_if(n->pores,     [this](auto x) { return x == this;   });
+
         }
         for (auto p : pores)
             erase_if(p->pores, [this](auto x) { return x == this; });
