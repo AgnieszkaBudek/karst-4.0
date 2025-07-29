@@ -104,6 +104,16 @@ namespace karst{
     };
 
 
+    enum class StepStateType          {WARNING, NORMAL, ERROR};
+    // Specialization of EnumToString
+    template<>
+    const std::map<StepStateType, std::string> EnumToString<StepStateType>::mapping = {
+            {StepStateType::WARNING ,    "WARNING" },
+            {StepStateType::NORMAL  ,    "NORMAL"  },
+            {StepStateType::ERROR   ,    "ERROR"   }
+    };
+
+
 }
 
 

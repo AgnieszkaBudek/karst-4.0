@@ -16,7 +16,7 @@
 namespace karst {
 
 
-    inline void Node::disconnect_from_network() {
+    inline void Node::do_disconnect_from_network() {
         for (auto n: nodes)
             erase_if(n->nodes, [this](auto x) { return x == this; });
         for (auto p : pores)
@@ -25,7 +25,7 @@ namespace karst {
             erase_if(g->nodes, [this](auto x) { return x == this; });
     }
 
-    inline void Pore::disconnect_from_network() {
+    inline void Pore::do_disconnect_from_network() {
         for (auto n: nodes) {
             for( auto [n0,p0] : n->nodePores)
                 if(p0 == this)
@@ -42,7 +42,7 @@ namespace karst {
     }
 
 
-    inline void Grain::disconnect_from_network() {
+    inline void Grain::do_disconnect_from_network() {
         for (auto n: nodes)
             erase_if(n->grains, [this](auto x) { return x == this; });
         for (auto p : pores)

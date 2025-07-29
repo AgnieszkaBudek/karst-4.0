@@ -20,17 +20,17 @@ namespace karst {
 
         // Main Network Parameters
 
-        Length l0 {1.};		    ///< (initial) characteristic pore length (should be always equal to one!!!!)
-        Length d0 {0.1};	    ///< (initial) characteristic pore diameter
-        Unitless Da {1.};		///< effective Damkohler number for first reaction
-        Unitless DaPe {1.};		///< DaPe for first reaction (previous G, Diffusion across the pore)
-        Unitless Pe {0.};		///< Peclet number for first reaction (D along pore)
+        Length   l0   {1.0};	///< (initial) characteristic pore length (should be always equal to one!!!!)
+        Length   d0   {0.1};	///< (initial) characteristic pore diameter
+        Unitless Da   {1.0};	///< effective Damkohler number for first reaction
+        Unitless DaPe {1.0};	///< DaPe for first reaction (previous G, Diffusion across the pore)
+        Unitless Pe   {0.0};	///< Peclet number for first reaction (D along pore)
 
-        Flow Q_tot     {0.};      ///< total Flow through the system
+        Flow     Q_tot {0.};      ///< total Flow through the system
         Pressure P_in  {0.};      ///< inlet pressure
         Pressure P_out {0.};      ///< outlet pressure
 
-        std::map<SPECIES,Unitless>  gamma ;	            ///< ratio of acid capacity numbers between first and the rest of reactions
+        std::map<SPECIES,Unitless>           gamma ;	///< ratio of acid capacity numbers between first and the rest of reactions
         std::map<ChemicalReaction,Unitless>  kappa ;	///< ratio of Da_1/Da_2 = ratio of reaction rates
         std::map<ChemicalReaction,Unitless>  theta ;	///< ratio of DaPe/DaPe
         std::map<ChemicalReaction,Unitless>  lambda; 	///< ratio of Pe (Diffusion along the pore)

@@ -132,6 +132,8 @@ namespace karst {
 
     inline std::ostream & operator<< (std::ostream &os, const Polygon3D& w) {       //TODO: dodać skalowanie ziarna i kolorowanie ładne
 
+
+
         //don't draw polygons crossing periodic boundary
         auto max_l = 0._L;          //maximal distance between consecutive nodes;
         for(auto it = w.n.begin(); it<w.n.end()-1; ++it)

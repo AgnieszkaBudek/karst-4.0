@@ -90,9 +90,9 @@ namespace karst {
 
         PrintingModule io_mod;
 
-        auto prepare_network_topology() -> void;
-        auto clear_unused_elements()    -> void;
-        auto check_network_connections() ->void;
+        auto prepare_network_topology()  -> void;
+        auto clear_unused_elements()     -> void;
+        auto check_network_connections() -> void;
 
 
         auto do_init() -> void {

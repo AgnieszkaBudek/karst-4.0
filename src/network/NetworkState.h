@@ -16,14 +16,14 @@ namespace karst {
 
 
         // flow parameter
-        Pressure P_in {10};     ///< pressure at the inlet (must by positive)
-        Pressure P_out {0};	    ///< pressure at the outlet, always should be set to zero
-        Flow     Q_tot {10};    ///< total flow through the system (if == 0 the constant pressure is kept)
+        Pressure P_in  {10};     ///< pressure at the inlet (must by positive)
+        Pressure P_out {0};	     ///< pressure at the outlet, always should be set to zero
+        Flow     Q_tot {10};     ///< total flow through the system (if == 0 the constant pressure is kept)
 
 
         // chemical properties
-        std::map <SPECIES, Concentration> C_0 ;	  ///< inlet concentration of all soluble chemicals
-        std::map <SPECIES, Volume> V_tot {};      ///< total volume of all species
+        std::map <SPECIES, Concentration>   C_0 ;	      ///< inlet concentration of all soluble chemicals
+        std::map <SPECIES, Volume>          V_tot {};      ///< total volume of all species
 
     };
 

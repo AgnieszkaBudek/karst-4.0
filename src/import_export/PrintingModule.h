@@ -23,7 +23,10 @@ namespace karst {
 
     public:
 
-        explicit PrintingModule(const NetworkTopologyConfig & net_conf0, const PrintingConfig& config0): net_topo_config{net_conf0}, config{config0}
+        explicit PrintingModule(const NetworkTopologyConfig & net_conf0,
+                                const PrintingConfig& config0):
+                                net_topo_config{net_conf0},
+                                config{config0}
         {
             if (config.do_save_table){
                 d_out .open("d.out", std::ios_base::out | std::ios_base::trunc );
@@ -89,6 +92,7 @@ namespace karst {
             std::cerr << "Printing postscript..." << std::endl;
 
             do_print_ps_headlines(stream,1,"Debugging...");
+
 
             for (const auto& g_tmp : grains)
                 if(g_tmp.check_if_active())

@@ -36,7 +36,6 @@ namespace karst{
 
 
     struct ElementConfig{
-
         const ElementType type;       ///< element type
         const Int name;               ///< element name
         std::ostream* log;            ///< log file
@@ -56,10 +55,16 @@ namespace karst{
 
     public:
 
-        explicit GenericElement(const NetworkConfig& netconf0, const NetworkTopologyConfig& topo_conf0, const ElementConfig config0) :
-                net_config{ netconf0 },
-                topo_config{ topo_conf0},
-                config{ config0}
+        friend auto createHexagonalNetwork(Network& S, Int N_x, Int N_y)->void;
+        friend Network; friend Node; friend Pore; friend Grain;
+
+
+        explicit GenericElement(const NetworkConfig& netconf0,
+                                const NetworkTopologyConfig& topo_conf0,
+                                const ElementConfig config0) :
+                                net_config{ netconf0 },
+                                topo_config{ topo_conf0},
+                                config{ config0}
         {}
 
 
@@ -74,9 +79,7 @@ namespace karst{
 
 
         auto remove_element_from_a_network() -> void{
-
-            static_cast<Element*>(this)->disconnect_from_network();
-
+            static_cast<Element *>(this)->do_disconnect_from_network();
             pores.clear();
             nodes.clear();
             grains.clear();
@@ -84,43 +87,31 @@ namespace karst{
         }
 
 
-
-        friend auto createHexagonalNetwork(Network& S, Int N_x, Int N_y)->void;
-        friend Network;
-        friend Node;
-        friend Pore;
-        friend Grain;
+        auto init() -> void { static_cast<Element*>(this)->do_init();}
 
         // getting and updating element state
-        inline auto set_state(ElementState&& s1)    ->  void { state=std::move(s1); }
 
-        inline auto set_oldstate(ElementState&& s1) ->  void { s_old=std::move(s1); }
-
-        inline auto update_state(ElementState& s1, long new_step) ->  void
-        {
+        auto set_state     (ElementState&& s1)               ->  void { state=std::move(s1); }
+        auto set_old_state (ElementState&& s1)               ->  void { s_old=std::move(s1); }
+        auto update_state  (ElementState& s1, long new_step) ->  void {
             assert (new_step>=step);
             s_old = std::move(state);
             state = std::move(s1);
             step  = new_step;
         }
 
-        inline auto get_state() const             -> ElementState& { return state; }
-
-        inline auto get_old_state() const         -> ElementState& { return s_old; }
-
-        inline auto update_time_step(long step0)  -> void          { step = step0; }
-
-        inline auto get_time_step () const        -> long          { return step; }
+        auto get_state() const             -> ElementState& { return state; }
+        auto get_old_state() const         -> ElementState& { return s_old; }
+        auto update_time_step(long step0)  -> void          { step = step0; }
+        auto get_time_step () const        -> long          { return step; }
+        auto is_state_set() -> bool{ static_cast<Element*>(this)->do_is_state_set();}
 
 
         //Saving info
 
         auto save_state()    -> void {}
-
         auto save_topology() -> void {}
-
         auto log_state(const std::ostream& log_file)    ->  void {}
-
         auto log_topology(const std::ostream& log_file) ->  void {}
 
 
@@ -135,6 +126,7 @@ namespace karst{
         auto get_grains () const ->  const std::vector<Grain* >&  { return grains; }
 
         auto check_if_active () const -> const bool {return active;}
+
         auto deactivate () -> void {
             active = false;
             remove_element_from_a_network();
@@ -150,18 +142,14 @@ namespace karst{
             return it != list_of_elements.end();
         }
 
-//        auto check_if_node_connected(const Node& n0) -> bool {    //FIXME: check if needed; maybe only the template version is enough
-//            return check_if_element_connected(n0, nodes);
-//        }
 
 
-
-    public:         //TODO: later make it protected
 
 
         const NetworkConfig& net_config;               ///< NetworkConfig   //zmienić potem na const Network* const S;
         const NetworkTopologyConfig& topo_config;
         const ElementConfig config;                  ///< Config
+
 
     protected:
 

@@ -35,6 +35,14 @@ namespace karst {
         Length x{0.}, y{0.}, z{0.};
     };
 
+    inline auto isnan(Point3D point) -> bool{
+        return(
+            std::isnan(double (point.x)) or
+            std::isnan(double (point.y)) or
+            std::isnan(double (point.z))
+        );
+    }
+
     inline auto operator - (const Point3D&  p1, const Point3D&  p2) -> Length {  //return distance between two points
         return Length(
                 sqrt(pow(double(p1.x - p2.x), 2) +

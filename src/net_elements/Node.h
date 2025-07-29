@@ -52,68 +52,27 @@ namespace karst {
 
     public:
 
+        friend  GenericElement <Node, NodeState>;
+        friend Network; friend Node; friend Pore; friend Grain;
+        friend auto createHexagonalNetwork(Network& S, Int N_x, Int N_y)->void;
+
 
         explicit Node  (const NetworkConfig& net_conf0, const NetworkTopologyConfig &topo_conf0, const ElementConfig config0)
         : GenericElement<Node, NodeState>(net_conf0,topo_conf0,config0) {}
 
-        friend  GenericElement <Node, NodeState>;
-
-
-        void disconnect_from_network();
-
-        inline auto set_type (NodeType t0) -> void      { type = t0;   }
-
-        inline auto get_type () const      -> NodeType  { return type; }
-
-        inline auto set_pos (Point3D p0)   -> void      { pos = p0;    }
-
-        inline auto get_pos () const       -> Point3D   { return pos;  }
-
-        inline auto set_u (Pressure u0)    -> void      { state.u = u0;    }
-
-        inline auto get_u () const         -> Pressure  { return state.u;  }
-
-        inline auto set_c (SPECIES sp, Concentration c)  -> void { state.c[sp] = c;}
-
-        inline auto get_c (SPECIES sp) const             -> Concentration{
+        auto set_type (NodeType t0)                 -> void      { type = t0;   }
+        auto get_type () const                      -> NodeType  { return type; }
+        auto set_pos  (Point3D p0)                  -> void      { pos = p0;    }
+        auto get_pos  () const                      -> Point3D   { return pos;  }
+        auto set_u    (Pressure u0)                 -> void      { state.u = u0;    }
+        auto get_u    () const                      -> Pressure  { return state.u;  }
+        auto set_c    (SPECIES sp, Concentration c) -> void      { state.c[sp] = c; }
+        auto get_c    (SPECIES sp) const            -> Concentration{
             assert(state.c.find(sp) != state.c.end() && "Key not found in the map");
             return state.c.at(sp);
         }
 
-        inline auto set_node_pores() -> void{
-            auto it2 = nodes.begin();
-            for(auto it = pores.begin(); it < pores.end() ; ++it) {
-                if(it2==nodes.end()){
-                    std::cerr<<"Problem with set_nodes_and_pores;"<<std::endl;
-                    return;
-                }
-                nodePores.push_back({.n = (*it2), .p = (*it)});
-                ++it2;
-            }
-        }
 
-
-
-
-        auto init() -> void
-        {
-            for (auto sp : solubleS)
-                if (type == NodeType::INPUT){
-                    assert(net_config.inlet_c.find(sp) != net_config.inlet_c.end() && "Key not found in the map");
-                    state.c[sp] = net_config.inlet_c.at(sp);
-                }
-                else
-                    state.c[sp] = Concentration{0.0};
-        }
-
-
-//        void disconnect_from_network() {
-//            for (Node* n : nodes)
-//                erase_if(n->nodes,[this](auto x)->bool{return x==this;});
-//            for (Pore* p : pores)
-//                erase_if(p->nodes,[this](auto x)->bool{return x==this;});
-//
-//        }
 
 
         //export functions
@@ -132,10 +91,52 @@ namespace karst {
 
 
 
-    public:  //FIXME: should be protected but somehow
+    protected:  //FIXME: should be protected but somehow
+
+
         std::vector<NodePore> nodePores;
         NodeType type {NodeType::NORMAL};
         Point3D  pos  {Length(NaN),Length(NaN),Length(NaN)};
+
+
+        void do_disconnect_from_network();
+
+        auto do_init() -> void
+        {
+            for (auto sp : solubleS)
+                if (type == NodeType::INPUT){
+                    assert(net_config.inlet_c.find(sp) != net_config.inlet_c.end() && "Key not found in the map");
+                    state.c[sp] = net_config.inlet_c.at(sp);
+                }
+                else
+                    state.c[sp] = Concentration{0.0};
+        }
+
+
+        auto set_node_pores() -> void{
+            auto it2 = nodes.begin();
+            for(auto it = pores.begin(); it < pores.end() ; ++it) {
+                if(it2==nodes.end()){
+                    std::cerr<<"Problem with set_nodes_and_pores;"<<std::endl;
+                    return;
+                }
+                nodePores.push_back({.n = (*it2), .p = (*it)});
+                ++it2;
+            }
+        }
+
+
+        auto do_is_state_set() -> bool{
+
+            return (
+                    !std::isnan(double(state.u)) and
+                    std::ranges::all_of(state.c, [](const auto& pair) {
+                        return double(pair.second) >= 0;
+                    }) and
+                            !isnan(pos)
+            );
+        }
+
     };
 } // namespace karst
 

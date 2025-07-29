@@ -19,31 +19,26 @@ namespace karst {
 
     class Grain : public GenericElement <Grain, GrainState> {
 
+        friend  GenericElement <Grain, GrainState>;
+
         public:
 
             explicit Grain  (const NetworkConfig & net_conf0, const NetworkTopologyConfig &topo_conf0, const ElementConfig config0) : GenericElement<Grain, GrainState>(net_conf0,topo_conf0,config0){}
 
 
-            friend  GenericElement <Grain, GrainState>;
+            [[nodiscard]] auto check_if_space_left () const -> bool      { return state.tot_volume < state.max_volume; }
+            [[nodiscard]] auto get_max_volume      () const -> Volume    { return state.max_volume; }
+            [[nodiscard]] auto get_tot_v           () const -> Volume    { return state.tot_volume; }
 
-            void disconnect_from_network();
-
-            inline auto check_if_space_left() const -> bool   { return state.tot_volume < state.max_volume; }
-
-            inline auto get_max_volume() const   -> Volume    { return state.max_volume; }
-
-            inline auto get_tot_v() const        -> Volume    { return state.tot_volume; }
-
-            inline auto get_v(SPECIES sp)  const -> Volume {
+            auto get_v(SPECIES sp)  const -> Volume {
                 assert(state.v.find(sp) != state.v.end() && "Key not found in the map");
                 return state.v.at(sp);
             }
 
-            inline auto set_v(SPECIES sp, Volume v_new) -> void { state.v[sp] = v_new; }
+            auto set_v(SPECIES sp, Volume v_new) -> void { state.v[sp] = v_new; }
 
 
-
-            inline auto calculate_tot_v () -> Volume
+            auto calculate_tot_v () -> Volume
             {
                 return std::accumulate(
                         state.v.begin(),
@@ -52,16 +47,6 @@ namespace karst {
                         [](Volume value, const std::pair<SPECIES, Volume>& p) {
                         return value + p.second;
                     });
-            }
-
-            auto init() -> void
-            {
-                //s.max_volume = area(n);
-                //s.v = {{SPECIES::A, calculate_initial_vol()}};
-                for (auto sp : solidS){
-                    if (sp != SPECIES::A)
-                        state.v[sp] = 0.0_V;
-                }
             }
 
 
@@ -83,6 +68,29 @@ namespace karst {
 
     protected:
 
+        void do_disconnect_from_network();
+
+        auto do_init() -> void
+        {
+            //s.max_volume = area(n);
+            //s.v = {{SPECIES::A, calculate_initial_vol()}};
+            for (auto sp : solidS){
+                if (sp != SPECIES::A)
+                    state.v[sp] = 0.0_V;
+            }
+        }
+
+
+        auto do_is_state_set() -> bool{
+
+            return (
+                    !std::isnan(double(state.max_volume)) and
+                    !std::isnan(double(state.tot_volume)) and
+                    std::ranges::all_of(state.v, [](const auto& pair) {
+                        return double(pair.second) >= 0;
+                    })
+                    );
+        }
 
     };
 

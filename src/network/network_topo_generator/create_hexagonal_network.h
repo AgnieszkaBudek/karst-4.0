@@ -116,7 +116,7 @@ namespace karst {
                         g_tmp.grains.push_back(gg);
 
 
-        //adding node Positions:
+        //adding positions to nodes:
         for (auto i = 0; i < N_x; i++)   // FIXME: rewrite this loop to be more elegant (?) Maybe not necessary
             for (auto j = 0; j < N_y; j++) {
                 S.nodes[N_x * j + i].set_pos (double(S.config.l0) * Point3D(

@@ -17,7 +17,8 @@ namespace karst {
 
         // simulation state
         Long sim_step    {0};           ///< nr of simulation steps already done
-        Time T           {0};           ///< Total time from the begging of simulation
+        Time T           {0};           ///< Total time from the begging of simulation (in units)
+        Time T_lab       {0};           ///< Total time from the begging of simulation (in physical time)
         Time dt          {NaN} ;       	///< time step (in dimensionless units [2 k1 * gamma_1/d0])
 
         TimeAdaptationMode   set_new_dt  {TimeAdaptationMode::NEUTRAL};    ///< if change the time step

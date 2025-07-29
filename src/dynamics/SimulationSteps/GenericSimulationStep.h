@@ -5,6 +5,50 @@
 #ifndef KARST_4_0_GENERICSIMULATIONSTEP_H
 #define KARST_4_0_GENERICSIMULATIONSTEP_H
 
+#include "src/utils.h"
+#include "src/units.h"
+#include "src/network/Network.h"
+#include "src/dynamics/SimulationConfig.h"
+
+
+namespace karst{
+    template < typename Step>
+    class GenericSimulationStep
+    {
+    public:
+
+        explicit GenericSimulationStep(const SimulationConfig& sim_config0) :
+                sim_config{sim_config0}
+        {}
+
+
+        ~GenericSimulationStep() {}
+
+
+        auto init ()  -> void { static_cast<Step&>(*this)->do_init();}
+        auto run  ()  -> void { static_cast<Step&>(*this)->do_run(); }
+
+
+        auto get_time_step () const        -> long          { return step; }
+
+
+        //Saving info
+        auto log_state(const std::ostream& log_file)    ->  void {}
+
+
+        const SimulationConfig& sim_config;   ///< SimulationConfig
+
+    protected:
+
+        Network&  S;
+        Long step{0};                  ///< time step the simulation step was run the last time
+        StepStateType state{StepStateType::NORMAL};
+    };
+
+
+
+
+}
 
 //auto update(const BType& bar) -> void  //TODO: use this...
 //{

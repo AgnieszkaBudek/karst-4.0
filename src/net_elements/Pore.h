@@ -22,40 +22,21 @@ namespace karst {
 
     public:
 
+        friend  GenericElement <Pore, PoreState>;
+
         explicit Pore  (const NetworkConfig &net_conf,
                         const NetworkTopologyConfig &topo_conf0,
                         const ElementConfig config0)
                         : GenericElement<Pore, PoreState>(net_conf,topo_conf0,config0){}
 
-        friend  GenericElement <Pore, PoreState>;
-
-        void disconnect_from_network();
-
-        inline auto check_if_active() const  -> bool  { return true;}   //TODO: implement it
-
-        inline auto check_if_space_left() const-> bool    { return state.d > 0._L; }
-
-        inline auto get_d() const -> Length  { return state.d; }
-
-        inline auto get_l() const -> Length  { return state.l; }
-
-        inline auto get_q() const -> Flow    { return state.q; }
 
 
+        [[nodiscard]] auto check_if_space_left () const-> bool     { return state.d > 0._L; }
+        [[nodiscard]] auto get_d               () const -> Length  { return state.d; }
+        [[nodiscard]] auto get_l               () const -> Length  { return state.l; }
+        [[nodiscard]] auto get_q               () const -> Flow    { return state.q; }
 
-        //init function
-        auto init() -> void
-        {
-            state = (PoreState{
-                    .d = net_config.d0,
-                    .l = nodes[0]->get_pos() - nodes[1]->get_pos(),
-                    .q = Flow(NaN)});
 
-            //add randomness to diamaeters //TODO: add randomness to init diameters
-
-            //std::cerr << "Initializing Pore: " << *this;
-
-        }
 
 
         //export functions:
@@ -69,7 +50,34 @@ namespace karst {
         //friend ofstream_ps_pores  &operator <<(ofstream_ps_pores &stream, const Pore &p){}     //TODO: implement it
         //friend ofstream_ps_grains &operator<<(ofstream_ps_grains &stream, const Pore &p){}     //TODO: implement it
 
+
     protected:
+
+        void do_disconnect_from_network();
+
+        //init function
+        auto do_init() -> void
+        {
+            state = (PoreState{
+                    .d = net_config.d0,
+                    .l = nodes[0]->get_pos() - nodes[1]->get_pos(),
+                    .q = Flow(NaN)});
+
+            //add randomness to diamaeters //TODO: add randomness to init diameters
+
+            //std::cerr << "Initializing Pore: " << *this;
+
+        }
+
+
+        auto do_is_state_set() -> bool{
+            return (
+                    !std::isnan(double(state.d)) and
+                    !std::isnan(double(state.l)) and
+                    !std::isnan(double(state.q))
+            );
+        }
+
 
         };
 
