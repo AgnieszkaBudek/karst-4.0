@@ -11,7 +11,8 @@ include_directories(${CMAKE_SOURCE_DIR}
 add_executable(karst_4_0 ./main.cpp
         src/net_elements/GenericElement_impl.h
         src/network/network_topo_generator/network_topo_generator.h
-        src/chemistry/reactions_kinetic.h)
+        src/chemistry/LinearKintetics.h
+        src/chemistry/GenericKinetics.h)
 
 
 message(STATUS "CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")

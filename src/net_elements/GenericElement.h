@@ -6,7 +6,7 @@
 #define KARST_4_0_GENERICELEMENT_H
 #include "src/utils.h"
 #include "src/units.h"
-#include "src/chemistry/reaction_config.h"
+#include "src/chemistry/ReactionConfig.h"
 #include "src/network/NetworkConfig.h"
 #include "src/network/NetworkTopologyConfig.h"
 

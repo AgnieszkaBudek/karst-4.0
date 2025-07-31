@@ -11,6 +11,7 @@
 #include "src/dynamics/SimulationConfig.h"
 #include "src/dynamics/SimulationState.h"
 #include "src/read_config.h"
+#include "src/chemistry/LinearKintetics.h"
 
 #include "src/network/network_topo_generator/network_topo_generator.h"
 
@@ -53,15 +54,16 @@ namespace karst {
 
     const Configs confs;
 
+
     auto init()             -> void { do_init();}
     auto run_simulation()   -> void {do_run_simulation();}
     auto get_state() const  -> const SimulationState& {return s;}
 
     protected:
 
-        SimulationState s{};
+        SimulationState s {};
         Network N = Network( confs.net_conf, confs.net_topo_conf, confs.print_conf );
-
+        ReactionKinetics R  {N, confs.sim_conf, s};
 
 
         auto check_simulation_state()   -> void {}  //TODO: implement later

@@ -7,6 +7,8 @@
 
 #include <list>
 #include "src/dynamics/SimulationSteps/GenericSimulationStep.h"
+#include "src/chemistry/ReactionConfig.h"
+#include "src/chemistry/LinearKintetics.h"
 
 namespace karst {
 
@@ -15,6 +17,7 @@ namespace karst {
 
         Flow eps_q{0.000001};
         std::map <SPECIES, bool> has_been_set;
+
     };
 
     class SimulateConcentrations : public GenericSimulationStep <SimulateConcentrations,SimulateConcentrationState> {
@@ -27,6 +30,7 @@ namespace karst {
             name = "SimulateConcentrationState";
             for(auto species : S.config.species_to_be_calculated)
                 state.has_been_set[species] = false;
+
     }
 
         auto do_run()  -> void {
@@ -52,6 +56,7 @@ namespace karst {
                     }
             );
         }
+
 
 
         auto outlet_CFlux(NodePore np, SPECIES species) -> CFlux{
