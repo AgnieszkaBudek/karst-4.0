@@ -30,6 +30,13 @@ namespace karst {
             return static_cast<double>(value);
         }
 
+        template<
+                typename U = Unit,
+                std::enable_if_t<
+                        std::is_same_v<U, Unit<std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>>>, int> = 0
+        >
+        explicit operator double() const { return value; }
+
     };
 
     template<typename M, typename L, typename T, typename C, typename Tp>
@@ -53,6 +60,7 @@ namespace karst {
     using Volume     = Unit<std::ratio<0>, std::ratio<3>,  std::ratio<0>,  std::ratio<0>>;
     using Viscosity  = Unit<std::ratio<1>, std::ratio<-1>, std::ratio<-1>, std::ratio<0>>;
     using Concentration = Unit<std::ratio<0>, std::ratio<-3>, std::ratio<0>, std::ratio<1>>;
+    using CFlux         = Unit<std::ratio<0>, std::ratio<0>, std::ratio<-1>, std::ratio<1>>;
     using Unitless      = Unit<std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>>;
 
 
@@ -72,6 +80,7 @@ namespace karst {
     inline Volume     operator"" _V(long double v) { return Volume     (static_cast<double>(v)); }
     inline Viscosity  operator"" _S(long double v) { return Viscosity  (static_cast<double>(v)); }
     inline Concentration operator"" _C(long double v) { return Concentration (static_cast<double>(v)); }
+    inline CFlux         operator"" _X(long double v) { return CFlux         (static_cast<double>(v)); }
     inline Unitless      operator"" _U(long double v) { return Unitless      (static_cast<double>(v)); }
 
     // Unit multiplication by double
@@ -154,6 +163,10 @@ namespace karst {
         return lhs.value == rhs.value;
     }
 
+    template<typename M1, typename L1, typename T1, typename C1, typename T>
+    auto abs(const Unit<M1, L1, T1, C1, T>& u) {
+        return  Unit<M1, L1, T1, C1, T>(fabs(u.value));
+    }
 
     template<typename M1, typename L1, typename T1, typename C1, typename T>
     std::istream& operator >> (std::istream& is,Unit<M1, L1, T1, C1, T>& lhs)  {
@@ -161,6 +174,16 @@ namespace karst {
         return lhs;
     }
 
+    template<int N, typename M1, typename L1, typename T1, typename C1, typename T>
+    auto power(const Unit<M1, L1, T1, C1, T>& u) {
+        return  Unit<
+                std::ratio_multiply<M1, std::ratio<N>>,
+                std::ratio_multiply<L1, std::ratio<N>>,
+                std::ratio_multiply<T1, std::ratio<N>>,
+                std::ratio_multiply<C1, std::ratio<N>>,
+                T>
+                (pow(u.value, N));
+    }
 
 } // namespace karst
 

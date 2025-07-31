@@ -38,11 +38,12 @@ namespace karst{
     struct ElementConfig{
         const ElementType type;       ///< element type
         const Int name;               ///< element name
+        int a_name{-1};               ///< element name for active subset
         std::ostream* log;            ///< log file
     };
 
 
-    struct ElementTopoProperties{
+    struct ElementTopoState{
         bool connected_to_percolation_cluster   {false};
         bool checked_for_percolation            {false};
     };
@@ -93,6 +94,8 @@ namespace karst{
 
         auto set_state     (ElementState&& s1)               ->  void { state=std::move(s1); }
         auto set_old_state (ElementState&& s1)               ->  void { s_old=std::move(s1); }
+        auto update_old_state()                              ->  void {s_old = state;}
+        auto revert_state()                                  ->  void {state = s_old;}
         auto update_state  (ElementState& s1, long new_step) ->  void {
             assert (new_step>=step);
             s_old = std::move(state);
@@ -100,15 +103,21 @@ namespace karst{
             step  = new_step;
         }
 
+        // State access
         auto get_state() const             -> ElementState& { return state; }
         auto get_old_state() const         -> ElementState& { return s_old; }
         auto update_time_step(long step0)  -> void          { step = step0; }
         auto get_time_step () const        -> long          { return step; }
         auto is_state_set() -> bool{ static_cast<Element*>(this)->do_is_state_set();}
 
+        //Topo_config access
+        auto is_connected_to_percolation_cluster() const -> bool { return topo_s.connected_to_percolation_cluster; }
+        auto is_checked_for_percolation()          const -> bool { return topo_s.checked_for_percolation; }
+        auto set_connected_to_percolation_cluster()      -> void { topo_s.connected_to_percolation_cluster = true; }
+        auto set_checked_for_percolation()               -> void { topo_s.checked_for_percolation = true; }
+        auto clean_percolation_state()                   -> void { topo_s={false,false};}
 
         //Saving info
-
         auto save_state()    -> void {}
         auto save_topology() -> void {}
         auto log_state(const std::ostream& log_file)    ->  void {}
@@ -116,7 +125,6 @@ namespace karst{
 
 
         //Setting the topology
-
         auto set_nodes  (std::vector<Node*  >&& n0) -> void { nodes = std::move(n0); }
         auto set_pores  (std::vector<Pore*  >&& p0) -> void { pores = std::move(p0); }
         auto set_grains (std::vector<Grain* >&& g0) -> void { grains = std::move(g0); }
@@ -143,12 +151,9 @@ namespace karst{
         }
 
 
-
-
-
         const NetworkConfig& net_config;               ///< NetworkConfig   //zmienić potem na const Network* const S;
         const NetworkTopologyConfig& topo_config;
-        const ElementConfig config;                  ///< Config
+        ElementConfig config;                  ///< Config
 
 
     protected:
@@ -159,9 +164,10 @@ namespace karst{
 
         bool active{true};               ///< if the element is still part of the network
         Long step{0};                    ///< time step the element has been updated the last time
-        ElementTopoProperties  topo_s{}; ///< temporal properties of an element
-        ElementState    state{};         ///< current state of an element
-        ElementState    s_old{};         ///< state of an element in previous time step
+
+        ElementTopoState  topo_s{}; ///< temporal properties of an element
+        ElementState      state{};         ///< current state of an element
+        ElementState      s_old{};         ///< state of an element in previous time step
 
 
     };

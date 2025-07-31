@@ -7,6 +7,7 @@
 
 
 #include <algorithm>
+#include <ranges>
 
 #include "Node.h"
 #include "Pore.h"
@@ -51,6 +52,12 @@ namespace karst {
             erase_if(g->grains, [this](auto x) { return x == this; });
     }
 
+
+    auto Pore::get_available_volume(SPECIES species) -> Volume{
+        Volume sum = 0._V;
+        for(auto g : grains)
+            sum = sum + g->get_v(species);
+    }
 }
 
 #endif //KARST_4_0_GENERICELEMENT_IMPL_H

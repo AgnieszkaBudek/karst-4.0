@@ -37,7 +37,7 @@ namespace karst {
 
         Length d_min {0.001};    ///< minimal possible pore diameter (important in precipitation)
         Length l_min {1e-10};    ///< minimal possible pore length (must be >0 for numerical reasons)
-
+        Length h_tot {1.0};      ///< total length of the system
 
 
         //physical parameters -> should be set after choosing dimenssionless one
@@ -47,6 +47,7 @@ namespace karst {
         Time dt_unit    {0.0};        ///< time unit (in dimensionless units [d0/2 k1 * gamma_1])
 
 
+        std::deque<SPECIES>                   species_to_be_calculated = {SPECIES::B,SPECIES::C};
         std::map<ChemicalReaction,Velocity>   reaction_rate;               ///< reaction rate for precipitation
         std::map<SPECIES,Diffusion>           diffusion_rate;              ///< reaction rate for precipitation
         std::map<SPECIES,Diffusion>           transversal_diffusion_rate;  ///< reaction rate for precipitation

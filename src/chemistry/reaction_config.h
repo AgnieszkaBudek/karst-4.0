@@ -30,7 +30,8 @@ namespace karst{
 
         const bool is_linear;    // is linear
         const Velocity k;        // reaction rate
-        const double c_eq;
+        const Concentration c_eq;
+        const Unit<std::ratio<0>,std::ratio<3>,std::ratio<0>,std::ratio<-1>> solid_mol_volume;
         //const double K;             // reaction coefficient1
         //const double O;             // reaction coefficient2
     };
@@ -41,8 +42,9 @@ namespace karst{
         .products   = {SPECIES::C},
         .tracked_concentrations = {SPECIES::B},
         .is_linear = true,
-        .k = 1._v,
-        .c_eq = 0};
+        .k {1.},
+        .c_eq {0.},
+        .solid_mol_volume {1.} };
         // .K = INFINITY,
         // .O = 0};
 
@@ -51,8 +53,10 @@ namespace karst{
             .products   = {SPECIES::E},
             .tracked_concentrations = {SPECIES::C},
             .is_linear = true,
-            .k = 1._v,
-            .c_eq = 0};
+            .k {1.},
+            .c_eq{0.},
+            .solid_mol_volume{1.}
+            };
             // .K = INFINITY,
             // .O = 0};
 

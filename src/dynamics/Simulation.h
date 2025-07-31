@@ -55,11 +55,12 @@ namespace karst {
 
     auto init()             -> void { do_init();}
     auto run_simulation()   -> void {do_run_simulation();}
+    auto get_state() const  -> const SimulationState& {return s;}
 
     protected:
 
         SimulationState s{};
-        Network S = Network( confs.net_conf, confs.net_topo_conf, confs.print_conf );
+        Network N = Network( confs.net_conf, confs.net_topo_conf, confs.print_conf );
 
 
 
@@ -72,10 +73,10 @@ namespace karst {
         auto do_init() -> void {
 
             std::cerr<<"Initializing simulation..."<<std::endl;
-            S.init();
+            N.init();
             s.dt = confs.sim_conf.dt0;
 
-            S.save_network_state();
+            N.save_network_state();
         }
 
         auto do_run_simulation() -> void{

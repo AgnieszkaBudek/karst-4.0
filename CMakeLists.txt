@@ -5,11 +5,13 @@ set(CMAKE_CXX_STANDARD 20)
 include_directories(${CMAKE_SOURCE_DIR}
                     src/external_algorithms
                     src/external_algorithms/triangulation
+                    /opt/homebrew/opt/eigen/include/eigen3
 )
 
 add_executable(karst_4_0 ./main.cpp
         src/net_elements/GenericElement_impl.h
-        src/network/network_topo_generator/network_topo_generator.h)
+        src/network/network_topo_generator/network_topo_generator.h
+        src/chemistry/reactions_kinetic.h)
 
 
 message(STATUS "CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")

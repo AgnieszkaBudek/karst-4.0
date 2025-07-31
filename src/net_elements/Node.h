@@ -31,10 +31,7 @@ namespace karst {
             { NodeType::INPUT,          "INPUT"         },
             { NodeType::OUTPUT,         "OUTPUT"        }
     };
-//    // Operator << specialization for NodeType   //TODO: wyrzucić potem
-//    std::ostream& operator<<(std::ostream& os, NodeType value) {
-//        return os << EnumToString<NodeType>::mapping.at(value);
-//    }
+
 
 
     struct NodeState {
@@ -59,6 +56,9 @@ namespace karst {
 
         explicit Node  (const NetworkConfig& net_conf0, const NetworkTopologyConfig &topo_conf0, const ElementConfig config0)
         : GenericElement<Node, NodeState>(net_conf0,topo_conf0,config0) {}
+
+
+        auto get_nodes_pores  () const ->  const std::vector<NodePore>&  { return nodePores; }
 
         auto set_type (NodeType t0)                 -> void      { type = t0;   }
         auto get_type () const                      -> NodeType  { return type; }
@@ -91,7 +91,7 @@ namespace karst {
 
 
 
-    protected:  //FIXME: should be protected but somehow
+    protected:
 
 
         std::vector<NodePore> nodePores;

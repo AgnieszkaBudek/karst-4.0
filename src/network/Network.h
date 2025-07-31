@@ -41,11 +41,13 @@ namespace karst {
 
         auto save_network_state() ->void { do_save_network_state();}
 
-        auto get_nodes()   const   { return nodes    | std::views::filter([](const Node& n)  { return n.active; });}
-        auto get_pores()   const   { return pores    | std::views::filter([](const Pore& p)  { return p.active; });}
-        auto get_grains()  const   { return grains   | std::views::filter([](const Grain& g) { return g.active; });}
-        auto get_inlets()  const   { return n_inlet  | std::views::filter([](const Node* n)  { return n->active; });}
-        auto get_outlets() const   { return n_outlet | std::views::filter([](const Node* n)  { return n->active; });}
+        auto get_nodes() const     { return nodes    | std::views::filter([](const Node& n)  { return n.active; });}
+        auto get_pores()      { return pores    | std::views::filter([](const Pore& p)  { return p.active; });}
+        auto get_grains()     { return grains   | std::views::filter([](const Grain& g) { return g.active; });}
+        auto get_inlets()     { return n_inlet  | std::views::filter([](const Node* n)  { return n->active; });}
+        auto get_outlets()    { return n_outlet | std::views::filter([](const Node* n)  { return n->active; });}
+
+        auto get_state()   const -> const NetworkState&   { return state;}
 
 
         auto find_pore(Node *n1, Node *n2)  const -> Pore* {
@@ -72,13 +74,12 @@ namespace karst {
         auto init() -> void { do_init(); }
 
 
-
         const NetworkTopologyConfig&  t_config;
         const NetworkConfig&            config;
 
     protected:
 
-        NetworkState      state;
+        NetworkState       state;
 
         std::vector<Node>  nodes;
         std::vector<Pore>  pores;
@@ -90,9 +91,38 @@ namespace karst {
 
         PrintingModule io_mod;
 
-        auto prepare_network_topology()  -> void;
-        auto clear_unused_elements()     -> void;
-        auto check_network_connections() -> void;
+        auto prepare_network_topology()      -> void;
+        auto clear_unused_elements()         -> void;
+        auto check_network_connections()     -> void;
+
+        auto update_number_of_active_nodes() -> void{
+            state.N_active = std::ranges::count_if(nodes, [](const Node& n) {
+                return n.active;
+            });
+        }
+
+        auto update_number_of_active_connections() -> void{
+            auto active_nodes = nodes
+                                | std::views::filter([](const Node& n){ return n.active; });
+
+            auto total_size = std::accumulate(
+                    active_nodes.begin(), active_nodes.end(),
+                    std::size_t{0},
+                    [](std::size_t sum, const Node& n){ return sum + n.nodes.size(); });
+            state.N_active_connections = total_size;
+        }
+
+        auto update_active_numbers_of_elements() -> void{
+            int i=0;
+            for(auto& n : nodes) if(n.active)
+                n.config.a_name = i++;
+            i=0;
+            for(auto& p : pores) if(p.active)
+                p.config.a_name = i++;
+            i=0;
+            for(auto& g : grains) if (g.active)
+                g.config.a_name = i++;
+        }
 
 
         auto do_init() -> void {
@@ -102,7 +132,13 @@ namespace karst {
             // 1. Prepare the topology
             prepare_network_topology();
 
-            // 2. Set initial element state
+            // 2.  Update number of active elements
+            update_number_of_active_nodes();
+            update_number_of_active_connections();
+            update_active_numbers_of_elements();
+
+
+            // 3. Set initial element state
             apply_to_all_net_elements([](auto& el){
                 el.init();
             });
@@ -117,7 +153,6 @@ namespace karst {
             if(io_mod.config.do_save_ps)
                 io_mod.print_net_ps(nodes, pores, grains);
         }
-
 
 
 

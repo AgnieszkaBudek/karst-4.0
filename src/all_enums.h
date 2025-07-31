@@ -113,6 +113,41 @@ namespace karst{
             {StepStateType::ERROR   ,    "ERROR"   }
     };
 
+    enum class MatrixSolver          {MUMPS, HYPRE, EIGEN };
+    // Specialization of EnumToString
+    template<>
+    const std::map<MatrixSolver, std::string> EnumToString<MatrixSolver>::mapping = {
+            {MatrixSolver::MUMPS ,    "MUMPS" },
+            {MatrixSolver::HYPRE  ,   "HYPRE" },
+            {MatrixSolver::EIGEN   ,  "EIGEN" }
+    };
+
+
+    enum class Pressure_Algorithm       {CLASSIC, SMALL_PORES, BIG_PORES};
+    // Specialization of EnumToString
+    template<>
+    const std::map<Pressure_Algorithm, std::string> EnumToString<Pressure_Algorithm>::mapping = {
+            {Pressure_Algorithm::CLASSIC,       "CLASSIC" },
+            {Pressure_Algorithm::SMALL_PORES,   "SMALL_PORES" },
+            {Pressure_Algorithm::BIG_PORES,     "BIG_PORES" },
+    };
+
+    enum class PoreGeometry       {CYLINDER, THIN_A, THICK_A, U_SHAPE};
+    template<>
+    const std::map<PoreGeometry, std::string> EnumToString<PoreGeometry>::mapping = {
+            {PoreGeometry::CYLINDER, "CYLINDER" },  // standard cylindrical
+            {PoreGeometry::THIN_A,   "THIN_A" },    //thin aperture
+            {PoreGeometry::THICK_A,  "THICK_A" },   //thick aperture
+            {PoreGeometry::U_SHAPE,  "U_SHAPE" },   //for experiments with Michal
+    };
+
+    enum class PoreType       {MATRIX, FRACTURE};
+    template<>
+    const std::map<PoreType, std::string> EnumToString<PoreType>::mapping = {
+            {PoreType::MATRIX,      "MATRIX" },
+            {PoreType::FRACTURE,    "FRACTURE" },
+
+    };
 
 }
 
