@@ -10,46 +10,44 @@
 
 namespace karst{
 
-    enum class SPECIES {A, B, C, E};
+    enum class SOLUBLES {B, C, D, SIZE};
     template<>
-    const std::map<SPECIES, std::string> EnumToString<SPECIES>::mapping = {
-            { SPECIES::A, "A" },
-            { SPECIES::B, "B" },
-            { SPECIES::C, "C" },
-            { SPECIES::E, "E" },
+    const std::map<SOLUBLES, std::string> EnumToString<SOLUBLES>::mapping = {
+            { SOLUBLES::B, "B" },
+            { SOLUBLES::C, "C" },
+            { SOLUBLES::D, "D" },
     };
 
-    enum class REACTIONS {D,P};
+    enum class SOLIDS {A, E, X, SIZE};
     template<>
-    const std::map<REACTIONS, std::string> EnumToString<REACTIONS>::mapping = {
-            { REACTIONS::D, "DISSOLUTION" },
-            { REACTIONS::P, "PRECIPITATION" },
+    const std::map<SOLIDS, std::string> EnumToString<SOLIDS>::mapping = {
+            { SOLIDS::A, "A" },
+            { SOLIDS::E, "E" },
+            { SOLIDS::X, "X" },
+    };
+
+
+    enum class REACTION {D, P, SIZE};
+    template<>
+    const std::map<REACTION, std::string> EnumToString<REACTION>::mapping = {
+            {REACTION::D, "DISSOLUTION" },
+            {REACTION::P, "PRECIPITATION" },
 
     };
 
 
     struct ChemicalReaction{
         std::string name;
-        std::vector<SPECIES>  substrates;
-        std::vector<SPECIES>  products;
-        std::vector<SPECIES> tracked_concentrations;
+        std::vector<SOLIDS>    tracked_solids;
+        std::vector<SOLUBLES>  tracked_solubles;
 
-        bool is_linear;    // is linear
-        Velocity k;        // reaction rate
-        Concentration c_eq;
-        Unit<std::ratio<0>,std::ratio<3>,std::ratio<0>,std::ratio<-1>> solid_mol_volume;
+        Velocity k{NaN};        // reaction rate
+        Concentration c_eq{NaN};
+        Unit<std::ratio<0>,std::ratio<3>,std::ratio<0>,std::ratio<-1>> solid_mol_volume{NaN};
         //const double K;             // reaction coefficient1
         //const double O;             // reaction coefficient2
     };
 
-
-    struct ReactionConfig{
-
-        std::vector<SPECIES>  allS;
-        std::vector<SPECIES>  solubleS;
-        std::vector<SPECIES>  solidS;
-
-    };
 
 
 

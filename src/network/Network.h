@@ -50,7 +50,7 @@ namespace karst {
         auto get_state()   const -> const NetworkState&   { return state;}
 
 
-        auto find_pore(Node *n1, Node *n2)  const -> Pore* {
+        static auto find_pore(Node *n1, Node *n2) -> Pore* {
             for(auto& [n0, p0] : n1->nodePores)
                 if(n0 == n2)  return p0;
             return nullptr;
@@ -174,7 +174,7 @@ namespace karst {
 
             for (auto n : n_inlet) add_to_cluster(*n);
 
-            //additionally we can ser pores and nodes belonging to the cluster
+            //additionally we can set pores and nodes belonging to the cluster
             if (set_pores_nodes)
                 for( auto& n : nodes) if(n.topo_s.connected_to_percolation_cluster)
                     for(auto& [n0,p0] : n.nodePores)

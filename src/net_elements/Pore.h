@@ -37,42 +37,50 @@ namespace karst {
 
 
         auto set_d (Length d0) -> void  {state.d = d0; }
+        auto add_d (Length d0) -> void  {state.d += d0; }
         auto set_l (Length l0) -> void  {state.l = l0; }
         auto set_q (Flow q0  ) -> void  {state.q = q0; }
 
-        [[nodiscard]] auto get_d               () const -> Length  { return state.d; }
-        [[nodiscard]] auto get_l               () const -> Length  { return state.l; }
-        [[nodiscard]] auto get_q               () const -> Flow    { return state.q; }
-        [[nodiscard]] auto check_if_space_left () const-> bool     { return state.d > 0._L; }
+        auto get_d               () const -> Length  { return state.d; }
+        auto get_l               () const -> Length  { return state.l; }
+        auto get_q               () const -> Flow    { return state.q; }
+        auto get_l_max           () const -> Length  { return nodes[1]->get_pos()-nodes[0]->get_pos();}
+        auto check_if_space_left () const-> bool     { return state.d > 0._L; }
 
-        [[nodiscard]] auto get_perm            () const    {
+        auto get_perm            () const    {
             switch (state.geometry) {
                 case PoreGeometry::CYLINDER: return power<4>(state.d)/state.l/net_config.mu_0;
                 case PoreGeometry::THICK_A:  return power<3>(net_config.h_tot)*state.d/state.l/net_config.mu_0;
                 case PoreGeometry::THIN_A:   return power<3>(state.d)*(net_config.h_tot)/state.l/net_config.mu_0;
                 case PoreGeometry::U_SHAPE:  return power<4>(state.d)/state.l/net_config.mu_0;
+                case PoreGeometry::SIZE:     break;
+
             }
         }
 
-        [[nodiscard]] auto get_surface         () const -> Area {
+        auto get_surface   (SOLIDS sp) const  -> Area;
+        auto get_surface_tot         () const -> Area {           //return total surface
             switch (state.geometry) {
                 case PoreGeometry::CYLINDER: return std::numbers::pi * state.d * state.l;
                 case PoreGeometry::THICK_A:  return net_config.h_tot * state.l;
                 case PoreGeometry::U_SHAPE:  return 3 * state.d * state.l;
                 case PoreGeometry::THIN_A:   return net_config.h_tot * state.l;
+                case PoreGeometry::SIZE:     break;
             }
         }
 
-        [[nodiscard]] auto get_volume         () const -> Volume {
+
+        auto get_volume         () const -> Volume {
             switch (state.geometry) {
                 case PoreGeometry::CYLINDER: return 1/4.*std::numbers::pi * state.d * state.d * state.l;
                 case PoreGeometry::THICK_A:  return net_config.h_tot * state.l * state.l;
                 case PoreGeometry::U_SHAPE:  return state.d * state.d * state.l;
                 case PoreGeometry::THIN_A:   return net_config.h_tot * state.l * state.l;
+                case PoreGeometry::SIZE:     break;
             }
         }
 
-        auto get_available_volume(SPECIES species) -> Volume;
+        auto get_available_volume(SOLIDS species) -> Volume;
 
 
 

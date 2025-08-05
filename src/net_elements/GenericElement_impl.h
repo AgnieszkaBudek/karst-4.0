@@ -53,11 +53,20 @@ namespace karst {
     }
 
 
-    auto Pore::get_available_volume(SPECIES species) -> Volume{
+    auto Pore::get_available_volume(SOLIDS species) -> Volume{
         Volume sum = 0._V;
         for(auto g : grains)
             sum = sum + g->get_v(species);
     }
+
+    auto Pore::get_surface   (SOLIDS sp) const -> Area {   //return surface in content with species sp
+        int active_grains = 0;
+        for(auto g : grains) if(g->if_species_left(sp)) active_grains++;
+        double species_factor = active_grains/double(grains.size());
+        return species_factor*get_surface_tot();
+    }
+
+
 }
 
 #endif //KARST_4_0_GENERICELEMENT_IMPL_H

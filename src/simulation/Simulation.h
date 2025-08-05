@@ -8,10 +8,10 @@
 #include "src/utils.h"
 #include "src/units.h"
 #include "src/network/Network.h"
-#include "src/dynamics/SimulationConfig.h"
-#include "src/dynamics/SimulationState.h"
+#include "src/simulation/SimulationConfig.h"
+#include "src/simulation/SimulationState.h"
 #include "src/read_config.h"
-#include "src/chemistry/LinearKintetics.h"
+#include "src/chemistry/prepare_chemical_kinetics.h"
 
 #include "src/network/network_topo_generator/network_topo_generator.h"
 
@@ -62,7 +62,7 @@ namespace karst {
     protected:
 
         SimulationState s {};
-        Network N = Network( confs.net_conf, confs.net_topo_conf, confs.print_conf );
+        Network N {confs.net_conf, confs.net_topo_conf, confs.print_conf };
         ReactionKinetics R  {N, confs.sim_conf, s};
 
 
@@ -77,8 +77,13 @@ namespace karst {
             std::cerr<<"Initializing simulation..."<<std::endl;
             N.init();
             s.dt = confs.sim_conf.dt0;
-
             N.save_network_state();
+
+            if(confs.net_conf.reaction_set == ReactionSet::LINEAR_DP)
+            R.prepare_linear_kinetics();
+            else {std::cerr<<"ERROR: Reactions not implemented...";}
+
+            if(!R.check_implementation()) std::cerr<<"ERROR: Problem with reactions implementation...";
         }
 
         auto do_run_simulation() -> void{

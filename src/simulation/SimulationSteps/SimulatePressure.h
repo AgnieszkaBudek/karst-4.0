@@ -8,7 +8,7 @@
 #include <Eigen/Sparse>
 #include <Eigen/IterativeLinearSolvers>
 
-#include "src/dynamics/SimulationSteps/GenericSimulationStep.h"
+#include "src/simulation//SimulationSteps/GenericSimulationStep.h"
 #include "external_algorithms/algorithms_cc.h"
 
 namespace karst {

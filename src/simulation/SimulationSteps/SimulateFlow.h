@@ -6,7 +6,7 @@
 #define KARST_4_0_SIMULATEFLOW_H
 
 
-#include "src/dynamics/SimulationSteps/GenericSimulationStep.h"
+#include "src/simulation//SimulationSteps/GenericSimulationStep.h"
 #include "external_algorithms/algorithms_cc.h"
 
 namespace karst {

@@ -24,7 +24,8 @@ namespace karst{
     enum class ElementType {
         NODE,
         PORE,
-        GRAIN
+        GRAIN,
+        SIZE
     };
     // Specialization of EnumToString
     template<>
@@ -120,8 +121,8 @@ namespace karst{
         //Saving info
         auto save_state()    -> void {}
         auto save_topology() -> void {}
-        auto log_state(const std::ostream& log_file)    ->  void {}
-        auto log_topology(const std::ostream& log_file) ->  void {}
+        auto log_state    (const std::ostream& log_file)  ->  void {}
+        auto log_topology (const std::ostream& log_file)  ->  void {}
 
 
         //Setting the topology
@@ -133,7 +134,7 @@ namespace karst{
         auto get_pores  () const ->  const std::vector<Pore*  >&  { return pores; }
         auto get_grains () const ->  const std::vector<Grain* >&  { return grains; }
 
-        auto check_if_active () const -> const bool {return active;}
+        auto check_if_active () const -> bool {return active;}
 
         auto deactivate () -> void {
             active = false;
@@ -153,7 +154,7 @@ namespace karst{
 
         const NetworkConfig& net_config;               ///< NetworkConfig   //zmienić potem na const Network* const S;
         const NetworkTopologyConfig& topo_config;
-        ElementConfig config;                  ///< Config
+        ElementConfig config;                          ///< Config
 
 
     protected:
@@ -162,10 +163,10 @@ namespace karst{
         std::vector<Pore*>     pores{};		///< list of pores connected to the element
         std::vector<Grain*>    grains{};    ///< list of grains connected to the element
 
-        bool active{true};               ///< if the element is still part of the network
-        Long step{0};                    ///< time step the element has been updated the last time
+        bool active{true};                   ///< if the element is still part of the network
+        Long step{0};                        ///< time step the element has been updated the last time
 
-        ElementTopoState  topo_s{}; ///< temporal properties of an element
+        ElementTopoState  topo_s{};        ///< temporal properties of an element
         ElementState      state{};         ///< current state of an element
         ElementState      s_old{};         ///< state of an element in previous time step
 

@@ -6,9 +6,9 @@
 #define KARST_4_0_SIMULATECONCENTRATION_H
 
 #include <list>
-#include "src/dynamics/SimulationSteps/GenericSimulationStep.h"
+#include "src/simulation/SimulationSteps/GenericSimulationStep.h"
 #include "src/chemistry/ReactionConfig.h"
-#include "src/chemistry/LinearKintetics.h"
+#include "src/chemistry/prepare_chemical_kinetics.h"
 
 namespace karst {
 
@@ -16,7 +16,7 @@ namespace karst {
     struct SimulateConcentrationState {
 
         Flow eps_q{0.000001};
-        std::map <SPECIES, bool> has_been_set;
+        EnumArray<SOLUBLES, bool, enum_size_v<SOLUBLES>> has_been_set {false};
 
     };
 
@@ -28,17 +28,17 @@ namespace karst {
 
         auto do_init() -> void {
             name = "SimulateConcentrationState";
-            for(auto species : S.config.species_to_be_calculated)
+            for(auto species : S.config.solubleS)
                 state.has_been_set[species] = false;
 
     }
 
         auto do_run()  -> void {
 
-        for(auto species : S.config.species_to_be_calculated)
+        for(auto species : S.config.solubleS)
                 state.has_been_set[species] = false;
 
-            for(auto species : S.config.species_to_be_calculated) {
+            for(auto species : S.config.solubleS) {
                 calculate_species(species);
                 state.has_been_set[species] = true;
             }
@@ -59,13 +59,8 @@ namespace karst {
 
 
 
-        auto outlet_CFlux(NodePore np, SPECIES species) -> CFlux{
-            auto [n,p] = np;
 
-            return 0._X;} //FIXME: TO BE IMPLEMENTED
-
-
-        auto set_new_concentration(Node& n, SPECIES species) -> void{
+        auto set_new_concentration(Node& n, SOLUBLES species) -> void{
 
             Flow Q   = 0._F;
             CFlux QC = 0._X;
@@ -73,7 +68,7 @@ namespace karst {
             for (auto& [nn,pp]: n.get_nodes_pores())
                 if(abs(pp->get_q()) > state.eps_q and nn->get_u() > n.get_u()){
                     Q = Q + abs(pp->get_q());
-                    QC = QC + outlet_CFlux(NodePore{.n=nn,.p=pp},species);
+                    QC = QC + abs(pp->get_q())*R.get_outlet_concentration(species)(NodePore{.n=nn,.p=pp});
                 }
 
             assert(Q>0._F and QC>0._X and "Problem while " + name + " for species"+"for node"<<n.name);
@@ -81,7 +76,7 @@ namespace karst {
         }
 
 
-        auto calculate_species(SPECIES species) -> void {
+        auto calculate_species(SOLUBLES species) -> void {
 
             std::cerr<<"Running calculate_species for "<<species<<"..."<<std::endl;
             std::list<Node *> to_be_checked;
@@ -91,7 +86,7 @@ namespace karst {
                     );
 
             for(auto& n : S.get_inlets()){
-                n->set_c(species, S.config.inlet_c.at(species));   //Filling concentration in inlet nodes
+                n->set_c(species, S.config.inlet_c[species]);   //Filling concentration in inlet nodes
                 n->set_connected_to_percolation_cluster();
                 for (auto& nn : n->get_nodes()){
                     n->set_checked_for_percolation();

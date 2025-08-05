@@ -10,7 +10,7 @@ namespace karst {
 
     struct GrainState {
 
-        std::map <SPECIES, Volume> v;      ///< Volume of specific species
+        EnumArray <SOLIDS, Volume, enum_size_v<SOLIDS>> v{0._V};      ///< Volume of specific species
         Volume max_volume {NaN};           ///< maximal volume of a grain (corresponding to zero porosity)
         Volume tot_volume {NaN};           ///< total volume of a grain
 
@@ -26,26 +26,28 @@ namespace karst {
             explicit Grain  (const NetworkConfig & net_conf0, const NetworkTopologyConfig &topo_conf0, const ElementConfig config0) : GenericElement<Grain, GrainState>(net_conf0,topo_conf0,config0){}
 
 
-            [[nodiscard]] auto check_if_space_left () const -> bool      { return state.tot_volume < state.max_volume; }
-            [[nodiscard]] auto get_max_volume      () const -> Volume    { return state.max_volume; }
-            [[nodiscard]] auto get_tot_v           () const -> Volume    { return state.tot_volume; }
+            auto check_if_space_left () const -> bool      { return state.tot_volume < state.max_volume; }
+            auto get_max_volume      () const -> Volume    { return state.max_volume; }
+            auto get_tot_v           () const -> Volume    { return state.tot_volume; }
+            auto if_species_left     (SOLIDS sp) const -> bool   { return state.v[sp] > 0._V; }
 
-            auto get_v(SPECIES sp)  const -> Volume {
+            auto get_v(SOLIDS sp)  const -> Volume {
                 assert(state.v.find(sp) != state.v.end() && "Key not found in the map");
-                return state.v.at(sp);
+                return state.v[sp];
             }
 
-            auto set_v(SPECIES sp, Volume v_new) -> void { state.v[sp] = v_new; }
+            auto set_v(SOLIDS sp, Volume v_new) -> void { state.v[sp] = v_new; }
+            auto add_v(SOLIDS sp, Volume v_new) -> void { state.v[sp] = state.v[sp] + v_new; }
 
 
             auto calculate_tot_v () -> Volume
             {
                 return std::accumulate(
-                        state.v.begin(),
-                        state.v.end(),
+                        state.v.get_data().begin(),
+                        state.v.get_data().end(),
                         Volume(0.0),
-                        [](Volume value, const std::pair<SPECIES, Volume>& p) {
-                        return value + p.second;
+                        [](Volume value, const  Volume v) {
+                        return value + v;
                     });
             }
 
@@ -55,7 +57,7 @@ namespace karst {
             friend log_stream& operator<<(log_stream& os, const Grain& obj) {
                 os <<  obj.config.type << ": "<< obj.config.name << std::endl;
                 os <<"\tVolume";
-                for(auto&[key,value]: obj.state.v)
+                for(auto[key,value]: obj.state.v.entries())
                     os << key <<" <-> "<<value<<"\t";
                 os << "max_volume = " << obj.state.max_volume << " tot_volume" << obj.state.tot_volume;
                 os << std::endl<<std::endl;
@@ -74,9 +76,9 @@ namespace karst {
         {
             //s.max_volume = area(n);
             //s.v = {{SPECIES::A, calculate_initial_vol()}};
-            for (auto sp : solidS){
-                if (sp != SPECIES::A)
-                    state.v[sp] = 0.0_V;
+            for (auto sp : net_config.solidS){
+                if (sp != SOLIDS::A)
+                    state.v[sp]=0.0_V;
             }
         }
 
@@ -86,8 +88,8 @@ namespace karst {
             return (
                     !std::isnan(double(state.max_volume)) and
                     !std::isnan(double(state.tot_volume)) and
-                    std::ranges::all_of(state.v, [](const auto& pair) {
-                        return double(pair.second) >= 0;
+                    std::ranges::all_of(state.v.get_data(), [](const auto& x) {
+                        return double(x) >= 0;
                     })
                     );
         }

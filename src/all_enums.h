@@ -14,8 +14,16 @@
 #include <map>
 #include <numeric>
 #include <cassert>
+#include <cstddef>
+#include <type_traits>
 
 namespace karst{
+
+
+
+
+    template<typename Enum>
+    constexpr std::size_t enum_size_v = static_cast<std::size_t>(Enum::SIZE);
 
     // Enum <-> string interface
 
@@ -54,7 +62,7 @@ namespace karst{
     }
 
 
-    enum class SimulationStateType          {WARNING, NORMAL, BREAKTHROUGH};
+    enum class SimulationStateType          {WARNING, NORMAL, BREAKTHROUGH, SIZE};
     // Specialization of EnumToString
     template<>
     const std::map<SimulationStateType, std::string> EnumToString<SimulationStateType>::mapping = {
@@ -64,7 +72,7 @@ namespace karst{
     };
 
 
-    enum class TimeAdaptationMode {INCREASE, DECREASE, NEUTRAL};
+    enum class TimeAdaptationMode {INCREASE, DECREASE, NEUTRAL, SIZE};
     template<>
     const std::map<TimeAdaptationMode, std::string> EnumToString<TimeAdaptationMode>::mapping = {
             {TimeAdaptationMode::INCREASE,  "INCREASE" },
@@ -74,7 +82,7 @@ namespace karst{
 
 
     // enum class for different types of topology
-    enum class TypeOfNetTopology  {HEXAGONAL, FROM_FILE, FROM_TRIANGULATION};
+    enum class TypeOfNetTopology  {HEXAGONAL, FROM_FILE, FROM_TRIANGULATION, SIZE};
 
     // Specialization of EnumToString for TypeOfNetTopology
     template<>
@@ -86,7 +94,7 @@ namespace karst{
 
 
     // enum class for different types of merging
-    enum class TypeOfMerging { MERGING_NONE, MERGING_GRAINS };
+    enum class TypeOfMerging { MERGING_NONE, MERGING_GRAINS, SIZE};
     // Specialization of EnumToString
     template<>
     const std::map<TypeOfMerging, std::string> EnumToString<TypeOfMerging>::mapping = {
@@ -95,7 +103,7 @@ namespace karst{
     };
 
 
-    enum class PrintingMode {DEBUGGING_PRINT_M, GRAIN_PRINT_M};
+    enum class PrintingMode {DEBUGGING_PRINT_M, GRAIN_PRINT_M, SIZE};
     // Specialization of EnumToString
     template<>
     const std::map<PrintingMode, std::string> EnumToString<PrintingMode>::mapping = {
@@ -104,7 +112,7 @@ namespace karst{
     };
 
 
-    enum class StepStateType          {WARNING, NORMAL, ERROR};
+    enum class StepStateType          {WARNING, NORMAL, ERROR, SIZE};
     // Specialization of EnumToString
     template<>
     const std::map<StepStateType, std::string> EnumToString<StepStateType>::mapping = {
@@ -113,7 +121,7 @@ namespace karst{
             {StepStateType::ERROR   ,    "ERROR"   }
     };
 
-    enum class MatrixSolver          {MUMPS, HYPRE, EIGEN };
+    enum class MatrixSolver          {MUMPS, HYPRE, EIGEN, SIZE};
     // Specialization of EnumToString
     template<>
     const std::map<MatrixSolver, std::string> EnumToString<MatrixSolver>::mapping = {
@@ -123,7 +131,7 @@ namespace karst{
     };
 
 
-    enum class Pressure_Algorithm       {CLASSIC, SMALL_PORES, BIG_PORES};
+    enum class Pressure_Algorithm       {CLASSIC, SMALL_PORES, BIG_PORES, SIZE};
     // Specialization of EnumToString
     template<>
     const std::map<Pressure_Algorithm, std::string> EnumToString<Pressure_Algorithm>::mapping = {
@@ -132,7 +140,7 @@ namespace karst{
             {Pressure_Algorithm::BIG_PORES,     "BIG_PORES" },
     };
 
-    enum class PoreGeometry       {CYLINDER, THIN_A, THICK_A, U_SHAPE};
+    enum class PoreGeometry       {CYLINDER, THIN_A, THICK_A, U_SHAPE, SIZE};
     template<>
     const std::map<PoreGeometry, std::string> EnumToString<PoreGeometry>::mapping = {
             {PoreGeometry::CYLINDER, "CYLINDER" },  // standard cylindrical
@@ -141,13 +149,15 @@ namespace karst{
             {PoreGeometry::U_SHAPE,  "U_SHAPE" },   //for experiments with Michal
     };
 
-    enum class PoreType       {MATRIX, FRACTURE};
+    enum class PoreType       {MATRIX, FRACTURE, SIZE};
     template<>
     const std::map<PoreType, std::string> EnumToString<PoreType>::mapping = {
             {PoreType::MATRIX,      "MATRIX" },
             {PoreType::FRACTURE,    "FRACTURE" },
 
     };
+
+    enum class ReactionSet      {LINEAR_DP, SIZE};
 
 }
 

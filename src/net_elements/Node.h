@@ -37,7 +37,7 @@ namespace karst {
     struct NodeState {
 
         Pressure u{NaN};
-        std::map <SPECIES, Concentration> c;              ///< concentration of specific species
+        EnumArray <SOLUBLES, Concentration,enum_size_v<SOLUBLES>> c{0._C};     ///< concentration of specific species
     };
 
     struct NodePore{
@@ -60,17 +60,14 @@ namespace karst {
 
         auto get_nodes_pores  () const ->  const std::vector<NodePore>&  { return nodePores; }
 
-        auto set_type (NodeType t0)                 -> void      { type = t0;   }
-        auto get_type () const                      -> NodeType  { return type; }
-        auto set_pos  (Point3D p0)                  -> void      { pos = p0;    }
-        auto get_pos  () const                      -> Point3D   { return pos;  }
-        auto set_u    (Pressure u0)                 -> void      { state.u = u0;    }
-        auto get_u    () const                      -> Pressure  { return state.u;  }
-        auto set_c    (SPECIES sp, Concentration c) -> void      { state.c[sp] = c; }
-        auto get_c    (SPECIES sp) const            -> Concentration{
-            assert(state.c.find(sp) != state.c.end() && "Key not found in the map");
-            return state.c.at(sp);
-        }
+        auto set_type (NodeType t0)                  -> void      { type = t0;   }
+        auto get_type () const                       -> NodeType  { return type; }
+        auto set_pos  (Point3D p0)                   -> void      { pos = p0;    }
+        auto get_pos  () const                       -> Point3D   { return pos;  }
+        auto set_u    (Pressure u0)                  -> void      { state.u = u0;    }
+        auto get_u    () const                       -> Pressure  { return state.u;  }
+        auto set_c    (SOLUBLES sp, Concentration c) -> void            { state.c[sp] = c; }
+        auto get_c    (SOLUBLES sp) const            -> Concentration   {return state.c[sp];}
 
 
 
@@ -80,7 +77,7 @@ namespace karst {
         {
             os <<  obj.config.type << ": "<< obj.config.name << std::endl;
             os <<"\tConcentration: ";
-            for(auto&[key,value]: obj.state.c)
+            for(auto [key,value] : obj.state.c.entries())
                 os << key <<" <-> "<<value<<"\t";
             os << std::endl;
             return os;
@@ -103,10 +100,10 @@ namespace karst {
 
         auto do_init() -> void
         {
-            for (auto sp : solubleS)
+            for (auto sp : net_config.solubleS)
                 if (type == NodeType::INPUT){
                     assert(net_config.inlet_c.find(sp) != net_config.inlet_c.end() && "Key not found in the map");
-                    state.c[sp] = net_config.inlet_c.at(sp);
+                    state.c[sp] = net_config.inlet_c[sp];
                 }
                 else
                     state.c[sp] = Concentration{0.0};
@@ -130,8 +127,8 @@ namespace karst {
 
             return (
                     !std::isnan(double(state.u)) and
-                    std::ranges::all_of(state.c, [](const auto& pair) {
-                        return double(pair.second) >= 0;
+                    std::ranges::all_of(state.c.get_data(), [](auto& pair) {
+                        return double(pair.value) >= 0;
                     }) and
                             !isnan(pos)
             );

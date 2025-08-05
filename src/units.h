@@ -35,7 +35,22 @@ namespace karst {
                 std::enable_if_t<
                         std::is_same_v<U, Unit<std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>>>, int> = 0
         >
-        explicit operator double() const { return value; }
+
+        //double()
+        constexpr explicit operator double() const { return value; }
+
+        // operator +=
+        constexpr Unit& operator+=(const Unit& other) {
+            this->value += other.value;
+            return *this;
+        }
+
+        // Unit multiplication by double
+        constexpr auto operator*( const double rhs) {return Unit(value * rhs);}
+
+        // Units times -1
+        constexpr auto operator-(const Unit& u) {return Unit(-u.value);}
+
 
     };
 
@@ -83,21 +98,17 @@ namespace karst {
     inline CFlux         operator"" _X(long double v) { return CFlux         (static_cast<double>(v)); }
     inline Unitless      operator"" _U(long double v) { return Unitless      (static_cast<double>(v)); }
 
+
     // Unit multiplication by double
     template<typename M1, typename L1, typename T1, typename C1, typename T>
-    auto operator*(const Unit<M1, L1, T1, C1, T>& lhs, const double rhs) {
-        return Unit<M1, L1, T1, C1, T>(lhs.value * rhs);
-    }
-    // Unit multiplication by double
-    template<typename M1, typename L1, typename T1, typename C1, typename T>
-    auto operator*(const double lhs, const Unit<M1, L1, T1, C1, T>& rhs) {
+    constexpr auto operator*(const double lhs, const Unit<M1, L1, T1, C1, T>& rhs) {
         return Unit<M1, L1, T1, C1, T>(rhs.value * lhs);
     }
 
 
     // Units multiplication
     template<typename M1, typename L1, typename T1, typename C1, typename T, typename M2, typename L2, typename T2, typename C2>
-    auto operator*(const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M2, L2, T2, C2, T>& rhs) {
+    constexpr auto operator*(const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M2, L2, T2, C2, T>& rhs) {
         return Unit<
                 std::ratio_add<M1, M2>,
                 std::ratio_add<L1, L2>,
@@ -109,7 +120,7 @@ namespace karst {
 
 // Units division
     template<typename M1, typename L1, typename T1, typename C1, typename T, typename M2, typename L2, typename T2, typename C2>
-    auto operator/(const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M2, L2, T2, C2, T>& rhs) {
+    constexpr auto operator/(const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M2, L2, T2, C2, T>& rhs) {
         return Unit<
                 std::ratio_subtract<M1, M2>,
                 std::ratio_subtract<L1, L2>,
@@ -121,52 +132,45 @@ namespace karst {
 
 // Units addition
     template<typename M1, typename L1, typename T1, typename C1, typename T>
-    auto operator+(const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) {
+    constexpr auto operator+(const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) {
         return Unit<M1, L1, T1, C1, T>(lhs.value + rhs.value);
     }
 
 // Units subtraction
     template<typename M1, typename L1, typename T1, typename C1, typename T>
-    auto operator-(const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) {
+    constexpr auto operator-(const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) {
         return Unit<M1, L1, T1, C1, T>(lhs.value - rhs.value);
     }
 
-    // Units times -1
-    template<typename M1, typename L1, typename T1, typename C1, typename T>
-    auto operator-(const Unit<M1, L1, T1, C1, T>& u) {
-        return Unit<M1, L1, T1, C1, T>(-u.value);
-    }
+
 
 // Units comparison
     template<typename M1, typename L1, typename T1, typename C1, typename T>
-    auto operator < (const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) ->bool {
+    constexpr auto operator < (const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) ->bool {
         return lhs.value < rhs.value;
     }
 
     template<typename M1, typename L1, typename T1, typename C1, typename T>
-    auto operator <= (const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) ->bool {
+    constexpr auto operator <= (const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) ->bool {
         return lhs.value <= rhs.value;
     }
 
     template<typename M1, typename L1, typename T1, typename C1, typename T>
-    auto operator > (const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) ->bool {
+    constexpr auto operator > (const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) ->bool {
         return lhs.value > rhs.value;
     }
 
     template<typename M1, typename L1, typename T1, typename C1, typename T>
-    auto operator >= (const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) ->bool {
+    constexpr auto operator >= (const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) ->bool {
         return lhs.value >= rhs.value;
     }
 
     template<typename M1, typename L1, typename T1, typename C1, typename T>
-    auto operator == (const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) ->bool {
+    constexpr auto operator == (const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) ->bool {
         return lhs.value == rhs.value;
     }
 
-    template<typename M1, typename L1, typename T1, typename C1, typename T>
-    auto abs(const Unit<M1, L1, T1, C1, T>& u) {
-        return  Unit<M1, L1, T1, C1, T>(fabs(u.value));
-    }
+
 
     template<typename M1, typename L1, typename T1, typename C1, typename T>
     std::istream& operator >> (std::istream& is,Unit<M1, L1, T1, C1, T>& lhs)  {
@@ -174,8 +178,13 @@ namespace karst {
         return lhs;
     }
 
+    template<typename M1, typename L1, typename T1, typename C1, typename T>
+    constexpr auto abs(const Unit<M1, L1, T1, C1, T>& u) {
+        return  Unit<M1, L1, T1, C1, T>(fabs(u.value));
+    }
+
     template<int N, typename M1, typename L1, typename T1, typename C1, typename T>
-    auto power(const Unit<M1, L1, T1, C1, T>& u) {
+    constexpr auto power(const Unit<M1, L1, T1, C1, T>& u) {
         return  Unit<
                 std::ratio_multiply<M1, std::ratio<N>>,
                 std::ratio_multiply<L1, std::ratio<N>>,

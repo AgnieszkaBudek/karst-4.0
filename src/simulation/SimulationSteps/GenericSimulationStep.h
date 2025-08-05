@@ -8,8 +8,9 @@
 #include "src/utils.h"
 #include "src/units.h"
 #include "src/network/Network.h"
-#include "src/dynamics/SimulationConfig.h"
-#include "src/dynamics/SimulationState.h"
+#include "src/simulation/SimulationConfig.h"
+#include "src/simulation/SimulationState.h"
+#include "src/chemistry/ReactionKinetics.h"
 
 
 namespace karst{
@@ -19,9 +20,10 @@ namespace karst{
     public:
 
         explicit GenericSimulationStep(Network& S0,
+                                       const ReactionKinetics& R0,
                                        const SimulationConfig& sim_config0,
                                        const SimulationState& sim_state0) :
-                                       S{S0},
+                                       S{S0},R{R0},
                                        sim_config{sim_config0},
                                        sim_state{sim_state0}
         {}
@@ -74,6 +76,7 @@ namespace karst{
     protected:
 
         Network&  S;
+        const ReactionKinetics& R;
         Time t {0.};            ///< time step the simulation step was run the last time
         Long step {0};          ///< time step the simulation step was run the last time
         const SimulationState& sim_state;
