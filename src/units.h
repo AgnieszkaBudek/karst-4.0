@@ -45,11 +45,8 @@ namespace karst {
             return *this;
         }
 
-        // Unit multiplication by double
-        constexpr auto operator*( const double rhs) {return Unit(value * rhs);}
-
-        // Units times -1
-        constexpr auto operator-(const Unit& u) {return Unit(-u.value);}
+//        // Unit multiplication by double
+//        constexpr auto operator*( const double rhs) {return Unit(value * rhs);}
 
 
     };
@@ -74,6 +71,7 @@ namespace karst {
     using Area       = Unit<std::ratio<0>, std::ratio<2>,  std::ratio<0>,  std::ratio<0>>;
     using Volume     = Unit<std::ratio<0>, std::ratio<3>,  std::ratio<0>,  std::ratio<0>>;
     using Viscosity  = Unit<std::ratio<1>, std::ratio<-1>, std::ratio<-1>, std::ratio<0>>;
+    using Permeability  = Unit<std::ratio<-1>, std::ratio<4>, std::ratio<1>, std::ratio<0>>;
     using Concentration = Unit<std::ratio<0>, std::ratio<-3>, std::ratio<0>, std::ratio<1>>;
     using CFlux         = Unit<std::ratio<0>, std::ratio<0>, std::ratio<-1>, std::ratio<1>>;
     using Unitless      = Unit<std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>>;
@@ -105,6 +103,11 @@ namespace karst {
         return Unit<M1, L1, T1, C1, T>(rhs.value * lhs);
     }
 
+    // Unit multiplication by double
+    template<typename M1, typename L1, typename T1, typename C1, typename T>
+    constexpr auto operator*(const Unit<M1, L1, T1, C1, T>& lhs, const double rhs) {
+        return Unit<M1, L1, T1, C1, T>(lhs.value * rhs);
+    }
 
     // Units multiplication
     template<typename M1, typename L1, typename T1, typename C1, typename T, typename M2, typename L2, typename T2, typename C2>
@@ -142,7 +145,11 @@ namespace karst {
         return Unit<M1, L1, T1, C1, T>(lhs.value - rhs.value);
     }
 
-
+    // Units times -1
+    template<typename M1, typename L1, typename T1, typename C1, typename T>
+    auto operator-(const Unit<M1, L1, T1, C1, T>& u) {
+        return Unit<M1, L1, T1, C1, T>(-u.value);
+    }
 
 // Units comparison
     template<typename M1, typename L1, typename T1, typename C1, typename T>

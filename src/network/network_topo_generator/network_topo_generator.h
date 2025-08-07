@@ -9,7 +9,6 @@
 
 namespace karst{
 
-    void createHexagonalNetwork(Network& S, Int N_x, Int N_y);
 
 
     auto Network::prepare_network_topology() -> void{
@@ -50,7 +49,7 @@ namespace karst{
 
 
         // 5. Delete unused elements
-        if (t_config.do_clean_unused_pores) {
+        if (t_config.do_clear_unused_net_el) {
             std::cerr << "Clearing unused elements of the network:" << std::endl;
             clear_unused_elements();
         }

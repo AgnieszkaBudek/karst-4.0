@@ -23,6 +23,8 @@ namespace karst {
     class SimulateConcentrations : public GenericSimulationStep <SimulateConcentrations,SimulateConcentrationState> {
 
     public:
+        friend class GenericSimulationStep<SimulateConcentrations, SimulateConcentrationState>;
+        using GenericSimulationStep::GenericSimulationStep;
 
     protected:
 
@@ -44,6 +46,8 @@ namespace karst {
             }
         }
 
+        auto do_check() -> bool{return true;};   //TODO: implement later
+
 
         auto can_be_calculated(Node& n) const -> bool{  //checked if logic is correct
             return std::ranges::all_of(
@@ -58,8 +62,6 @@ namespace karst {
         }
 
 
-
-
         auto set_new_concentration(Node& n, SOLUBLES species) -> void{
 
             Flow Q   = 0._F;
@@ -71,7 +73,7 @@ namespace karst {
                     QC = QC + abs(pp->get_q())*R.get_outlet_concentration(species)(NodePore{.n=nn,.p=pp});
                 }
 
-            assert(Q>0._F and QC>0._X and "Problem while " + name + " for species"+"for node"<<n.name);
+            ASSERT_MSG(Q>0._F and QC>0._X , std::string("Problem for species")+species+"for node"+ std::to_string(n.config.name));
             if(Q>0._F and QC>0._X) n.set_c(species, QC/Q);
         }
 

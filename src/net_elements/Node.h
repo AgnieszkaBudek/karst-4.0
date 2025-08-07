@@ -102,7 +102,6 @@ namespace karst {
         {
             for (auto sp : net_config.solubleS)
                 if (type == NodeType::INPUT){
-                    assert(net_config.inlet_c.find(sp) != net_config.inlet_c.end() && "Key not found in the map");
                     state.c[sp] = net_config.inlet_c[sp];
                 }
                 else

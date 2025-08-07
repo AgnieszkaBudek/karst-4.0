@@ -32,23 +32,21 @@ namespace karst {
             auto if_species_left     (SOLIDS sp) const -> bool   { return state.v[sp] > 0._V; }
 
             auto get_v(SOLIDS sp)  const -> Volume {
-                assert(state.v.find(sp) != state.v.end() && "Key not found in the map");
                 return state.v[sp];
             }
 
             auto set_v(SOLIDS sp, Volume v_new) -> void { state.v[sp] = v_new; }
-            auto add_v(SOLIDS sp, Volume v_new) -> void { state.v[sp] = state.v[sp] + v_new; }
+            auto add_v(SOLIDS sp, Volume v_new) -> void { state.v[sp] +=  v_new; }
 
 
             auto calculate_tot_v () -> Volume
             {
-                return std::accumulate(
-                        state.v.get_data().begin(),
-                        state.v.get_data().end(),
-                        Volume(0.0),
-                        [](Volume value, const  Volume v) {
-                        return value + v;
-                    });
+                Volume V_tot {0.};
+                for(auto v : state.v.get_data())
+                    V_tot+=v;
+                return V_tot;
+
+
             }
 
 
@@ -74,8 +72,8 @@ namespace karst {
 
         auto do_init() -> void
         {
-            //s.max_volume = area(n);
-            //s.v = {{SPECIES::A, calculate_initial_vol()}};
+            //state.max_volume = area(nodes);
+            //state.v = {{SPECIES::A, calculate_initial_vol()}};
             for (auto sp : net_config.solidS){
                 if (sp != SOLIDS::A)
                     state.v[sp]=0.0_V;

@@ -2,12 +2,11 @@
 // Created by Agnieszka on 24/05/2024.
 //
 
-#ifndef KARST_4_0_SIMULATEPRESSURE_H
+#ifndef KARST_4_0_SIMULATEFLOW_H
 #define KARST_4_0_SIMULATEFLOW_H
 
 
 #include "src/simulation//SimulationSteps/GenericSimulationStep.h"
-#include "external_algorithms/algorithms_cc.h"
 
 namespace karst {
 
@@ -16,8 +15,11 @@ namespace karst {
         Unitless eps_q = 1.e-5_U;     ///<acceptable error for flow calculations
     };
 
-    class SimulateFLow : public GenericSimulationStep <SimulateFLow,SimulateFlowState> {
+    class SimulateFlow : public GenericSimulationStep <SimulateFlow,SimulateFlowState> {
 
+    public:
+        friend class GenericSimulationStep<SimulateFlow, SimulateFlowState>;
+        using GenericSimulationStep::GenericSimulationStep;
 
     protected:
 
@@ -41,7 +43,8 @@ namespace karst {
                 for(auto p : in->get_pores())
                     Q_tmp = Q_tmp + p->get_q();
 
-            assert(Q_tmp>0 and "ERROR: Problem with inlet flow in " + state.name);
+
+            ASSERT_MSG(Q_tmp>0._F , "ERROR: Problem with inlet flow in calculating flow." + std::to_string(double(Q_tmp)));
             for(auto& p : S.get_pores())
                 p.set_q(p.get_q()*S.config.Q_tot/Q_tmp);
         }
@@ -56,7 +59,7 @@ namespace karst {
                 for(auto p : out->get_pores())
                     Q_in = Q_in + abs(p->get_q());
 
-            assert(Q_in>0 and Q_out>0 and "ERROR: Problem with inlet/outlet flow in " + state.name);
+            ASSERT_MSG(Q_in>0._F and Q_out>0._F , "ERROR: Problem with inlet/outlet flow in calculating flow.");
             return abs(Q_in-Q_out)/abs(Q_in+Q_out) < state.eps_q;
         }
 
@@ -67,4 +70,4 @@ namespace karst {
 
 
 
-#endif //KARST_4_0_SIMULATEPRESSURE_H
+#endif //KARST_4_0_SIMULATEFLOW_H

@@ -57,6 +57,7 @@ namespace karst {
         Volume sum = 0._V;
         for(auto g : grains)
             sum = sum + g->get_v(species);
+        return sum;
     }
 
     auto Pore::get_surface   (SOLIDS sp) const -> Area {   //return surface in content with species sp

@@ -10,7 +10,7 @@
 #include "src/units.h"
 #include "src/network/NetworkConfig.h"
 #include "src/network/NetworkTopologyConfig.h"
-#include "src/dynamics/SimulationConfig.h"
+#include "src/simulation//SimulationConfig.h"
 #include "src/import_export/PrintingConfig.h"
 
 namespace karst {
@@ -29,7 +29,7 @@ namespace karst {
         // Parser config map
         //TODO ; przepisać ten kawałek tak, by mieć tylko mapę łączątą stringi ze wskaźnikami oraz dla każdego typu przeładowanie typ<< string!!!
 
-        std::map<std::string, std::function<void(const std::string&)>> config_map = {
+        const std::map<std::string, std::function<void(const std::string&)>> config_map = {
                  {"N_x", [&](const std::string& value) {
                      net_top_conf.N_x = std::stoi(value);
                      net_conf.Q_tot = Flow(2 * net_top_conf.N_x);
@@ -73,8 +73,8 @@ namespace karst {
                      std::cerr << "Setting net_top_conf.do_randomness_in_regular_net = " << std::boolalpha << net_top_conf.do_randomness_in_regular_net << std::endl;
                  }},
                  {"do_clear_unused_pores", [&](const std::string& value) {
-                     net_top_conf.do_clean_unused_pores = (value == "true");
-                     std::cerr << "Setting net_top_conf.do_clear_unused_pores = " << std::boolalpha << net_top_conf.do_clean_unused_pores << std::endl;
+                     net_top_conf.do_clear_unused_net_el = (value == "true");
+                     std::cerr << "Setting net_top_conf.do_clear_unused_pores = " << std::boolalpha << net_top_conf.do_clear_unused_net_el << std::endl;
                  }},
                  {"do_periodic_bc", [&](const std::string& value) {
                      net_top_conf.do_periodic_bc = (value == "true");
@@ -117,7 +117,7 @@ namespace karst {
                      std::cerr << "Setting net_top_conf.point_outlet = " << std::boolalpha << net_top_conf.point_outlet << std::endl;
                  }},
                  {"T_max", [&](const std::string& value) {
-                     sim_conf.T_max = Long(std::stol(value));
+                     sim_conf.T_max = Time(std::stol(value));
                      std::cerr << "Setting sim_conf.T_max = " << sim_conf.T_max << std::endl;
                  }},
                  {"l0", [&](const std::string& value) {
@@ -257,10 +257,6 @@ namespace karst {
                      else
                          std::cerr << "WARNING: Wrong value of variable print_conf.do_debugging_printing. Set true or false." << std::endl;
                      std::cerr << "Setting print_conf.do_debugging_printing = " << std::boolalpha << print_conf.do_debugging_printing << std::endl;
-                 }},
-                 {"T_max", [&](const std::string& value) {
-                     sim_conf.T_max = Long(std::stol(value));
-                     std::cerr << "Setting sim_conf.T_max = " << sim_conf.T_max << std::endl;
                  }},
                  {"tot_steps", [&](const std::string& value) {
                      sim_conf.tot_steps = Long(std::stol(value));

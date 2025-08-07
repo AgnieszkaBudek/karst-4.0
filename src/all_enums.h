@@ -20,21 +20,23 @@
 namespace karst{
 
 
+    template<typename T>
+    concept Enum = std::is_enum_v<T>;
 
-
-    template<typename Enum>
-    constexpr std::size_t enum_size_v = static_cast<std::size_t>(Enum::SIZE);
+    template<Enum T>
+    constexpr std::size_t enum_size_v = static_cast<std::size_t>(T::SIZE);
 
     // Enum <-> string interface
 
-    template<typename T>
+    template<Enum T>
     struct EnumToString {
         static const std::map<T, std::string> mapping;
     };
 
-    template<typename T>
-    typename std::enable_if<std::is_enum<T>::value, std::ostream&>::type
-    operator<<(std::ostream& os, T value) {
+
+
+    template<Enum T>
+    std::ostream& operator<<(std::ostream& os, T value) {
         const auto& mapping = EnumToString<T>::mapping;
         auto it = mapping.find(value);
         if (it != mapping.end()) {
@@ -45,6 +47,23 @@ namespace karst{
         return os;
     }
 
+// operator+
+    template<Enum T>
+    std::string operator+(const std::string& str, T value) {
+        const auto& mapping = EnumToString<T>::mapping;
+        auto it = mapping.find(value);
+        if (it != mapping.end()) {
+            return str + it->second;
+        } else {
+            std::cerr << "Unknown enum value.\n";
+            return str + "UNKNOWN_ENUM";
+        }
+    }
+
+    template<Enum T>
+    std::string operator+(const char* lhs, T rhs) {
+        return std::string(lhs) + rhs;
+    }
 
     template<typename T>
     typename std::enable_if<std::is_enum<T>::value, T&>::type
@@ -62,13 +81,14 @@ namespace karst{
     }
 
 
-    enum class SimulationStateType          {WARNING, NORMAL, BREAKTHROUGH, SIZE};
+    enum class SimulationStateType          {WARNING, NORMAL, BREAKTHROUGH, FINISHED, SIZE};
     // Specialization of EnumToString
     template<>
     const std::map<SimulationStateType, std::string> EnumToString<SimulationStateType>::mapping = {
             {SimulationStateType::WARNING,      "WARNING" },
             {SimulationStateType::NORMAL,       "NORMAL" },
-            {SimulationStateType::BREAKTHROUGH, "BREAKTHROUGH" }
+            {SimulationStateType::BREAKTHROUGH, "BREAKTHROUGH" },
+            {SimulationStateType::FINISHED,     "FINISHED" }
     };
 
 
@@ -121,13 +141,14 @@ namespace karst{
             {StepStateType::ERROR   ,    "ERROR"   }
     };
 
-    enum class MatrixSolver          {MUMPS, HYPRE, EIGEN, SIZE};
+    enum class MatrixSolver          {MUMPS, HYPRE, EIGEN, HYPRE_MUMPS, SIZE};
     // Specialization of EnumToString
     template<>
     const std::map<MatrixSolver, std::string> EnumToString<MatrixSolver>::mapping = {
-            {MatrixSolver::MUMPS ,    "MUMPS" },
-            {MatrixSolver::HYPRE  ,   "HYPRE" },
-            {MatrixSolver::EIGEN   ,  "EIGEN" }
+            {MatrixSolver::MUMPS        ,  "MUMPS"       },         //only MUMPS
+            {MatrixSolver::HYPRE        ,  "HYPRE"       },         //only HYPRE
+            {MatrixSolver::HYPRE_MUMPS  ,  "HYPRE_MUMPS" },         //direct: MUMPS, iterative: HYPRE
+            {MatrixSolver::EIGEN        ,  "EIGEN"       }          //direct: EIGEN:llc, iterative: EIGEN::cg
     };
 
 
@@ -157,7 +178,7 @@ namespace karst{
 
     };
 
-    enum class ReactionSet      {LINEAR_DP, SIZE};
+    enum class ReactionSet      {LINEAR_DP, LINEAR_D, SIZE};
 
 }
 

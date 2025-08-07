@@ -15,6 +15,12 @@
 
 #include "src/network/network_topo_generator/network_topo_generator.h"
 
+#include "src/simulation/SimulationSteps/SimulatePressure.h"
+#include "src/simulation/SimulationSteps/SimulateFlow.h"
+#include "src/simulation/SimulationSteps/SimulateConcentration.h"
+#include "src/simulation/SimulationSteps/SimulateGeometry.h"
+#include "src/simulation/SimulationSteps/SimulateMerging.h"
+
 
 namespace karst {
 
@@ -43,61 +49,92 @@ namespace karst {
         };
 
 
+    explicit Simulation(const std::string& cfile_name) : confs(tupleToStruct<Simulation::Configs>(read_configs(cfile_name))) {}
 
-    explicit Simulation(const std::string& cfile_name) : confs(tupleToStruct<Simulation::Configs>(read_configs(cfile_name))) {
-//        switch (confs.sim_conf.integration_mode) { //TODO: figure out how to choose the integration method...
-//            case (INTEGRATION_METHOD::EULER) :
-//
-//        }
-    }
 
 
     const Configs confs;
-
+    const SimulationConfig&      sim_conf       = confs.sim_conf;
+    const NetworkConfig&         net_conf       = confs.net_conf;
+    const PrintingConfig&        print_conf     = confs.print_conf;
+    const NetworkTopologyConfig& net_topo_conf  = confs.net_topo_conf;
 
     auto init()             -> void { do_init();}
-    auto run_simulation()   -> void {do_run_simulation();}
-    auto get_state() const  -> const SimulationState& {return s;}
+    auto run_simulation()   -> void { do_run_simulation();}
+    auto get_state() const  -> const SimulationState& {return state;}
 
     protected:
 
-        SimulationState s {};
-        Network N {confs.net_conf, confs.net_topo_conf, confs.print_conf };
-        ReactionKinetics R  {N, confs.sim_conf, s};
+        SimulationState state {};
+        Network S {net_conf, net_topo_conf, print_conf };
+        ReactionKinetics R  {S, confs.sim_conf, state};
 
+        SimulatePressure        sim_pressure        {SimulatePressure       ::Config{.S=S,.R=R,.sim_config=sim_conf, .sim_state=state}};
+        SimulateFlow            sim_flow            {SimulateFlow           ::Config{.S=S,.R=R,.sim_config=sim_conf, .sim_state=state}};
+        SimulateConcentrations  sim_concentration   {SimulateConcentrations ::Config{.S=S,.R=R,.sim_config=sim_conf, .sim_state=state}};
+        SimulateGeometry        sim_geometry        {SimulateGeometry       ::Config{.S=S,.R=R,.sim_config=sim_conf, .sim_state=state}};
 
-        auto check_simulation_state()   -> void {}  //TODO: implement later
-        auto check_dt_adaptation_mode() -> void {}  //TODO: implement later
-
-        auto save_results()             -> void {}  //TODO: implement later
 
 
         auto do_init() -> void {
 
+            // 1. Initializing Network
             std::cerr<<"Initializing simulation..."<<std::endl;
-            N.init();
-            s.dt = confs.sim_conf.dt0;
-            N.save_network_state();
+            S.init();
+            state.dt = sim_conf.dt0;
+            S.save_network_state();
 
-            if(confs.net_conf.reaction_set == ReactionSet::LINEAR_DP)
-            R.prepare_linear_kinetics();
-            else {std::cerr<<"ERROR: Reactions not implemented...";}
-
+            // 2. Preparing reactions
+            switch(confs.net_conf.reaction_set){
+                case ReactionSet::LINEAR_DP:  R.prepare_linear_dissolution_and_precipitation(); break;
+                case ReactionSet::LINEAR_D:   R.prepare_linear_dissolution(); break;
+                case ReactionSet::SIZE:       break;
+            }
             if(!R.check_implementation()) std::cerr<<"ERROR: Problem with reactions implementation...";
+
+            // 3. Preparing Simulation steps
+            sim_pressure     .init();
+            sim_flow         .init();
+            sim_concentration.init();
+            sim_geometry     .init();
+
         }
 
         auto do_run_simulation() -> void{
 
-            while(s.sim_state==SimulationStateType::NORMAL){
 
-                s.T = s.T + s.dt;
-                s.sim_step++;
+            while(state.sim_state==SimulationStateType::NORMAL){
+
+                state.T = state.T + state.dt;
+                state.sim_step++;
+                std::cerr<<"\n\n"<<state.sim_step<<". step of Simulation, ";
+                std::cerr<<"T = "<<state.T<<"."<<std::endl;
+
+                do_one_Euler_step();
 
                 save_results();
                 check_simulation_state();
-                check_dt_adaptation_mode();
+                adapt_time_step();
             }
         }
+
+
+        auto do_one_Euler_step() -> void;
+
+
+        auto check_simulation_state()   -> void {  //TODO: implement later
+
+            if(state.T >= confs.sim_conf.T_max) {
+                state.sim_state = SimulationStateType::FINISHED;
+                std::cerr << "Setting simulation state to " << state.sim_state << std::endl;
+            }
+        }
+
+        auto adapt_time_step() -> void {}  //TODO: implement later
+
+        auto save_results()             -> void {}  //TODO: implement later
+
+
 
     };
 

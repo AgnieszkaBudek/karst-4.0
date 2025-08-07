@@ -17,7 +17,7 @@ namespace karst {
 
         // flow parameter
         Pressure P_in  {10.};     ///< pressure at the inlet (must by positive)
-        Pressure P_out {0.};	     ///< pressure at the outlet, always should be set to zero
+        Pressure P_out {0.};	  ///< pressure at the outlet, always should be set to zero
         Flow     Q_tot {10.};     ///< total flow through the system (if == 0 the constant pressure is kept)
 
         Long     N_active{0};               ///<number_of_active_nodes

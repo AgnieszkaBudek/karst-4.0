@@ -20,6 +20,7 @@
 #include "src/network/NetworkState.h"
 
 
+
 namespace karst {
 
 
@@ -103,25 +104,28 @@ namespace karst {
 
         auto update_number_of_active_connections() -> void{
             auto active_nodes = nodes
-                                | std::views::filter([](const Node& n){ return n.active; });
+                                | std::views::filter([](const Node& n){
+                return n.active and
+                       n.type == NodeType::NORMAL; });
 
             auto total_size = std::accumulate(
                     active_nodes.begin(), active_nodes.end(),
                     std::size_t{0},
                     [](std::size_t sum, const Node& n){ return sum + n.nodes.size(); });
-            state.N_active_connections = total_size;
+
+            state.N_active_connections = Long(total_size);
         }
 
-        auto update_active_numbers_of_elements() -> void{
+        auto update_active_names_of_elements() -> void{
             int i=0;
             for(auto& n : nodes) if(n.active)
-                n.config.a_name = i++;
+                n.a_name = i++;
             i=0;
             for(auto& p : pores) if(p.active)
-                p.config.a_name = i++;
+                p.a_name = i++;
             i=0;
-            for(auto& g : grains) if (g.active)
-                g.config.a_name = i++;
+            for(auto& g : grains) if(g.active)
+                g.a_name = i++;
         }
 
 
@@ -135,7 +139,7 @@ namespace karst {
             // 2.  Update number of active elements
             update_number_of_active_nodes();
             update_number_of_active_connections();
-            update_active_numbers_of_elements();
+            update_active_names_of_elements();
 
 
             // 3. Set initial element state

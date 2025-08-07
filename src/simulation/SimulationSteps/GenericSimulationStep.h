@@ -18,15 +18,16 @@ namespace karst{
     class GenericSimulationStep
     {
     public:
-
-        explicit GenericSimulationStep(Network& S0,
-                                       const ReactionKinetics& R0,
-                                       const SimulationConfig& sim_config0,
-                                       const SimulationState& sim_state0) :
-                                       S{S0},R{R0},
-                                       sim_config{sim_config0},
-                                       sim_state{sim_state0}
-        {}
+        struct Config
+        {
+            Network& S;
+            const ReactionKinetics& R;
+            const SimulationConfig& sim_config;
+            const SimulationState& sim_state;
+        };
+        explicit GenericSimulationStep(const Config& c):
+                                       S{c.S}, R{c.R}, sim_config{c.sim_config}, sim_state{c.sim_state}
+                                       {}
 
 
         ~GenericSimulationStep() = default;
@@ -34,14 +35,14 @@ namespace karst{
 
         auto init (Long step0 =0, Time t0 = 0._T)  -> void {
             t = t0; step = step0;
-            static_cast<Step&>(*this)->do_init();
+            static_cast<Step&>(*this).do_init();
         }
 
         auto run  (Long step_to_be_calculated)  -> void {
 
             std::cerr<<"Running "<<name<<"..."<<std::endl;
             if (step >= step_to_be_calculated) return;      //do nth if simulation step has been already calculated for this time step
-            static_cast<Step&>(*this)->do_run();
+            static_cast<Step&>(*this).do_run();
             check_and_accept();
             step = step_to_be_calculated;
             t    = t + sim_state.dt;
@@ -51,7 +52,7 @@ namespace karst{
         auto check_and_accept () -> void{
 
             std::cerr<<"Checking "<<name<<"..."<<std::endl;
-            if(static_cast<Step&>(*this)->do_check()) {
+            if(static_cast<Step&>(*this).do_check()) {
 
                 // static_cast<Step&>(*this)->do_accept(); //TODO: Better implement it differenly
                 S.apply_to_all_nodes([](auto &el) {

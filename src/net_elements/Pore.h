@@ -53,7 +53,7 @@ namespace karst {
                 case PoreGeometry::THICK_A:  return power<3>(net_config.h_tot)*state.d/state.l/net_config.mu_0;
                 case PoreGeometry::THIN_A:   return power<3>(state.d)*(net_config.h_tot)/state.l/net_config.mu_0;
                 case PoreGeometry::U_SHAPE:  return power<4>(state.d)/state.l/net_config.mu_0;
-                case PoreGeometry::SIZE:     break;
+                case PoreGeometry::SIZE:     return Permeability {NaN};
 
             }
         }
@@ -65,7 +65,7 @@ namespace karst {
                 case PoreGeometry::THICK_A:  return net_config.h_tot * state.l;
                 case PoreGeometry::U_SHAPE:  return 3 * state.d * state.l;
                 case PoreGeometry::THIN_A:   return net_config.h_tot * state.l;
-                case PoreGeometry::SIZE:     break;
+                case PoreGeometry::SIZE:     return Area{NaN};
             }
         }
 
@@ -76,12 +76,11 @@ namespace karst {
                 case PoreGeometry::THICK_A:  return net_config.h_tot * state.l * state.l;
                 case PoreGeometry::U_SHAPE:  return state.d * state.d * state.l;
                 case PoreGeometry::THIN_A:   return net_config.h_tot * state.l * state.l;
-                case PoreGeometry::SIZE:     break;
+                case PoreGeometry::SIZE:     return Volume {NaN};
             }
         }
 
         auto get_available_volume(SOLIDS species) -> Volume;
-
 
 
         //export functions:

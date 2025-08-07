@@ -19,11 +19,11 @@ namespace karst {
         SimulationConfig& operator=(SimulationConfig&&) = default;
 
         //evolution parameters
-        Long T_max       {10};     	    ///< maximal number of time steps
+        Time T_max       {1.};     	    ///< maximal number of time steps
 
         Long tot_steps   {0};           ///< total nr of steps in simulation
         Time tot_time    {0.0};         ///< total time in simulation
-        Time dt0         {0.00001};     ///< initial time step
+        Time dt0         {0.01};        ///< initial time step
 
         Length d_d_max   {0.1};	        ///< maximal change of pore diameter in one step (in %; if obtained then dt = 2/3 dt)
         Length d_d_min   {0.01};	    ///< minimal change of pore diameter in one step (in %; if not obtained then dt = 1.2dt)

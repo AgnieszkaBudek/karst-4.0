@@ -32,7 +32,6 @@ namespace karst{
     const std::map<REACTION, std::string> EnumToString<REACTION>::mapping = {
             {REACTION::D, "DISSOLUTION" },
             {REACTION::P, "PRECIPITATION" },
-
     };
 
 

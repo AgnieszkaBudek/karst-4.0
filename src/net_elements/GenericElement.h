@@ -39,7 +39,6 @@ namespace karst{
     struct ElementConfig{
         const ElementType type;       ///< element type
         const Int name;               ///< element name
-        int a_name{-1};               ///< element name for active subset
         std::ostream* log;            ///< log file
     };
 
@@ -64,9 +63,9 @@ namespace karst{
         explicit GenericElement(const NetworkConfig& netconf0,
                                 const NetworkTopologyConfig& topo_conf0,
                                 const ElementConfig config0) :
-                                net_config{ netconf0 },
-                                topo_config{ topo_conf0},
-                                config{ config0}
+                                net_config  { netconf0   },
+                                topo_config { topo_conf0 },
+                                config      { config0    }
         {}
 
 
@@ -98,7 +97,7 @@ namespace karst{
         auto update_old_state()                              ->  void {s_old = state;}
         auto revert_state()                                  ->  void {state = s_old;}
         auto update_state  (ElementState& s1, long new_step) ->  void {
-            assert (new_step>=step);
+            ASSERT_MSG (new_step>=step, "new_step = "+std::to_string(new_step)+"\t step = "+std::string(step));
             s_old = std::move(state);
             state = std::move(s1);
             step  = new_step;
@@ -128,11 +127,11 @@ namespace karst{
         //Setting the topology
         auto set_nodes  (std::vector<Node*  >&& n0) -> void { nodes = std::move(n0); }
         auto set_pores  (std::vector<Pore*  >&& p0) -> void { pores = std::move(p0); }
-        auto set_grains (std::vector<Grain* >&& g0) -> void { grains = std::move(g0); }
+        auto set_grains (std::vector<Grain* >&& g0) -> void { grains = std::move(g0);}
 
         auto get_nodes  () const ->  const std::vector<Node*  >&  { return nodes; }
         auto get_pores  () const ->  const std::vector<Pore*  >&  { return pores; }
-        auto get_grains () const ->  const std::vector<Grain* >&  { return grains; }
+        auto get_grains () const ->  const std::vector<Grain* >&  { return grains;}
 
         auto check_if_active () const -> bool {return active;}
 
@@ -154,8 +153,8 @@ namespace karst{
 
         const NetworkConfig& net_config;               ///< NetworkConfig   //zmienić potem na const Network* const S;
         const NetworkTopologyConfig& topo_config;
-        ElementConfig config;                          ///< Config
-
+        const ElementConfig config;                          ///< Config
+        Int a_name{config.name};               ///< element name for active subset
 
     protected:
 

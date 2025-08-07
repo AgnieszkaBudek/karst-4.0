@@ -15,19 +15,36 @@
 #include <array>
 #include <cstddef>
 #include <algorithm>
-
-
-
+#include <numbers>
+#include <format>
 #include <type_traits>
 #include <iterator>
 #include <utility>
 
 #include "src/all_enums.h"
 
+
+
+
+#ifdef NDEBUG
+    #define ASSERT_MSG(cond, msg) ((void)0)
+#else
+#define ASSERT_MSG(cond, msg) \
+        do { \
+            if (!(cond)) { \
+                std::cerr << std::format("Assertion failed: {}\nIn file {} at line {}\n", msg, __FILE__, __LINE__); \
+                assert(cond); \
+            } \
+        } while (0)
+#endif
+
+
 namespace karst {
 
 
     inline const double NaN = std::numeric_limits<double>::quiet_NaN();
+
+
 
 
     class ofstream_ps         : public std::ofstream  {};
@@ -45,7 +62,7 @@ namespace karst {
             return T{std::forward<decltype(args)>(args)...}; }, std::forward<Tuple>(tuple));
     }
 
-
+///< fast as array but takes particular enum as a key!
     template<typename Enum, typename T, std::size_t N>
     class EnumArray {
         static_assert(std::is_enum_v<Enum>, "EnumArray: Enum must be an enum type.");

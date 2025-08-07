@@ -35,7 +35,7 @@ namespace karst {
 
         //boundary conditions
         bool do_periodic_bc	       {true};	     ///< if periodic boundary condition
-        bool do_clean_unused_pores {true};       ///< if true unused pores and nodes and grains are deleted
+        bool do_clear_unused_net_el{true};       ///< if true unused pores and nodes and grains are deleted
         bool do_radial_geometry    {true};      ///< if true (false is default) one input in the centre and output along circle
         bool point_inlet           {false};	     ///< if true the inlet is a point at the top of the crack
         bool point_outlet          {false};	     ///< if true the outlet is a point at the top of the crack

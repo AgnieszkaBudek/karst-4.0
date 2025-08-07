@@ -32,19 +32,17 @@ namespace karst {
         auto get_solidS()   const -> std::vector<SOLIDS>   {return solidS;};
 
         auto get_outlet_concentration(SOLUBLES sp)   const -> std::function<Concentration(NodePore)>{
-            assert(outlet_concentration_map.contains(sp) and "In outlet_concentration_map: "+sp+" does not belong to outlet_concentration_map. ");
             return outlet_concentration_map[sp];}
 
         auto get_delta_volume_map(SOLIDS sp)   const -> std::function<Volume(Pore&)>{
-            assert(delta_volume_map.contains(sp) and "In get_delta_volume_map: "+sp+" does not belong to delta_volume_map. ");
             return delta_volume_map[sp];}
 
         auto get_reaction(REACTION r)   const -> ChemicalReaction{
-            assert(R.contains(r) and "In Reactions: "+r+" does not belong to reactions. ");
             return R[r];}
 
         //preparation for given reactions
-        void prepare_linear_kinetics();
+        void prepare_linear_dissolution_and_precipitation();
+        void prepare_linear_dissolution();
 
         auto check_implementation() -> bool{
 
