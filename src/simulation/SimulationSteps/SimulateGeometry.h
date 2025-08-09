@@ -31,8 +31,8 @@ namespace karst {
                 for(auto& sp : S.config.solidS){
                     Volume V_tmp = R.get_delta_volume_map(sp)(p);                       //total change of volume of species sp
                     auto count = std::ranges::count_if(p.get_grains(), [&](auto g) {    //number of gains that take part in reaction
-                        return (g->if_species_left(sp) or V_tmp>0._V);});
-                    for(auto g : p.get_grains()) if(g->if_species_left(sp) or V_tmp>0._V){            //distributing volume into those grains
+                        return (g->if_species_available(sp) or V_tmp > 0._V);});
+                    for(auto g : p.get_grains()) if(g->if_species_available(sp) or V_tmp > 0._V){            //distributing volume into those grains
                         g->add_v(sp, 1./double(count) * V_tmp);
                         if(g->get_v(sp) < state.epsilon_V) g->set_v(sp,0._V);
                     }

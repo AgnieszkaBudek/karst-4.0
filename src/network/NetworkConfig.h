@@ -7,6 +7,8 @@
 
 #include "src/utils.h"
 #include "src/units.h"
+#include "src/all_enums.h"
+#include "src/chemistry/ReactionConfig.h"
 
 
 namespace karst {
@@ -23,8 +25,8 @@ namespace karst {
         Length   l0   {1.0};	///< (initial) characteristic pore length (should be always equal to one!!!!)
         Length   d0   {0.1};	///< (initial) characteristic pore diameter
 
-        Flow     Q_tot {40.};      ///< total Flow through the system
-        Pressure P_in  {40.};      ///< inlet pressure
+        Flow     Q_tot {4.};      ///< total Flow through the system
+        Pressure P_in  {3.};      ///< inlet pressure
         Pressure P_out {0.};      ///< outlet pressure
 
 
@@ -45,11 +47,11 @@ namespace karst {
         //physical parameters -> should be set after choosing dimensionless one
 
         Unitless Sh     {4.0};	      ///< Sherwood number for pipe
-        Viscosity mu_0  {1.0};  	  ///< viscosity  always set to M_PI*pow(d0,4)/(128*l0)
+        Viscosity mu_0  {0.0001};  	  ///< viscosity  always set to M_PI*pow(d0,4)/(128*l0)
         Time dt_unit    {1.0};        ///< time unit (in dimensionless units [d0/2 k1 * gamma_1])
 
         // Reactions
-        ReactionSet                              reaction_set  = ReactionSet::LINEAR_DP;
+        ReactionSet                              reaction_set  = ReactionSet::LINEAR_D;
         std::array<SOLUBLES,2>                   solubleS      = {SOLUBLES::B,SOLUBLES::C};
         std::array<SOLIDS,2>                     solidS        = {SOLIDS::A,SOLIDS::E};
         EnumArray<SOLUBLES,Diffusion,enum_size_v<SOLUBLES>>           diffusion_rate;              ///< reaction rate for precipitation

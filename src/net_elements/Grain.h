@@ -29,7 +29,7 @@ namespace karst {
             auto check_if_space_left () const -> bool      { return state.tot_volume < state.max_volume; }
             auto get_max_volume      () const -> Volume    { return state.max_volume; }
             auto get_tot_v           () const -> Volume    { return state.tot_volume; }
-            auto if_species_left     (SOLIDS sp) const -> bool   { return state.v[sp] > 0._V; }
+            auto if_species_available     (SOLIDS sp) const -> bool   { return state.v[sp] > 0._V; }        //can take into account passivation or nucleation
 
             auto get_v(SOLIDS sp)  const -> Volume {
                 return state.v[sp];

@@ -62,10 +62,11 @@ namespace karst {
 
     auto Pore::get_surface   (SOLIDS sp) const -> Area {   //return surface in content with species sp
         int active_grains = 0;
-        for(auto g : grains) if(g->if_species_left(sp)) active_grains++;
+        for(auto g : grains) if(g->if_species_available(sp)) active_grains++;
         double species_factor = active_grains/double(grains.size());
         return species_factor*get_surface_tot();
     }
+
 
 
 }

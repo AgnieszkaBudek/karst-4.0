@@ -20,6 +20,7 @@
 #include <type_traits>
 #include <iterator>
 #include <utility>
+#include <string>
 
 #include "src/all_enums.h"
 

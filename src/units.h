@@ -201,6 +201,39 @@ namespace karst {
                 (pow(u.value, N));
     }
 
+    template<typename M1, typename L1, typename T1, typename C1, typename T>
+    constexpr auto sqrt(const Unit<M1, L1, T1, C1, T>& u) {
+        return Unit<
+                std::ratio_multiply<M1, std::ratio<1, 2>>,
+                std::ratio_multiply<L1, std::ratio<1, 2>>,
+                std::ratio_multiply<T1, std::ratio<1, 2>>,
+                std::ratio_multiply<C1, std::ratio<1, 2>>,
+                T
+        >(std::sqrt(u.value));
+    }
+
+    // Units addition
+    template<typename M1, typename L1, typename T1, typename C1, typename T>
+    constexpr auto min(const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) {
+        return Unit<M1, L1, T1, C1, T>(std::min(lhs.value , rhs.value));
+    }
+
+    // Units addition
+    template<typename M1, typename L1, typename T1, typename C1, typename T>
+    constexpr auto max(const Unit<M1, L1, T1, C1, T>& lhs, const Unit<M1, L1, T1, C1, T>& rhs) {
+        return Unit<M1, L1, T1, C1, T>(std::max(lhs.value , rhs.value));
+    }
+
+
+    template<typename M, typename L, typename Tt, typename C, typename Tp>
+    constexpr Unit<M, L, Tt, C, Tp> operator/(const Unit<M, L, Tt, C, Tp>& u, double scalar) {
+        return Unit<M, L, Tt, C, Tp>(u.value / scalar);
+    }
+
+    //not implemented
+    template<typename M, typename L, typename Tt, typename C, typename Tp>
+    constexpr Unit<M, L, Tt, C, Tp> operator/(double scalar, const Unit<M, L, Tt, C, Tp>& u) = delete;
+
 } // namespace karst
 
 #endif //def UNITS_H

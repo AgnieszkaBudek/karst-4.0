@@ -21,13 +21,12 @@ namespace karst {
         INPUT,
         OUTPUT,
         NORMAL,
-        NOT_CONNECTED
+        SIZE
     };
     // Specialization of EnumToString
     template<>
     const std::map<NodeType, std::string> EnumToString<NodeType>::mapping = {
             { NodeType::NORMAL,         "NORMAL"        },
-            { NodeType::NOT_CONNECTED,  "NOT_CONNECTED" },
             { NodeType::INPUT,          "INPUT"         },
             { NodeType::OUTPUT,         "OUTPUT"        }
     };
@@ -50,9 +49,9 @@ namespace karst {
     public:
 
         friend  GenericElement <Node, NodeState>;
-        friend Network; friend Node; friend Pore; friend Grain;
+        friend Network; friend Pore; friend Grain;
         friend auto createHexagonalNetwork(Network& S, Int N_x, Int N_y)->void;
-
+        friend auto operator - (const Node&  n1, const Node&  n2) -> Length ;
 
         explicit Node  (const NetworkConfig& net_conf0, const NetworkTopologyConfig &topo_conf0, const ElementConfig config0)
         : GenericElement<Node, NodeState>(net_conf0,topo_conf0,config0) {}
@@ -134,6 +133,25 @@ namespace karst {
         }
 
     };
+
+
+    inline auto operator - (const Node&  n1, const Node&  n2) -> Length {  //return distance between two points
+
+        Length dx = abs(n1.pos.x - n2.pos.x);
+        if(n1.topo_config.do_periodic_bc)
+            if (dx > n1.topo_config.N_x*n1.net_config.l0 / 2.0)
+                dx = n1.topo_config.N_x*n1.net_config.l0 - dx;
+
+        Length dy = abs(n1.pos.y - n2.pos.y);
+        if(n1.topo_config.do_periodic_bc and n1.topo_config.do_radial_geometry)
+            if (dy > n1.topo_config.N_y*n1.net_config.l0 / 2.0)
+                dy = n1.topo_config.N_y*n1.net_config.l0 - dy;
+
+        Length dz = n1.pos.z - n2.pos.z;
+
+        return sqrt(dx*dx + dy*dy + dz*dz);
+    }
+
 } // namespace karst
 
 #endif //KARST_4_0_NODE_H

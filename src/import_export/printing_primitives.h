@@ -43,12 +43,12 @@ namespace karst {
         );
     }
 
+
     inline auto operator - (const Point3D&  p1, const Point3D&  p2) -> Length {  //return distance between two points
-        return Length(
-                sqrt(pow(double(p1.x - p2.x), 2) +
-                     pow(double(p1.y - p2.y), 2) +
-                     pow(double(p1.z - p2.z), 2))
-                     );
+        return  sqrt(  power<2>(p1.x - p2.x) +
+                       power<2>(p1.y - p2.y) +
+                       power<2>(p1.z - p2.z)
+                               );
     }
 
     inline auto  operator * (const Point3D& p1,  const Point3D& p2)  -> Point3D {  //return middle of two points
@@ -57,7 +57,7 @@ namespace karst {
                 (p1.y+p2.y)/2.0_U,
                 (p1.z+p2.z)/2.0_U
                 );
-                }
+    }
 
     inline auto  operator + (const Point3D&  p1, const Point3D&  p2) -> Point3D {  //return sum of two points
         return Point3D ((p1.x+p2.x), (p1.y+p2.y), (p1.z+p2.z));

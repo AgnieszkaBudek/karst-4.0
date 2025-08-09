@@ -42,11 +42,11 @@ namespace karst {
 
         auto save_network_state() ->void { do_save_network_state();}
 
-        auto get_nodes() const     { return nodes    | std::views::filter([](const Node& n)  { return n.active; });}
+        auto get_nodes()      { return nodes    | std::views::filter([](const Node& n)  { return n.active; });}
         auto get_pores()      { return pores    | std::views::filter([](const Pore& p)  { return p.active; });}
         auto get_grains()     { return grains   | std::views::filter([](const Grain& g) { return g.active; });}
-        auto get_inlets()     { return n_inlet  | std::views::filter([](const Node* n)  { return n->active; });}
-        auto get_outlets()    { return n_outlet | std::views::filter([](const Node* n)  { return n->active; });}
+        auto get_inlets()     { return n_inlet;}
+        auto get_outlets()    { return n_outlet;}
 
         auto get_state()   const -> const NetworkState&   { return state;}
 
@@ -103,23 +103,24 @@ namespace karst {
         }
 
         auto update_number_of_active_connections() -> void{
-            auto active_nodes = nodes
-                                | std::views::filter([](const Node& n){
-                return n.active and
-                       n.type == NodeType::NORMAL; });
 
-            auto total_size = std::accumulate(
-                    active_nodes.begin(), active_nodes.end(),
-                    std::size_t{0},
-                    [](std::size_t sum, const Node& n){ return sum + n.nodes.size(); });
+            Long total_size = 0;
+            for (auto& n: get_nodes()){
+                if(n.type == NodeType::NORMAL)
+                    for(auto nn : n.get_nodes())
+                        if(nn->type == NodeType::NORMAL)
+                            total_size++;
+            }
 
-            state.N_active_connections = Long(total_size);
+            state.N_active_connections = total_size;
         }
 
         auto update_active_names_of_elements() -> void{
-            int i=0;
-            for(auto& n : nodes) if(n.active)
-                n.a_name = i++;
+            int i=0; int j=0;
+            for(auto& n : nodes) {
+                if (n.active and n.type == NodeType::NORMAL) n.a_name = i++;
+                else n.a_name = --j;
+            }
             i=0;
             for(auto& p : pores) if(p.active)
                 p.a_name = i++;

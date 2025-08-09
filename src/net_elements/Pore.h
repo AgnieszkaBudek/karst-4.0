@@ -43,11 +43,11 @@ namespace karst {
 
         auto get_d               () const -> Length  { return state.d; }
         auto get_l               () const -> Length  { return state.l; }
-        auto get_q               () const -> Flow    { return state.q; }
+        auto get_q               () const -> Flow    { return abs(state.q); }
         auto get_l_max           () const -> Length  { return nodes[1]->get_pos()-nodes[0]->get_pos();}
         auto check_if_space_left () const-> bool     { return state.d > 0._L; }
 
-        auto get_perm            () const    {
+        auto get_perm            () const    {      //we can do some mixing of different regimes
             switch (state.geometry) {
                 case PoreGeometry::CYLINDER: return power<4>(state.d)/state.l/net_config.mu_0;
                 case PoreGeometry::THICK_A:  return power<3>(net_config.h_tot)*state.d/state.l/net_config.mu_0;
@@ -56,9 +56,15 @@ namespace karst {
                 case PoreGeometry::SIZE:     return Permeability {NaN};
 
             }
+            return Permeability {NaN};
         }
 
+        //auto get_SH_eff    (SOLIDS sp) const  -> Unitless ;         //Rethink if needed - NIE CHCE ICH
+        //auto get_DA_eff    (SOLIDS sp) const  -> Unitless ;         //Rethink if needed
+
+        //This one will give the information about passivation (would it handel a hysteresis?)
         auto get_surface   (SOLIDS sp) const  -> Area;
+
         auto get_surface_tot         () const -> Area {           //return total surface
             switch (state.geometry) {
                 case PoreGeometry::CYLINDER: return std::numbers::pi * state.d * state.l;
@@ -67,18 +73,10 @@ namespace karst {
                 case PoreGeometry::THIN_A:   return net_config.h_tot * state.l;
                 case PoreGeometry::SIZE:     return Area{NaN};
             }
+            return Area{NaN};
         }
 
 
-        auto get_volume         () const -> Volume {
-            switch (state.geometry) {
-                case PoreGeometry::CYLINDER: return 1/4.*std::numbers::pi * state.d * state.d * state.l;
-                case PoreGeometry::THICK_A:  return net_config.h_tot * state.l * state.l;
-                case PoreGeometry::U_SHAPE:  return state.d * state.d * state.l;
-                case PoreGeometry::THIN_A:   return net_config.h_tot * state.l * state.l;
-                case PoreGeometry::SIZE:     return Volume {NaN};
-            }
-        }
 
         auto get_available_volume(SOLIDS species) -> Volume;
 
@@ -104,14 +102,14 @@ namespace karst {
         {
             state = (PoreState{
                     .d = net_config.d0,
-                    .l = nodes[0]->get_pos() - nodes[1]->get_pos(),
+                    .l = *nodes[0] - *nodes[1],
                     .q = Flow(NaN)});
 
             update_geometry();
 
             //add randomness to diamaeters //TODO: add randomness to init diameters
 
-            //std::cerr << "Initializing Pore: " << *this;
+            std::cerr << "Initializing Pore: " << *this;
 
         }
 

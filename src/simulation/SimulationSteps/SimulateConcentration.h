@@ -62,7 +62,7 @@ namespace karst {
         }
 
 
-        auto set_new_concentration(Node& n, SOLUBLES species) -> void{
+        auto set_new_concentration_full_mixing(Node& n, SOLUBLES species) -> void{
 
             Flow Q   = 0._F;
             CFlux QC = 0._X;
@@ -102,7 +102,7 @@ namespace karst {
 
                     if (can_be_calculated(**it)) {
                         new_action = true;
-                        set_new_concentration(**it, species);
+                        set_new_concentration_full_mixing(**it, species);
                         (*it)->set_connected_to_percolation_cluster();
                         for(auto &[nn,pp] : (*it)->get_nodes_pores())
                             if(!nn->is_checked_for_percolation() and pp->get_q()!=0._F){

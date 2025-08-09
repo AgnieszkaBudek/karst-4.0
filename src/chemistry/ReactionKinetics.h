@@ -45,6 +45,12 @@ namespace karst {
         void prepare_linear_dissolution();
 
         auto check_implementation() -> bool{
+            std::cerr<<"Checking ReactionKinetics implementation..."<<std::endl;
+            for(auto sp:solubleS)
+                ASSERT_MSG(outlet_concentration_map[sp] != nullptr, "Problem with outlet_concentration_map[ "+sp+"]");
+
+            for(auto sp:solidS)
+                ASSERT_MSG(delta_volume_map[sp] != nullptr, "Problem with delta_volume_map["+sp+"]");
 
             return(
             std::ranges::all_of(solubleS, [&](const auto& sp) {

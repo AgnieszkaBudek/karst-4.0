@@ -54,8 +54,7 @@ namespace karst {
         }
 
         auto do_update_state() -> void{
-            ASSERT_MSG(state.N_active > 0, "state.N_active = "+std::to_string(state.N_active));
-            state.N_active   = S.get_state().N_active;
+            state.N_active   = S.get_state().N_active - Long(S.get_inlets().size() + S.get_outlets().size()) ;
             state.N_non_zero = S.get_state().N_active_connections + state.N_active;
             triplets.reserve(state.N_non_zero);
             triplets.clear();
@@ -64,6 +63,8 @@ namespace karst {
             M.resize(state.N_active,state.N_active);
 
             state.step = 0;
+
+            ASSERT_MSG(state.N_active > 0, "state.N_active = "+std::to_string(state.N_active));
 
         }
 
@@ -84,9 +85,17 @@ namespace karst {
 
         auto set_pressures() -> void{
             int i_tmp=0;
-            for(auto n : S.get_nodes()){
+            for(auto& n : S.get_nodes()){
+                if(n.get_type()==NodeType::INPUT)  {n.set_u(S.config.P_in);  continue;}
+                if(n.get_type()==NodeType::OUTPUT) {n.set_u(S.config.P_out); continue;}
                 ASSERT_MSG(n.a_name == i_tmp,"n.a_name = "+std::to_string(n.a_name)+"\ti_tmp = "+std::to_string(i_tmp));
-                n.set_u(Pressure(x[i_tmp++]));
+                ASSERT_MSG(x[i_tmp] >0,"x[i_tmp] = "+std::to_string(x[i_tmp]));
+                n.set_u(Pressure(x[i_tmp]));
+                i_tmp++;
+            }
+            for(auto& n : S.get_nodes()){
+                std::cerr<<"u["<<n.config.name<<"] = "<<n.get_u()<<std::endl;
+
             }
         }
 
@@ -95,6 +104,27 @@ namespace karst {
 
 
             M.setFromTriplets(triplets.begin(), triplets.end());
+
+            int rows = M.rows();
+            int cols = M.cols();
+
+            int max_rows = std::min(16, rows);
+            int max_cols = std::min(16, cols);
+
+            Eigen::MatrixXd denseM = Eigen::MatrixXd(M);  // konwersja na macierz gęstą
+
+            for (int i = 0; i < max_rows; ++i) {
+                for (int j = 0; j < max_cols; ++j) {
+                    std::cout
+                            << std::fixed
+                            << std::setprecision(1)
+                            << std::setw(6)    // szerokość pola, dopasuj według potrzeb
+                            << std::right
+                            << denseM(i, j)
+                            << " ";
+                }
+                std::cout << std::endl;
+            }
 
             if(state.step % state.how_often_direct == 0){       // Solver: Conjugate Gradient + Incomplete Cholesky
                 direct_solver.compute(M);
@@ -115,27 +145,32 @@ namespace karst {
             state.step++;
         }
 
-        auto prepare_matrix_for_EIGEN() -> void{
+        auto prepare_matrix_for_EIGEN() -> void {
 
             triplets.clear();
-
-            for(auto& n : S.get_nodes()){
-
+            for(auto& n : S.get_nodes()) {
                 int name_tmp = n.a_name;
-                ASSERT_MSG(name_tmp >= 0 && name_tmp < y.size(),"In prepare_matrix_for_EIGEN name_tmp = "+std::to_string(name_tmp) );
-                if (n.get_type()==NodeType::INPUT)  y[name_tmp]  = double(S.get_state().P_in);
-                if (n.get_type()==NodeType::OUTPUT) y[name_tmp]  = double(S.get_state().P_out);
-                if (n.get_type()!=NodeType::NORMAL) triplets.emplace_back(name_tmp, name_tmp, 1.0);
-
-                for(auto& [nn,pp] : n.get_nodes_pores()) {
-                    double perm_v = double(pp->get_perm());
-                    ASSERT_MSG(perm_v >= 0, "Problem with calculating permeability for pore:"+std::to_string(pp->config.name));
-                    triplets.emplace_back(nn->a_name, name_tmp, perm_v);
-                    triplets.emplace_back(name_tmp, name_tmp, -perm_v);
+                if (n.get_type() == NodeType::NORMAL){
+                    double sum_tmp = 0.0;
+                    for (auto &[nn, pp]: n.get_nodes_pores()) {
+                        double perm_v = double(pp->get_perm());
+                        sum_tmp+=perm_v;
+                        switch (nn->get_type()){
+                            case NodeType::NORMAL:
+                                triplets.emplace_back(name_tmp, nn->a_name, -perm_v); break;
+                            case NodeType::INPUT:
+                                y[name_tmp] += double(perm_v*S.config.P_in);  break;
+                            case NodeType::OUTPUT:
+                                y[name_tmp] += double(perm_v*S.config.P_out); break;
+                            case NodeType::SIZE: break;
+                        }
+                    }
+                    triplets.emplace_back(name_tmp, name_tmp, sum_tmp);
                 }
             }
+            ASSERT_MSG(triplets.size()==state.N_non_zero,"triplets.size = "+std::to_string(triplets.size()) +
+                                                        " state.N_non_zero = "+std::to_string(state.N_non_zero));
         }
-
 
     };
 } // namespace karst

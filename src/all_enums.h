@@ -21,21 +21,21 @@ namespace karst{
 
 
     template<typename T>
-    concept Enum = std::is_enum_v<T>;
+    concept EnumType = std::is_enum_v<T>;
 
-    template<Enum T>
+    template<EnumType T>
     constexpr std::size_t enum_size_v = static_cast<std::size_t>(T::SIZE);
 
     // Enum <-> string interface
 
-    template<Enum T>
+    template<EnumType T>
     struct EnumToString {
         static const std::map<T, std::string> mapping;
     };
 
 
 
-    template<Enum T>
+    template<EnumType T>
     std::ostream& operator<<(std::ostream& os, T value) {
         const auto& mapping = EnumToString<T>::mapping;
         auto it = mapping.find(value);
@@ -48,7 +48,7 @@ namespace karst{
     }
 
 // operator+
-    template<Enum T>
+    template<EnumType T>
     std::string operator+(const std::string& str, T value) {
         const auto& mapping = EnumToString<T>::mapping;
         auto it = mapping.find(value);
@@ -60,7 +60,7 @@ namespace karst{
         }
     }
 
-    template<Enum T>
+    template<EnumType T>
     std::string operator+(const char* lhs, T rhs) {
         return std::string(lhs) + rhs;
     }

@@ -120,7 +120,7 @@ namespace karst {
         for (auto i = 0; i < N_x; i++)   // FIXME: rewrite this loop to be more elegant (?) Maybe not necessary
             for (auto j = 0; j < N_y; j++) {
                 S.nodes[N_x * j + i].set_pos (double(S.config.l0) * Point3D(
-                        {.x=Length(i - j % 2 * 0.5), .y=Length(j * sqrt(3) / 2),.z=0._L}));
+                        {.x=Length(i - j % 2 * 0.5), .y=Length(j * std::sqrt(3) / 2),.z=0._L}));
             }
 
 
