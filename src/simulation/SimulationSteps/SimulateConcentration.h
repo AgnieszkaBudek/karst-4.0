@@ -68,12 +68,12 @@ namespace karst {
             CFlux QC = 0._X;
 
             for (auto& [nn,pp]: n.get_nodes_pores())
-                if(abs(pp->get_q()) > state.eps_q and nn->get_u() > n.get_u()){
-                    Q = Q + abs(pp->get_q());
-                    QC = QC + abs(pp->get_q())*R.get_outlet_concentration(species)(NodePore{.n=nn,.p=pp});
+                if(pp->get_q() > state.eps_q and nn->get_u() > n.get_u()){
+                    Q = Q + pp->get_q();
+                    QC = QC + pp->get_q()*R.get_outlet_concentration(species)(NodePore{.n=nn,.p=pp});
                 }
 
-            ASSERT_MSG(Q>0._F and QC>0._X , std::string("Problem for species")+species+"for node"+ std::to_string(n.config.name));
+            ASSERT_MSG(Q>0._F and QC>0._X , std::string("Problem for species ")+species+" for node "+ std::to_string(n.config.name)+".");
             if(Q>0._F and QC>0._X) n.set_c(species, QC/Q);
         }
 
@@ -87,25 +87,26 @@ namespace karst {
                     [](auto& el) {el.clean_percolation_state();}
                     );
 
-            for(auto& n : S.get_inlets()){
+            for (auto n : S.get_inlets()){
                 n->set_c(species, S.config.inlet_c[species]);   //Filling concentration in inlet nodes
+                n->set_checked_for_percolation();
                 n->set_connected_to_percolation_cluster();
-                for (auto& nn : n->get_nodes()){
-                    n->set_checked_for_percolation();
-                    to_be_checked.push_back(nn);
+                for (auto nn : n->get_nodes())
+                    if (!nn->is_checked_for_percolation()){
+                        nn->set_checked_for_percolation();
+                        to_be_checked.push_back(nn);
                     }
             }
 
             while ( !to_be_checked.empty()){
                 bool new_action = false;
                 for (auto it = to_be_checked.begin(); it != to_be_checked.end(); ) {
-
                     if (can_be_calculated(**it)) {
                         new_action = true;
                         set_new_concentration_full_mixing(**it, species);
                         (*it)->set_connected_to_percolation_cluster();
                         for(auto &[nn,pp] : (*it)->get_nodes_pores())
-                            if(!nn->is_checked_for_percolation() and pp->get_q()!=0._F){
+                            if(!nn->is_checked_for_percolation() and pp->get_q()<state.eps_q){
                                 nn->set_checked_for_percolation();
                                 to_be_checked.push_back(nn);
                             }
@@ -121,6 +122,12 @@ namespace karst {
             }
     }
 
+        std::string do_get_state_info() const{
+            std:: string str ="\t.eps_q = "+state.eps_q;
+            for(auto sp : S.config.solubleS)
+                str  += "\tc[" + sp + "] = "+std::to_string(state.has_been_set[sp]);
+            return str;
+        }
 
     };
 } // namespace karst

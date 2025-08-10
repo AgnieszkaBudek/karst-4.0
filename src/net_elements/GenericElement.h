@@ -80,7 +80,7 @@ namespace karst{
 
 
         auto remove_element_from_a_network() -> void{
-            static_cast<Element *>(this)->do_disconnect_from_network();
+            static_cast<Element&>(*this).do_disconnect_from_network();
             pores.clear();
             nodes.clear();
             grains.clear();
@@ -88,10 +88,9 @@ namespace karst{
         }
 
 
-        auto init() -> void { static_cast<Element*>(this)->do_init();}
+        auto init() -> void { static_cast<Element&>(*this).do_init(); }
 
         // getting and updating element state
-
         auto set_state     (ElementState&& s1)               ->  void { state=std::move(s1); }
         auto set_old_state (ElementState&& s1)               ->  void { s_old=std::move(s1); }
         auto update_old_state()                              ->  void {s_old = state;}
@@ -108,7 +107,7 @@ namespace karst{
         auto get_old_state() const         -> ElementState& { return s_old; }
         auto update_time_step(long step0)  -> void          { step = step0; }
         auto get_time_step () const        -> long          { return step; }
-        auto is_state_set() -> bool{ static_cast<Element*>(this)->do_is_state_set();}
+        auto is_state_set() -> bool{ static_cast<Element&> (*this).do_is_state_set();}
 
         //Topo_config access
         auto is_connected_to_percolation_cluster() const -> bool { return topo_s.connected_to_percolation_cluster; }
@@ -118,10 +117,15 @@ namespace karst{
         auto clean_percolation_state()                   -> void { topo_s={false,false};}
 
         //Saving info
-        auto save_state()    -> void {}
-        auto save_topology() -> void {}
-        auto log_state    (const std::ostream& log_file)  ->  void {}
-        auto log_topology (const std::ostream& log_file)  ->  void {}
+        auto save_state    (const std::ostream& log_file) const   -> void {}
+        auto save_topology (const std::ostream& log_file) const-> void {}
+
+        std::string get_context_info() const {
+            return config.type +" [" + std::to_string(config.name) + "] ";
+        }
+        std::string get_state_info() const {
+            return static_cast<Element &>(*this).do_get_state_info()+"\n";
+        }
 
 
         //Setting the topology
@@ -153,8 +157,8 @@ namespace karst{
 
         const NetworkConfig& net_config;               ///< NetworkConfig   //zmienić potem na const Network* const S;
         const NetworkTopologyConfig& topo_config;
-        const ElementConfig config;                          ///< Config
-        Int a_name{config.name};               ///< element name for active subset
+        const ElementConfig config;                    ///< Config
+        Int a_name{config.name};                       ///< element name for active subset (for nodes we numerate those entering the pressure matrix)
 
     protected:
 

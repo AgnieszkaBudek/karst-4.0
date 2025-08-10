@@ -13,6 +13,8 @@ namespace karst {
 
     struct SimulateFlowState {
         Unitless eps_q = 1.e-5_U;     ///<acceptable error for flow calculations
+        Flow     Q_in {0.};
+        Flow     Q_out {0.};
     };
 
     class SimulateFlow : public GenericSimulationStep <SimulateFlow,SimulateFlowState> {
@@ -35,7 +37,6 @@ namespace karst {
         auto calculate_flow_field()     -> void{
             for(auto& p : S.get_pores()){
                 p.set_q(p.get_perm()*(p.get_nodes()[0]->get_u() - p.get_nodes()[1]->get_u()));
-                //std::cerr<<"perm = "<<p.get_perm()<<"\t u1 = "<<p.get_nodes()[0]->get_u()<<"\t u2 = "<<p.get_nodes()[1]->get_u()<<std::endl;
                 std::cerr<<"q = "<<p.get_q()<<std::endl;
             }
         }
@@ -47,26 +48,28 @@ namespace karst {
                     Q_tmp = Q_tmp + p->get_q();
 
 
-            ASSERT_MSG(Q_tmp>=0._F , "ERROR: Problem with inlet flow in calculating flow." + std::to_string(double(Q_tmp)));
+            ASSERT_MSG(Q_tmp>=0._F , "Problem with inlet flow in calculating flow." + std::to_string(double(Q_tmp)));
             for(auto& p : S.get_pores())
                 p.set_q(p.get_q()*S.config.Q_tot/Q_tmp);
         }
 
         auto do_check()-> bool{
-            Flow Q_in {0.};
-            Flow Q_out {0.};
+            state.Q_in  = 0._F;
+            state.Q_out = 0._F;
             for(auto in : S.get_inlets())
                 for(auto p : in->get_pores())
-                    Q_in = Q_in + abs(p->get_q());
+                    state.Q_in += abs(p->get_q());
             for(auto out : S.get_outlets())
                 for(auto p : out->get_pores())
-                    Q_out = Q_out + abs(p->get_q());
+                    state.Q_out += abs(p->get_q());
 
-            ASSERT_MSG(Q_in>0._F and Q_out>0._F , "Q_in = "+std::to_string(double(Q_in))+"\t Q_out = "+std::to_string(double(Q_out)));
-            return abs(Q_in-Q_out)/abs(Q_in+Q_out) < state.eps_q;
+            ASSERT_MSG(state.Q_in>0._F and state.Q_out>0._F , "Q_in = "+state.Q_in+"\t Q_out = "+state.Q_out);
+            return abs(state.Q_in-state.Q_out)/abs(state.Q_in+state.Q_out) < state.eps_q;
         }
 
-
+        std::string do_get_state_info() const{
+            return "\t.eps_q = "+state.eps_q + "\t.Q_in" +state.Q_in + "\t.Q_out" + state.Q_out;
+        }
 
     };
 } // namespace karst

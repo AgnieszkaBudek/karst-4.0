@@ -33,8 +33,6 @@ namespace karst{
         static const std::map<T, std::string> mapping;
     };
 
-
-
     template<EnumType T>
     std::ostream& operator<<(std::ostream& os, T value) {
         const auto& mapping = EnumToString<T>::mapping;
@@ -46,6 +44,7 @@ namespace karst{
         }
         return os;
     }
+
 
 // operator+
     template<EnumType T>
@@ -59,6 +58,19 @@ namespace karst{
             return str + "UNKNOWN_ENUM";
         }
     }
+    // operator+
+    template<EnumType T>
+    std::string operator+( T value, const std::string& str) {
+        const auto& mapping = EnumToString<T>::mapping;
+        auto it = mapping.find(value);
+        if (it != mapping.end()) {
+            return str + it->second;
+        } else {
+            std::cerr << "Unknown enum value.\n";
+            return str + "UNKNOWN_ENUM";
+        }
+    }
+
 
     template<EnumType T>
     std::string operator+(const char* lhs, T rhs) {

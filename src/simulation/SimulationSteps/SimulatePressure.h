@@ -172,6 +172,15 @@ namespace karst {
                                                         " state.N_non_zero = "+std::to_string(state.N_non_zero));
         }
 
+        std::string do_get_state_info() const{
+            return  "\t.N_active = "              + std::to_string(state.N_active)+
+                    "\t.N_non_zero = "            + std::to_string(state.N_non_zero)+
+                    "\t.cg_solver_iterations = "  + std::to_string(state.cg_solver_iterations)+
+                    "\t.cg_solver_tolerance = "   + std::to_string(state.cg_solver_tolerance)+
+                    "\t.how_often_direct = "      + std::to_string(state.how_often_direct)+
+                    "\t.matrix_solver_type = "    + state.matrix_solver_type;
+        }
+
     };
 } // namespace karst
 

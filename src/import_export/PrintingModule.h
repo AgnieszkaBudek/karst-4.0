@@ -80,7 +80,6 @@ namespace karst {
 
         // inlet files
         std::ifstream 	conf_in, net_in, net_g_in, pores_in, grains_in;
-        std::ostream * log_out = &std::cerr;
 
 
 

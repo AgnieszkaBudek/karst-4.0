@@ -23,6 +23,7 @@
 #include <string>
 
 #include "src/all_enums.h"
+#include "src/import_export/Logger.h"
 
 
 

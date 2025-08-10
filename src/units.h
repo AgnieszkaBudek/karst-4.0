@@ -51,11 +51,7 @@ namespace karst {
 
     };
 
-    template<typename M, typename L, typename T, typename C, typename Tp>
-    std::ostream& operator<<(std::ostream& os, const Unit<M, L, T, C, Tp>& unit) {
-        os << unit.value;
-        return os;
-    }
+
 
 // Aliases for useful units
     using Mass   = Unit<std::ratio<1>, std::ratio<0>, std::ratio<0>, std::ratio<0>>;
@@ -183,6 +179,22 @@ namespace karst {
     std::istream& operator >> (std::istream& is,Unit<M1, L1, T1, C1, T>& lhs)  {
         is >> lhs.value;
         return lhs;
+    }
+
+    template<typename M1, typename L1, typename T1, typename C1, typename T>
+    std::ostream& operator<<(std::ostream& os, const Unit<M1, L1, T1, C1, T>& rhs) {
+        os << rhs.value;
+        return os;
+    }
+
+    template<typename M1, typename L1, typename T1, typename C1, typename T>
+    std::string operator+(const std::string& lhs, const Unit<M1, L1, T1, C1, T>& rhs) {
+        return lhs + std::to_string(rhs.value);
+    }
+
+    template<typename M1, typename L1, typename T1, typename C1, typename T>
+    std::string operator+(const Unit<M1, L1, T1, C1, T>& lhs, const std::string& rhs) {
+        return std::to_string(lhs.value) + rhs;
     }
 
     template<typename M1, typename L1, typename T1, typename C1, typename T>

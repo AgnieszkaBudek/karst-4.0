@@ -12,7 +12,8 @@ add_executable(karst_4_0 ./main.cpp
         src/net_elements/GenericElement_impl.h
         src/network/network_topo_generator/network_topo_generator.h
         src/chemistry/prepare_chemical_kinetics.h
-        src/chemistry/ReactionKinetics.h)
+        src/chemistry/ReactionKinetics.h
+        src/import_export/Logger.h)
 
 
 message(STATUS "CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")

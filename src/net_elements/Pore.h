@@ -81,14 +81,6 @@ namespace karst {
         auto get_available_volume(SOLIDS species) -> Volume;
 
 
-        //export functions:
-        inline friend std::ostream& operator<<(std::ostream& os, const Pore& obj) {
-            os <<  obj.config.type << ": "<< obj.config.name << std::endl;
-            os << "\td = " << obj.state.d << "\tl = " << obj.state.l << "\tq = " << obj.state.q;
-            os << std::endl << std::endl;
-            return os;
-        }
-
         //friend ofstream_ps_pores  &operator <<(ofstream_ps_pores &stream, const Pore &p){}     //TODO: implement it
         //friend ofstream_ps_grains &operator<<(ofstream_ps_grains &stream, const Pore &p){}     //TODO: implement it
 
@@ -108,8 +100,6 @@ namespace karst {
             update_geometry();
 
             //add randomness to diamaeters //TODO: add randomness to init diameters
-
-            std::cerr << "Initializing Pore: " << *this;
 
         }
 
@@ -135,6 +125,10 @@ namespace karst {
                 else
                     state.geometry = PoreGeometry::THIN_A;
             }
+        }
+
+        std::string do_get_state_info() const{
+            return "\t.d = " + state.d + "\t .l = " + state.l + "\t.q" + state.q + "\t.geometry = " + state.geometry;
         }
 
         };

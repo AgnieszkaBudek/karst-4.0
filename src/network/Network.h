@@ -34,8 +34,10 @@ namespace karst {
 
         explicit Network (const NetworkConfig&  conf,
                           const NetworkTopologyConfig&  t_conf,
-                          const PrintingConfig& p_conf):
-                          config{conf}, t_config{t_conf}, io_mod{t_conf, p_conf} {}
+                          const PrintingConfig& p_conf,
+                          Logger& log0,
+                          PrintingModule& io0):
+                          config{conf}, t_config{t_conf}, io_mod{io0}, log(log0) {}
 
 
         ~Network() { std::cerr << "Deleting network..." << std::endl;}
@@ -90,7 +92,9 @@ namespace karst {
         std::vector<Node*> n_inlet;
         std::vector<Node*> n_outlet;
 
-        PrintingModule io_mod;
+        PrintingModule& io_mod;
+        Logger& log;
+
 
         auto prepare_network_topology()      -> void;
         auto clear_unused_elements()         -> void;

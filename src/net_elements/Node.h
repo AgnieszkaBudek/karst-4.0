@@ -70,18 +70,6 @@ namespace karst {
 
 
 
-
-        //export functions
-        friend auto operator<<(log_stream& os, const Node& obj) -> log_stream&
-        {
-            os <<  obj.config.type << ": "<< obj.config.name << std::endl;
-            os <<"\tConcentration: ";
-            for(auto [key,value] : obj.state.c.entries())
-                os << key <<" <-> "<<value<<"\t";
-            os << std::endl;
-            return os;
-        }
-
         //friend ofstream_ps_pores &operator <<(ofstream_ps_pores &stream, const Node &n){}     //TODO: implement it
         //friend ofstream_ps_grains &operator<<(ofstream_ps_grains &stream, const Node &n){}    //TODO: implement it
 
@@ -132,6 +120,14 @@ namespace karst {
             );
         }
 
+
+        std::string do_get_state_info() const{
+            std:: string str ="\t.u = " + state.u + "\t .type = " + type;
+            for(auto sp : net_config.solubleS)
+                str  += "\tc[" + sp + "] = "+state.c[sp];
+            return str;
+        }
+
     };
 
 
@@ -151,6 +147,8 @@ namespace karst {
 
         return sqrt(dx*dx + dy*dy + dz*dz);
     }
+
+
 
 } // namespace karst
 

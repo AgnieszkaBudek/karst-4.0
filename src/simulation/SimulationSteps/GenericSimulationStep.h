@@ -24,9 +24,10 @@ namespace karst{
             const ReactionKinetics& R;
             const SimulationConfig& sim_config;
             const SimulationState& sim_state;
+            Logger& log;
         };
         explicit GenericSimulationStep(const Config& c):
-                                       S{c.S}, R{c.R}, sim_config{c.sim_config}, sim_state{c.sim_state}
+                                       S{c.S},R{c.R}, sim_config{c.sim_config}, sim_state{c.sim_state},log{c.log}
                                        {}
 
 
@@ -46,6 +47,7 @@ namespace karst{
             check_and_accept();
             step = step_to_be_calculated;
             t    = t + sim_state.dt;
+            log.log_state(LogLevel::INFO,static_cast<Step&>(*this),"");
 
         }
 
@@ -66,9 +68,15 @@ namespace karst{
         auto get_step () const        -> Long          { return step; }
         auto get_time () const        -> Time          { return t; }
 
+        //Saving info
+        std::string get_context_info() const {
+            return  name + " [" + std::to_string(step)+"] ";
+        }
 
         //Saving info
-        auto log_state(const std::ostream& log_file)    ->  void {}
+        std::string get_state_info() const {
+            return  static_cast<const Step &>(*this).do_get_state_info() + "\n";
+        }
 
 
         const SimulationConfig& sim_config;   ///< SimulationConfig
@@ -83,6 +91,7 @@ namespace karst{
         const SimulationState& sim_state;
         StepState state;
         std::string name{"Unknown."};
+        Logger& log;
     };
 
 

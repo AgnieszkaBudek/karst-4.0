@@ -65,14 +65,16 @@ namespace karst {
 
     protected:
 
-        SimulationState state {};
-        Network S {net_conf, net_topo_conf, print_conf };
-        ReactionKinetics R  {S, confs.sim_conf, state};
+        Logger           log   {std::cout};
+        PrintingModule   io    {confs.net_topo_conf, confs.print_conf};
+        SimulationState  state {};
+        Network          S     {net_conf, net_topo_conf, print_conf, log, io};
+        ReactionKinetics R     {S, confs.sim_conf, state};
 
-        SimulatePressure        sim_pressure        {SimulatePressure       ::Config{.S=S,.R=R,.sim_config=sim_conf, .sim_state=state}};
-        SimulateFlow            sim_flow            {SimulateFlow           ::Config{.S=S,.R=R,.sim_config=sim_conf, .sim_state=state}};
-        SimulateConcentrations  sim_concentration   {SimulateConcentrations ::Config{.S=S,.R=R,.sim_config=sim_conf, .sim_state=state}};
-        SimulateGeometry        sim_geometry        {SimulateGeometry       ::Config{.S=S,.R=R,.sim_config=sim_conf, .sim_state=state}};
+        SimulatePressure        sim_pressure        {SimulatePressure       ::Config{.S=S,.R=R,.sim_config=sim_conf, .sim_state=state,.log = log}};
+        SimulateFlow            sim_flow            {SimulateFlow           ::Config{.S=S,.R=R,.sim_config=sim_conf, .sim_state=state,.log = log}};
+        SimulateConcentrations  sim_concentration   {SimulateConcentrations ::Config{.S=S,.R=R,.sim_config=sim_conf, .sim_state=state,.log = log}};
+        SimulateGeometry        sim_geometry        {SimulateGeometry       ::Config{.S=S,.R=R,.sim_config=sim_conf, .sim_state=state,.log = log}};
 
 
 

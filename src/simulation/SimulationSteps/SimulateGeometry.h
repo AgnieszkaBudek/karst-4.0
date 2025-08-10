@@ -11,7 +11,10 @@ namespace karst {
 
 
     struct SimulateGeometryState {
-        Volume epsilon_V = 1.e-5_V;
+        Volume eps_V = 1.e-5_V;
+        EnumArray<SOLUBLES,CFlux,enum_size_v<SOLUBLES>> CF_in {0._X};
+        EnumArray<SOLUBLES,CFlux,enum_size_v<SOLUBLES>> CF_out{0._X};
+        EnumArray<SOLUBLES,Volume,enum_size_v<SOLUBLES>> Delta_V {0._V};
     };
 
     class SimulateGeometry : public GenericSimulationStep <SimulateGeometry,SimulateGeometryState> {
@@ -34,7 +37,7 @@ namespace karst {
                         return (g->if_species_available(sp) or V_tmp > 0._V);});
                     for(auto g : p.get_grains()) if(g->if_species_available(sp) or V_tmp > 0._V){            //distributing volume into those grains
                         g->add_v(sp, 1./double(count) * V_tmp);
-                        if(g->get_v(sp) < state.epsilon_V) g->set_v(sp,0._V);
+                        if(g->get_v(sp) < state.eps_V) g->set_v(sp, 0._V);
                     }
                 }
 
@@ -60,14 +63,15 @@ namespace karst {
 
         auto do_check()-> bool {
 
-            EnumArray<SOLUBLES,CFlux,enum_size_v<SOLUBLES>> CF_in {0._X};
-            EnumArray<SOLUBLES,CFlux,enum_size_v<SOLUBLES>> CF_out{0._X};
-
             return true;
-
         }
 
-
+        std::string do_get_state_info() const{
+            std:: string str ="\t.eps_V = "+state.eps_V;
+            for(auto sp : S.config.solubleS)
+                str  += "\tCF["+sp+"] = "+state.CF_in[sp]+" -> "+state.CF_out[sp] + "\tdelta_V["+sp+"] = "+state.Delta_V[sp];
+            return str;
+        }
 
     };
 } // namespace karst
