@@ -20,13 +20,13 @@ namespace karst{
                 createHexagonalNetwork(*this,t_config.N_x,t_config.N_y);
                 break;
             case TypeOfNetTopology::FROM_FILE:
-                std::cerr << "TypeOfNetTopology::FROM_FILE Not implemented yet!" << std::endl;
+                log.log<LogLevel::ERROR>("TypeOfNetTopology::FROM_FILE Not implemented yet!");
                 break;
             case TypeOfNetTopology::FROM_TRIANGULATION:
-                std::cerr << "TypeOfNetTopology::FROM_TRIANGULATION Not implemented yet." << std::endl;
+                log.log<LogLevel::ERROR>("TypeOfNetTopology::FROM_TRIANGULATION Not implemented yet.");
                 break;
             default:
-                std::cerr << "Unknown geometry." << std::endl;
+                log.log<LogLevel::ERROR>( "Unknown geometry.");
                 break;
         }
 
@@ -50,7 +50,7 @@ namespace karst{
 
         // 5. Delete unused elements
         if (t_config.do_clear_unused_net_el) {
-            std::cerr << "Clearing unused elements of the network:" << std::endl;
+            log.log<LogLevel::INFO>( "Clearing unused elements of the network:");
             clear_unused_elements();
         }
 
@@ -76,27 +76,24 @@ namespace karst{
 
     auto Network::check_network_connections() -> void{ //FIXME: finish implementing this one
 
-        std::cerr<<"Checking connections in the network..."<<std::endl;
+        log.log<LogLevel::INFO>( "Checking connections in the network...");
 
-        apply_to_all_net_elements([](auto& el) {
+        apply_to_all_net_elements([&](auto& el) {
             if (!el.active)
-                std::cerr<<"Nonactive "<< el.config.type <<" nr"<<el.config.name<<" in the network."<<std::endl;
+                log.log_with_context<LogLevel::ERROR>( el ,"Nonactive element in the network.");
             for (auto p : el.pores)
                 if(!p->active)
-                    std::cerr<<"Nonactive connection: "<< el.config.type << " nr "<<el.config.name<<" <-> "
-                    << p->config.type << " nr "<<p->config.name<<std::endl;
+                    log.log_with_context<LogLevel::ERROR>(el,"Nonactive connection: with"+ p->get_context_info());
             for (auto n : el.nodes)
                 if(!n->active)
-                    std::cerr<<"Nonactive connection: "<< el.config.type << " nr "<<el.config.name<<" <-> "
-                             << n->config.type << " nr "<<n->config.name<<std::endl;
+                    log.log_with_context<LogLevel::ERROR>(el,"Nonactive connection: with"+ n->get_context_info());
             for (auto g : el.grains)
                 if(!g->active)
-                    std::cerr<<"Nonactive connection: "<< el.config.type << " nr "<<el.config.name<<" <-> "
-                             << g->config.type << " nr "<<g->config.name<<std::endl;
+                    log.log_with_context<LogLevel::ERROR>(el,"Nonactive connection: with"+ g->get_context_info());
 
         });
 
-        std::cerr<<"Checking networks' topology..."<<std::endl;
+        log.log<LogLevel::INFO>("Checking networks' topology...");
     }
 
 

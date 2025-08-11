@@ -1,7 +1,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #  Size of the network
 
-#N_x = 4        # size of the regular network
-#N_y = 4         # size of the regular network
+N_x = 4        # size of the regular network
+N_y = 4         # size of the regular network
 
 #type_of_topology = HEXAGONAL

@@ -37,7 +37,7 @@ namespace karst {
         auto calculate_flow_field()     -> void{
             for(auto& p : S.get_pores()){
                 p.set_q(p.get_perm()*(p.get_nodes()[0]->get_u() - p.get_nodes()[1]->get_u()));
-                std::cerr<<"q = "<<p.get_q()<<std::endl;
+                log.log_with_context<LogLevel::DEBUG_FULL>(p," .q = "+p.get_q());
             }
         }
 
@@ -67,8 +67,24 @@ namespace karst {
             return abs(state.Q_in-state.Q_out)/abs(state.Q_in+state.Q_out) < state.eps_q;
         }
 
+        auto do_mix_states() -> void {
+
+            for(auto& p :S.get_pores()){
+                const auto s_new = p.get_state();
+                const auto s_old = p.get_old_state();
+                p.set_q((s_old.q+s_new.q)/2.);
+            }
+        }
+
+        auto do_go_back(){
+            log.log_with_context<LogLevel::ERROR>(*this,"Not implemented. Shouldn't be necessary.");
+        }
+
         std::string do_get_state_info() const{
-            return "\t.eps_q = "+state.eps_q + "\t.Q_in" +state.Q_in + "\t.Q_out" + state.Q_out;
+            return
+                "\n\t\teps_q = " + state.eps_q +
+                "\n\t\tQ_in  = " + state.Q_in +
+                "\n\t\tQ_out = " + state.Q_out;
         }
 
     };

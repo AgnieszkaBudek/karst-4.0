@@ -83,6 +83,19 @@ namespace karst {
 
         auto do_check() -> bool{return true;};   //TODO: implement later
 
+        auto do_mix_states() -> void{
+
+            for(auto& n :S.get_nodes()){
+                const auto s_new = n.get_state();
+                const auto s_old = n.get_old_state();
+                n.set_u((s_old.u+s_new.u)/2.);
+            }
+        }
+
+        auto do_go_back(){
+            log.log_with_context<LogLevel::ERROR>(*this,"Not implemented. Shouldn't be necessary.");
+        }
+
         auto set_pressures() -> void{
             int i_tmp=0;
             for(auto& n : S.get_nodes()){
@@ -93,10 +106,8 @@ namespace karst {
                 n.set_u(Pressure(x[i_tmp]));
                 i_tmp++;
             }
-            for(auto& n : S.get_nodes()){
-                std::cerr<<"u["<<n.config.name<<"] = "<<n.get_u()<<std::endl;
-
-            }
+            for(auto& n : S.get_nodes())
+                log.log_with_context<LogLevel::DEBUG_FULL>(n," .u = "+n.get_u());;
         }
 
 
@@ -105,32 +116,14 @@ namespace karst {
 
             M.setFromTriplets(triplets.begin(), triplets.end());
 
-            int rows = M.rows();
-            int cols = M.cols();
+            log.log<LogLevel::DEBUG_FULL>(print_full_matrix());
 
-            int max_rows = std::min(16, rows);
-            int max_cols = std::min(16, cols);
-
-            Eigen::MatrixXd denseM = Eigen::MatrixXd(M);  // konwersja na macierz gęstą
-
-            for (int i = 0; i < max_rows; ++i) {
-                for (int j = 0; j < max_cols; ++j) {
-                    std::cout
-                            << std::fixed
-                            << std::setprecision(1)
-                            << std::setw(6)    // szerokość pola, dopasuj według potrzeb
-                            << std::right
-                            << denseM(i, j)
-                            << " ";
-                }
-                std::cout << std::endl;
-            }
 
             if(state.step % state.how_often_direct == 0){       // Solver: Conjugate Gradient + Incomplete Cholesky
                 direct_solver.compute(M);
-                if (direct_solver.info() != Eigen::Success) std::cerr << "Eigen::SimplicialLLT Decomposition failed.\n";
+                if (direct_solver.info() != Eigen::Success) log.log_with_context<LogLevel::ERROR>(*this,"Eigen::SimplicialLLT Decomposition failed.");
                 x = direct_solver.solve(y);
-                if (direct_solver.info() != Eigen::Success) std::cerr << "Eigen::SimplicialLLT Solver failed.\n";
+                if (direct_solver.info() != Eigen::Success) log.log_with_context<LogLevel::ERROR>(*this,"Eigen::SimplicialLLT Solver failed.");
 
             }
 
@@ -138,9 +131,11 @@ namespace karst {
                 cg_solver.setTolerance(state.cg_solver_tolerance);
                 cg_solver.setMaxIterations(state.cg_solver_iterations);
                 cg_solver.compute(M);
-                if (cg_solver.info() != Eigen::Success) std::cerr << "Eigen::ConjugateGradient Decomposition failed.\n";
+                if (cg_solver.info() != Eigen::Success)
+                    log.log_with_context<LogLevel::ERROR>(*this,"Eigen::ConjugateGradient Decomposition failed.");
                 x = cg_solver.solveWithGuess(y, x);
-                if (cg_solver.info() != Eigen::Success) std::cerr << "Eigen::ConjugateGradient Solver failed.\n";
+                if (cg_solver.info() != Eigen::Success)
+                    log.log_with_context<LogLevel::ERROR>(*this,"Eigen::ConjugateGradient Solver failed.");
             }
             state.step++;
         }
@@ -173,12 +168,39 @@ namespace karst {
         }
 
         std::string do_get_state_info() const{
-            return  "\t.N_active = "              + std::to_string(state.N_active)+
-                    "\t.N_non_zero = "            + std::to_string(state.N_non_zero)+
-                    "\t.cg_solver_iterations = "  + std::to_string(state.cg_solver_iterations)+
-                    "\t.cg_solver_tolerance = "   + std::to_string(state.cg_solver_tolerance)+
-                    "\t.how_often_direct = "      + std::to_string(state.how_often_direct)+
-                    "\t.matrix_solver_type = "    + state.matrix_solver_type;
+            return  "\n\t\tN_active             = " + std::to_string(state.N_active)+
+                    "\n\t\tN_non_zero           = " + std::to_string(state.N_non_zero)+
+                    "\n\t\tcg_solver_iterations = " + std::to_string(state.cg_solver_iterations)+
+                    "\n\t\tcg_solver_tolerance  = " + std::to_string(state.cg_solver_tolerance)+
+                    "\n\t\thow_often_direct     = " + std::to_string(state.how_often_direct)+
+                    "\n\t\tmatrix_solver_type   = " + state.matrix_solver_type;
+        }
+
+        std::string print_full_matrix() const{
+            std::ostringstream out;
+            out <<"\n";
+
+            int rows = int(M.rows());
+            int cols = int(M.cols());
+
+            int max_rows = std::min(16, rows);
+            int max_cols = std::min(16, cols);
+
+            Eigen::MatrixXd denseM = Eigen::MatrixXd(M);  // konwersja na macierz gęstą
+
+            for (int i = 0; i < max_rows; ++i) {
+                for (int j = 0; j < max_cols; ++j) {
+                    out
+                            << std::fixed
+                            << std::setprecision(1)
+                            << std::setw(6)    // szerokość pola, dopasuj według potrzeb
+                            << std::right
+                            << denseM(i, j)
+                            << " ";
+                }
+                out << std::endl;
+            }
+            return out.str();
         }
 
     };

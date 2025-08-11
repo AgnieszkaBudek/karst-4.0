@@ -24,9 +24,11 @@ namespace karst {
     public:
 
         explicit PrintingModule(const NetworkTopologyConfig & net_conf0,
-                                const PrintingConfig& config0):
+                                const PrintingConfig& config0,
+                                Logger<logger_level_min>& log0):
                                 net_topo_config{net_conf0},
-                                config{config0}
+                                config{config0},
+                                log{log0}
         {
             if (config.do_save_table){
                 d_out .open("d.out", std::ios_base::out | std::ios_base::trunc );
@@ -65,10 +67,12 @@ namespace karst {
                 const std::vector<Grain> &g) -> void {
             do_print_net_ps( net_pores_ps,n,p,g); }
 
+
         const PrintingConfig& config;
 
     protected:
 
+        Logger<logger_level_min>& log;
         const NetworkTopologyConfig & net_topo_config;
 
         // output files
@@ -88,7 +92,7 @@ namespace karst {
                              const std::vector<Pore>  &pores,
                              const std::vector<Grain> &grains) -> void {
 
-            std::cerr << "Printing postscript..." << std::endl;
+            log.log<LogLevel::INFO>("Printing postscript...");
 
             do_print_ps_headlines(stream,1,"Debugging...");
 

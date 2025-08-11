@@ -37,8 +37,11 @@ namespace karst {
 
         auto do_run()  -> void {
 
-        for(auto species : S.config.solubleS)
+            for(auto species : S.config.solubleS)
                 state.has_been_set[species] = false;
+
+            for(auto& n : S.get_nodes())
+                n.clear_c();            //filling c with zeros for all species and all nodes
 
             for(auto species : S.config.solubleS) {
                 calculate_species(species);
@@ -48,6 +51,20 @@ namespace karst {
 
         auto do_check() -> bool{return true;};   //TODO: implement later
 
+
+        auto do_mix_states() -> void{
+
+            for(auto& n :S.get_nodes()){
+                const auto s_new = n.get_state();
+                const auto s_old = n.get_old_state();
+                for(auto sp : S.config.solubleS)
+                    n.set_c(sp,(s_old.c[sp]+s_new.c[sp])/2.);
+            }
+        }
+
+        auto do_go_back(){
+            log.log_with_context<LogLevel::ERROR>(*this,"Not implemented. Shouldn't be necessary.");
+        }
 
         auto can_be_calculated(Node& n) const -> bool{  //checked if logic is correct
             return std::ranges::all_of(
@@ -80,7 +97,7 @@ namespace karst {
 
         auto calculate_species(SOLUBLES species) -> void {
 
-            std::cerr<<"Running calculate_species for "<<species<<"..."<<std::endl;
+            log.log<LogLevel::INFO>("Running calculate_species for "+species+"...");
             std::list<Node *> to_be_checked;
 
             S.apply_to_all_nodes(
@@ -117,15 +134,15 @@ namespace karst {
 
                 if(!new_action){
                     state.eps_q=state.eps_q*2;
-                    std::cerr<<"Node::epsilon_for_c has been updated: "<<state.eps_q<<std::endl;
+                    log.log<LogLevel::INFO>("Node::epsilon_for_c has been updated: "+state.eps_q);
                 }
             }
     }
 
         std::string do_get_state_info() const{
-            std:: string str ="\t.eps_q = "+state.eps_q;
+            std:: string str ="\n\t\teps_q = "+state.eps_q;
             for(auto sp : S.config.solubleS)
-                str  += "\tc[" + sp + "] = "+std::to_string(state.has_been_set[sp]);
+                str  += "\n\t\tc[" + sp + "] = "+std::to_string(state.has_been_set[sp]);
             return str;
         }
 

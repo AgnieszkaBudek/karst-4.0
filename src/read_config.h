@@ -13,11 +13,12 @@
 #include "src/simulation//SimulationConfig.h"
 #include "src/import_export/PrintingConfig.h"
 
+
 namespace karst {
 
-     inline auto read_configs(const std::string& f_path) -> std::tuple<NetworkConfig, NetworkTopologyConfig, PrintingConfig, SimulationConfig> {
+     inline auto read_configs(const std::string& f_path, Logger<logger_level_min>& log) -> std::tuple<NetworkConfig, NetworkTopologyConfig, PrintingConfig, SimulationConfig> {
 
-         std::cerr << "Parsing the configuration file..." << std::endl;
+         log.log<LogLevel::INFO>("Parsing the configuration file...");
 
         // Creating all configs
         NetworkConfig           net_conf        {};
@@ -33,7 +34,7 @@ namespace karst {
                  {"N_x", [&](const std::string& value) {
                      net_top_conf.N_x = std::stoi(value);
                      net_conf.Q_tot = Flow(2 * net_top_conf.N_x);
-                     std::cerr << "Setting N_x = " << net_top_conf.N_x << std::endl;
+                     //log.log<LogLevel::INFO>("Setting N_x = " << net_top_conf.N_x << std::endl;
                      std::cerr << "Additionally setting Q_tot = " << net_conf.Q_tot << std::endl;
                  }},
                  {"N_y", [&](const std::string& value) {
@@ -409,10 +410,9 @@ namespace karst {
 
 
          // reading config file:
-
          std::ifstream fp_setup(f_path);
          if (!fp_setup) {
-             std::cerr << "Error opening file: " << f_path << std::endl;
+             log.log<LogLevel::ERROR>("Error opening file: " + f_path);
              return {std::move(net_conf), std::move(net_top_conf), std::move(print_conf), std::move(sim_conf)};
          }
 
@@ -420,6 +420,7 @@ namespace karst {
          int i = 0;
 
          while (std::getline(fp_setup, s)) {
+
              i++;
 
              // Deleting white space
@@ -435,7 +436,7 @@ namespace karst {
              line >> name >> e >> value;
 
              if (e != "=" || value.empty()) {
-                 std::cerr << "Problem with parsing line nr " << i << std::endl;
+                 log.log<LogLevel::WARNING>("Problem with parsing line nr " + std::to_string(i));
                  continue;
              }
 
@@ -448,16 +449,16 @@ namespace karst {
                      func(value); // Wywołaj funkcję z parametrem value
                  }
                  catch (const std::invalid_argument &ia) {
-                     std::cerr << "Invalid value for " << name << " in line nr " << i << std::endl;
+                     log.log<LogLevel::WARNING>("Invalid value for " + name + " in line nr " + std::to_string(i));
                  }
                  catch (const std::bad_function_call &bfc) {
-                     std::cerr << "Error calling function for key " << name << ": " << bfc.what() << std::endl;
+                     log.log<LogLevel::WARNING>("Error calling function for key " + name + ": " + bfc.what());
                  }
              }
                  //TODO: dopisać tutaj elseif dla mapy z parsowaniem wyrażeń regularnych!!!
              else {
-                 std::cerr << "Problem with parsing line nr " << i << ": ";
-                 std::cerr << "Key " << name << " not found in config_map." << std::endl;
+                 log.log<LogLevel::WARNING>("Problem with parsing line nr " +std::to_string(i));
+                 log.log<LogLevel::WARNING>("Key " + name + " not found in config_map.");
              }
          }
 

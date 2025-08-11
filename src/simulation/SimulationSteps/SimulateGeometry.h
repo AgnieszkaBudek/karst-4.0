@@ -40,18 +40,51 @@ namespace karst {
                         if(g->get_v(sp) < state.eps_V) g->set_v(sp, 0._V);
                     }
                 }
+        }
 
+        auto do_check()-> bool {
 
-            //update diameters
+            return true;
+        }
+
+        auto do_go_back(){
+
+            for(auto& p : S.get_pores()){
+                p.set_d(p.get_old_state().d);
+                p.set_l(p.get_old_state().l);
+            }
+
+            for(auto& g : S.get_grains()) g.revert_states();
+
+        }
+
+        auto do_mix_states() -> void{           //more complicated that other optwions
+
+            log.log_with_context<LogLevel::WARNING>(*this,"This may not be implemented correctly.");
+
+            for(auto& p : S.get_pores()){
+                p.set_d(p.get_old_state().d);
+                p.set_l(p.get_old_state().l);
+            }
+
+            // 2. Set new volume based on both new and old states;
+            for(auto& g :S.get_grains()){
+                const auto s_new = g.get_state();
+                const auto s_old = g.get_old_state();
+                for (auto sp : S.config.solidS)
+                    g.set_v(sp,(s_old.v[sp]+s_new.v[sp])/2.);           //immune to going back
+                g.set_tot_v((s_new.tot_volume+s_old.tot_volume)/2.);
+            }
+
+            //3. update diameters
             for(auto& p : S.get_pores()){
                 Volume V_tot = 0._V;
                 for(auto& sp : S.config.solidS)
                     V_tot += R.get_delta_volume_map(sp)(p);
-                p.add_d(2*V_tot/p.get_surface_tot());
+                p.add_d(2*V_tot/p.get_surface_tot());       //TODO: this wont work both state and state_old are in future now...
             }
 
-
-            //update lengths
+            //4. update lengths
             for(auto& p : S.get_pores()){
                 Unitless l_tot_f = 0._U;
                 for(auto& g : p.get_grains())
@@ -61,15 +94,11 @@ namespace karst {
             }
         }
 
-        auto do_check()-> bool {
-
-            return true;
-        }
 
         std::string do_get_state_info() const{
-            std:: string str ="\t.eps_V = "+state.eps_V;
+            std:: string str ="\n\t\teps_V = "+state.eps_V;
             for(auto sp : S.config.solubleS)
-                str  += "\tCF["+sp+"] = "+state.CF_in[sp]+" -> "+state.CF_out[sp] + "\tdelta_V["+sp+"] = "+state.Delta_V[sp];
+                str  += "\n\t\tCF["+sp+"] = "+state.CF_in[sp]+" -> "+state.CF_out[sp] + "\tdelta_V["+sp+"] = "+state.Delta_V[sp];
             return str;
         }
 

@@ -45,7 +45,7 @@ namespace karst {
         void prepare_linear_dissolution();
 
         auto check_implementation() -> bool{
-            std::cerr<<"Checking ReactionKinetics implementation..."<<std::endl;
+            S.log.log<LogLevel::INFO>("Checking ReactionKinetics implementation...");
             for(auto sp:solubleS)
                 ASSERT_MSG(outlet_concentration_map[sp] != nullptr, "Problem with outlet_concentration_map[ "+sp+"]");
 

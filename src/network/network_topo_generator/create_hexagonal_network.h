@@ -15,11 +15,11 @@ namespace karst {
 
     inline void createHexagonalNetwork(Network& S, Int N_x, Int N_y) {
 
-        std::cerr << "Creating hexagonal network..." << std::endl;
+        S.log.log<LogLevel::INFO>("Creating hexagonal network...");
 
 
         if (N_y % 2 == 1) {
-            std::cerr << "ERROR: N_y must be even in hexagonal network!" << std::endl;
+            S.log.log<LogLevel::ERROR>("ERROR: N_y must be even in hexagonal network!");
         }
 
 
@@ -31,13 +31,13 @@ namespace karst {
 // Creating all network elements: nodes, pores and grains
 
         for (auto i=0; i < N_x * N_y; i++)
-            S.nodes.emplace_back(S.config, S.t_config, ElementConfig{.type=ElementType::NODE,.name=i,.log = &std::cerr});
+            S.nodes.emplace_back(S.config, S.t_config, ElementConfig{.type=ElementType::NODE,.name=i,.log = S.log});
 
         for (auto i=0; i < N_x * N_y * 3; i++)
-            S.pores.emplace_back(S.config, S.t_config, ElementConfig{.type=ElementType::PORE,.name=i,.log = &std::cerr});
+            S.pores.emplace_back(S.config, S.t_config, ElementConfig{.type=ElementType::PORE,.name=i,.log = S.log});
 
         for (auto i=0; i < N_x * N_y * 2; i++)
-            S.grains.emplace_back(S.config, S.t_config, ElementConfig{.type=ElementType::GRAIN,.name=i,.log = &std::cerr});
+            S.grains.emplace_back(S.config, S.t_config, ElementConfig{.type=ElementType::GRAIN,.name=i,.log = S.log});
 
 
         //pore and node connections
@@ -125,7 +125,7 @@ namespace karst {
 
 
         //inlet/outlet nodes:
-        std::cerr << "Setting inlets and outlets..." << std::endl;
+        S.log.log<LogLevel::INFO>("Setting inlets and outlets...");
         if (S.t_config.do_radial_geometry){
             auto& n_in = S.nodes[N_x*(N_y/2-1)+N_x/2-1];
             S.n_inlet.push_back(&n_in);
@@ -159,7 +159,7 @@ namespace karst {
 
         //adding random shift
         if(S.t_config.do_randomness_in_regular_net){
-            std::cerr<<"Adding randomness to the network..."<<std::endl;
+            S.log.log<LogLevel::INFO>("Adding randomness to the network...");
             std::mt19937 gen(S.t_config.random_seed);
             std::uniform_real_distribution<double> dist(-1.0, 1.0);
             for (auto& n : S.nodes){
@@ -170,7 +170,7 @@ namespace karst {
                     n.set_pos(n.get_pos()+shift);
                 }
         }
-        std::cerr << "Hexagonal network has been created." << std::endl;
+        S.log.log<LogLevel::INFO>("Hexagonal network has been created.");
 
     }
 

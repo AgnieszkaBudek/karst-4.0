@@ -17,84 +17,58 @@
 
 namespace karst{
 
-    enum class LogLevel {DEBUG, INFO, WARNING, ERROR};
+    enum class LogLevel {DEBUG_FULL, DEBUG, INFO, WARNING, ERROR};
     template<>
     const std::map<LogLevel, std::string> EnumToString<LogLevel>::mapping = {
-            {LogLevel::DEBUG,   "DEBUG"     },
-            {LogLevel::INFO,    "INFO"      },
-            {LogLevel::WARNING, "WARNING"   },
-            {LogLevel::ERROR,   "ERROR"     }
+            {LogLevel::DEBUG_FULL,  "DEBUG_FULL"},
+            {LogLevel::DEBUG,       "DEBUG"     },
+            {LogLevel::INFO,        "INFO"      },
+            {LogLevel::WARNING,     "WARNING"   },
+            {LogLevel::ERROR,       "ERROR"     }
     };
 
-    namespace Logging {
-        inline LogLevel minLevel = LogLevel::INFO;
-    }
+    constexpr LogLevel      logger_level_min  = LogLevel::DEBUG;
+    constexpr std::ostream& logger_output     = std::cout;
 
+    template<LogLevel MinLevel>
     class Logger {
     public:
         explicit Logger(std::ostream& os)
                 : out(os) {}
 
-        void log(LogLevel level, const std::string& message) {
-            if (level < Logging::minLevel) return;
-            out << "[" << level << "] " << message << "\n";
+        template<LogLevel Level>
+        void log(const std::string& message) {
+            if constexpr (Level >= MinLevel)
+                out << "[" << Level << "] " << message << "\n";
         }
 
-        void pure_log(LogLevel level, const std::string& message) {
-            if (level < Logging::minLevel) return;
-            out << message;
+        template<LogLevel Level>
+        void pure_log(const std::string& message) {
+            if constexpr (Level >= MinLevel)
+                out << message;
         }
 
-        template<typename T>
-        void log_with_context(LogLevel level, const T& obj, const std::string& message) {
-            if (level < Logging::minLevel) return;
-            out << "[" << level << "] "
-                << obj.get_context_info() << ": " << message << "\n";
+        template<LogLevel Level, typename T>
+        void log_with_context(const T& obj, const std::string& message) {
+            if constexpr (Level >= MinLevel)
+                out << "[" << Level << "] "
+                    << obj.get_context_info() << "\t" << message << "\n";
         }
 
-        template<typename T>
-        void log_state(LogLevel level, const T& obj, const std::string& message) {
-            if (level < Logging::minLevel) return;
-            out << "[" << level << "] "
-                << obj.get_context_info()
-                << obj.get_state_info() << ": " << message << "\n";
+        template<LogLevel Level, typename T>
+        void log_state(const T& obj, const std::string& message) {
+            if constexpr (Level >= MinLevel) {
+                out << "[" << Level << "] "
+                    << obj.get_context_info()
+                    << obj.get_state_info();
+                out << " " << message << "\n";
+            }
         }
-
-
 
     private:
         std::ostream& out;
 
-
-
     };
-//
-//// ----- PRZYKŁADY PODREALIZACJI -----
-//    inline Logger makeCoutLogger(LogLevel minLevel = LogLevel::Info) {
-//        return Logger(std::cout, minLevel);
-//    }
-//
-//    inline Logger makeCerrLogger(LogLevel minLevel = LogLevel::Info) {
-//        return Logger(std::cerr, minLevel);
-//    }
-//
-//// ----- PRZYKŁADOWE OBIEKTY TWOJEJ SIECI -----
-//    struct Node {
-//        int id;
-//        std::string getContextInfo() const {
-//            return "Node#" + std::to_string(id);
-//        }
-//    };
-//
-//    struct Pore {
-//        int id;
-//        std::string getContextInfo() const {
-//            return "Pore#" + std::to_string(id);
-//        }
-//    };
-
-
-
 }
 
 

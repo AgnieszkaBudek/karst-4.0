@@ -54,7 +54,7 @@ namespace karst{
         if (it != mapping.end()) {
             return str + it->second;
         } else {
-            std::cerr << "Unknown enum value.\n";
+            std::cerr << "[ERROR] Unknown enum value.\n";
             return str + "UNKNOWN_ENUM";
         }
     }
@@ -66,7 +66,7 @@ namespace karst{
         if (it != mapping.end()) {
             return str + it->second;
         } else {
-            std::cerr << "Unknown enum value.\n";
+            std::cerr << "[ERROR] Unknown enum value.\n";
             return str + "UNKNOWN_ENUM";
         }
     }
@@ -87,7 +87,7 @@ namespace karst{
         if (it != mapping.end()) {
             enumVar = it->first;
         } else {
-            throw std::invalid_argument("Unknown string value for enum: " + str);
+            throw std::invalid_argument("[ERROR] Unknown string value for enum: " + str);
         }
         return enumVar;
     }

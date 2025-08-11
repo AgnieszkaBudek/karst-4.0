@@ -37,7 +37,7 @@ namespace karst {
 
             auto set_v(SOLIDS sp, Volume v_new) -> void { state.v[sp] = v_new; }
             auto add_v(SOLIDS sp, Volume v_new) -> void { state.v[sp] +=  v_new; }
-
+            auto set_tot_v(Volume v_new) -> void { state.tot_volume =  v_new; }
 
             auto calculate_tot_v () -> Volume{
                 Volume V_tot {0.};

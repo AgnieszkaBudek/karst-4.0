@@ -65,8 +65,9 @@ namespace karst {
         auto get_pos  () const                       -> Point3D   { return pos;  }
         auto set_u    (Pressure u0)                  -> void      { state.u = u0;    }
         auto get_u    () const                       -> Pressure  { return state.u;  }
-        auto set_c    (SOLUBLES sp, Concentration c) -> void            { state.c[sp] = c; }
-        auto get_c    (SOLUBLES sp) const            -> Concentration   {return state.c[sp];}
+        auto set_c    (SOLUBLES sp, Concentration c) -> void            { state.c[sp] = c;   }
+        auto get_c    (SOLUBLES sp) const            -> Concentration   { return state.c[sp];}
+        auto clear_c  ()                             -> void            { state.c.fill(0._C);}
 
 
 
@@ -100,7 +101,7 @@ namespace karst {
             auto it2 = nodes.begin();
             for(auto it = pores.begin(); it < pores.end() ; ++it) {
                 if(it2==nodes.end()){
-                    std::cerr<<"Problem with set_nodes_and_pores;"<<std::endl;
+                    config.log.log<LogLevel::ERROR>("Problem with set_nodes_and_pores for ");
                     return;
                 }
                 nodePores.push_back({.n = (*it2), .p = (*it)});

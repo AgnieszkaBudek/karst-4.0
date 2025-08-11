@@ -39,7 +39,7 @@ namespace karst{
     struct ElementConfig{
         const ElementType type;       ///< element type
         const Int name;               ///< element name
-        std::ostream* log;            ///< log file
+        Logger<logger_level_min>& log;                  ///< log file
     };
 
 
@@ -94,7 +94,7 @@ namespace karst{
         auto set_state     (ElementState&& s1)               ->  void { state=std::move(s1); }
         auto set_old_state (ElementState&& s1)               ->  void { s_old=std::move(s1); }
         auto update_old_state()                              ->  void {s_old = state;}
-        auto revert_state()                                  ->  void {state = s_old;}
+        auto revert_states()                                 ->  void {state = s_old;}
         auto update_state  (ElementState& s1, long new_step) ->  void {
             ASSERT_MSG (new_step>=step, "new_step = "+std::to_string(new_step)+"\t step = "+std::string(step));
             s_old = std::move(state);
@@ -103,8 +103,8 @@ namespace karst{
         }
 
         // State access
-        auto get_state() const             -> ElementState& { return state; }
-        auto get_old_state() const         -> ElementState& { return s_old; }
+        auto get_state() const             -> const ElementState& { return state; }
+        auto get_old_state() const         -> const ElementState& { return s_old; }
         auto update_time_step(long step0)  -> void          { step = step0; }
         auto get_time_step () const        -> long          { return step; }
         auto is_state_set() -> bool{ static_cast<Element&> (*this).do_is_state_set();}
@@ -169,7 +169,7 @@ namespace karst{
         bool active{true};                   ///< if the element is still part of the network
         Long step{0};                        ///< time step the element has been updated the last time
 
-        ElementTopoState  topo_s{};        ///< temporal properties of an element
+        ElementTopoState  topo_s{};        ///< topological (temporal) properties of an element
         ElementState      state{};         ///< current state of an element
         ElementState      s_old{};         ///< state of an element in previous time step
 

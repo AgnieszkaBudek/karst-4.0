@@ -35,12 +35,12 @@ namespace karst {
         explicit Network (const NetworkConfig&  conf,
                           const NetworkTopologyConfig&  t_conf,
                           const PrintingConfig& p_conf,
-                          Logger& log0,
+                          Logger<logger_level_min>& log0,
                           PrintingModule& io0):
                           config{conf}, t_config{t_conf}, io_mod{io0}, log(log0) {}
 
 
-        ~Network() { std::cerr << "Deleting network..." << std::endl;}
+        ~Network() { log.log<LogLevel::INFO>("Deleting network...");}
 
         auto save_network_state() ->void { do_save_network_state();}
 
@@ -79,6 +79,8 @@ namespace karst {
 
         const NetworkTopologyConfig&  t_config;
         const NetworkConfig&            config;
+        PrintingModule&                 io_mod;
+        Logger<logger_level_min>&      log;
 
     protected:
 
@@ -92,8 +94,6 @@ namespace karst {
         std::vector<Node*> n_inlet;
         std::vector<Node*> n_outlet;
 
-        PrintingModule& io_mod;
-        Logger& log;
 
 
         auto prepare_network_topology()      -> void;
@@ -136,7 +136,7 @@ namespace karst {
 
         auto do_init() -> void {
 
-            std::cerr<<"Initializing network..."<<std::endl;
+            log.log<LogLevel::INFO>("Initializing network...");
 
             // 1. Prepare the topology
             prepare_network_topology();
@@ -157,8 +157,8 @@ namespace karst {
 
         auto do_save_network_state() -> void   //TODO: zastanowić się czy nie może to być jednak funkcja const?
         {
-            std::cerr<<"Saving network state..."<<std::endl;
-            std::cerr<<"Saving print_net_ps..."<<std::endl;
+            log.log<LogLevel::INFO>("Saving network state...");
+            log.log<LogLevel::INFO>("Saving print_net_ps...");
             if(io_mod.config.do_save_ps)
                 io_mod.print_net_ps(nodes, pores, grains);
         }

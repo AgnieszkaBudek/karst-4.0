@@ -49,7 +49,8 @@ namespace karst {
         };
 
 
-    explicit Simulation(const std::string& cfile_name) : confs(tupleToStruct<Simulation::Configs>(read_configs(cfile_name))) {}
+    explicit Simulation(const std::string& cfile_name, Logger<logger_level_min>& log0):
+        confs(tupleToStruct<Simulation::Configs>(read_configs(cfile_name,log0))), log{log0} {}
 
 
 
@@ -65,23 +66,23 @@ namespace karst {
 
     protected:
 
-        Logger           log   {std::cout};
-        PrintingModule   io    {confs.net_topo_conf, confs.print_conf};
+        Logger<logger_level_min>&  log;
+
+        PrintingModule   io    {confs.net_topo_conf, confs.print_conf, log};
         SimulationState  state {};
         Network          S     {net_conf, net_topo_conf, print_conf, log, io};
         ReactionKinetics R     {S, confs.sim_conf, state};
 
-        SimulatePressure        sim_pressure        {SimulatePressure       ::Config{.S=S,.R=R,.sim_config=sim_conf, .sim_state=state,.log = log}};
-        SimulateFlow            sim_flow            {SimulateFlow           ::Config{.S=S,.R=R,.sim_config=sim_conf, .sim_state=state,.log = log}};
-        SimulateConcentrations  sim_concentration   {SimulateConcentrations ::Config{.S=S,.R=R,.sim_config=sim_conf, .sim_state=state,.log = log}};
-        SimulateGeometry        sim_geometry        {SimulateGeometry       ::Config{.S=S,.R=R,.sim_config=sim_conf, .sim_state=state,.log = log}};
-
+        SimulatePressure        sim_pressure        {SimulatePressure       ::Config{.S=S, .R=R, .sim_config=sim_conf, .sim_state=state, .log = log}};
+        SimulateFlow            sim_flow            {SimulateFlow           ::Config{.S=S, .R=R, .sim_config=sim_conf, .sim_state=state, .log = log}};
+        SimulateConcentrations  sim_concentration   {SimulateConcentrations ::Config{.S=S, .R=R, .sim_config=sim_conf, .sim_state=state, .log = log}};
+        SimulateGeometry        sim_geometry        {SimulateGeometry       ::Config{.S=S, .R=R, .sim_config=sim_conf, .sim_state=state, .log = log}};
 
 
         auto do_init() -> void {
 
             // 1. Initializing Network
-            std::cerr<<"Initializing simulation..."<<std::endl;
+            log.log<LogLevel::INFO>("Initializing simulation...");
             S.init();
             state.dt = sim_conf.dt0;
             S.save_network_state();
@@ -92,7 +93,7 @@ namespace karst {
                 case ReactionSet::LINEAR_D:   R.prepare_linear_dissolution(); break;
                 case ReactionSet::SIZE:       break;
             }
-            if(!R.check_implementation()) std::cerr<<"ERROR: Problem with reactions implementation...";
+            if(!R.check_implementation()) S.log.log<LogLevel::ERROR>("Problem with reactions implementation...");
 
             // 3. Preparing Simulation steps
             sim_pressure     .init();
@@ -107,35 +108,37 @@ namespace karst {
 
             while(state.sim_state==SimulationStateType::NORMAL){
 
-                state.T = state.T + state.dt;
-                state.sim_step++;
-                std::cerr<<"\n\n"<<state.sim_step<<". step of Simulation, ";
-                std::cerr<<"T = "<<state.T<<"."<<std::endl;
+                log.pure_log<LogLevel::INFO>("\n\n"+std::string(50, '*')+"\n");
+                log.log<LogLevel::INFO>(std::to_string(state.sim_step)+". step of Simulation.");
+                log.log<LogLevel::INFO>("T = "+state.T+"\n");
 
                 do_one_Euler_step();
 
                 save_results();
                 check_simulation_state();
                 adapt_time_step();
+
+
             }
         }
 
 
         auto do_one_Euler_step() -> void;
+        auto do_one_LeapFrog_step() -> void;
+        auto do_iterative_step() -> void;       //to be implemented
 
 
         auto check_simulation_state()   -> void {  //TODO: implement later
 
             if(state.T >= confs.sim_conf.T_max) {
                 state.sim_state = SimulationStateType::FINISHED;
-                std::cerr << "Setting simulation state to " << state.sim_state << std::endl;
+                log.log<LogLevel::INFO>( "Setting simulation state to " + state.sim_state);
             }
         }
 
         auto adapt_time_step() -> void {}  //TODO: implement later
 
         auto save_results()             -> void {}  //TODO: implement later
-
 
 
     };

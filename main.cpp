@@ -12,12 +12,14 @@ using namespace karst;
 
 int main() {
 
+    Logger<logger_level_min> log  {logger_output};
+
     std::string config_name = "config.txt";
-    Simulation simulation{config_name};
+    Simulation simulation{config_name,log};
     simulation.init();
     simulation.run_simulation();
 
-    std::cerr<<"Preparing pictures..."<<std::endl;
+    log.log<LogLevel::INFO>("Preparing pictures...");
     system("ps2pdf net_pores.ps");
     system("open net_pores.pdf");
 

@@ -24,7 +24,7 @@ namespace karst{
             const ReactionKinetics& R;
             const SimulationConfig& sim_config;
             const SimulationState& sim_state;
-            Logger& log;
+            Logger<logger_level_min>& log;
         };
         explicit GenericSimulationStep(const Config& c):
                                        S{c.S},R{c.R}, sim_config{c.sim_config}, sim_state{c.sim_state},log{c.log}
@@ -39,30 +39,44 @@ namespace karst{
             static_cast<Step&>(*this).do_init();
         }
 
-        auto run  (Long step_to_be_calculated)  -> void {
+        auto run  (Long step_to_be_calculated, Time t_to_be_calculate)  -> void {
 
-            std::cerr<<"Running "<<name<<"..."<<std::endl;
-            if (step >= step_to_be_calculated) return;      //do nth if simulation step has been already calculated for this time step
+//            if (step >= step_to_be_calculated or t >= t_to_be_calculate){
+//                log.log_with_context<LogLevel::INFO>( *this," nth to be done...");
+//                return;      //do nth if simulation step has been already calculated for this time step
+//            }
+
+            log.log_with_context<LogLevel::INFO>( *this," is running...");
             static_cast<Step&>(*this).do_run();
-            check_and_accept();
+            log.log_with_context<LogLevel::INFO>( *this," is being checked...");
+            bool success = static_cast<Step&>(*this).do_check();
+            ASSERT_MSG(success,"Problem with " + get_context_info());
+
+            log.log_state<LogLevel::DEBUG>(static_cast<Step&>(*this),"");
+
             step = step_to_be_calculated;
-            t    = t + sim_state.dt;
-            log.log_state(LogLevel::INFO,static_cast<Step&>(*this),"");
+            t    = t_to_be_calculate;
 
         }
 
-        auto check_and_accept () -> void{
 
-            std::cerr<<"Checking "<<name<<"..."<<std::endl;
-            if(static_cast<Step&>(*this).do_check()) {
 
-                // static_cast<Step&>(*this)->do_accept(); //TODO: Better implement it differenly
-                S.apply_to_all_nodes([](auto &el) {
-                    el.update_old_state();
-                });
-            }
+        auto update_old_state() -> void{
+            log.log_with_context<LogLevel::INFO>(*this,"Updating old_state...");
+            S.apply_to_all_net_elements([](auto &el) {
+                el.update_old_state();
+            });
+        };
+
+        auto mix_states(){
+            log.log_with_context<LogLevel::INFO>(*this,"Mixing state_old and state_new...");
+            static_cast<Step&>(*this).do_mix_states();
         }
 
+        auto go_back(){
+            log.log_with_context<LogLevel::INFO>(*this,"Reverting to state_old...");
+            static_cast<Step&>(*this).do_go_back();
+        }
 
 
         auto get_step () const        -> Long          { return step; }
@@ -75,7 +89,7 @@ namespace karst{
 
         //Saving info
         std::string get_state_info() const {
-            return  static_cast<const Step &>(*this).do_get_state_info() + "\n";
+            return  static_cast<const Step &>(*this).do_get_state_info();
         }
 
 
@@ -86,12 +100,12 @@ namespace karst{
 
         Network&  S;
         const ReactionKinetics& R;
-        Time t {0.};            ///< time step the simulation step was run the last time
-        Long step {0};          ///< time step the simulation step was run the last time
+        Time t {-1};            ///< time step the simulation step was run the last time
+        Long step {-1};          ///< time step the simulation step was run the last time
         const SimulationState& sim_state;
         StepState state;
         std::string name{"Unknown."};
-        Logger& log;
+        Logger<logger_level_min>& log;
     };
 
 
