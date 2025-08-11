@@ -34,7 +34,7 @@
 #define ASSERT_MSG(cond, msg) \
         do { \
             if (!(cond)) { \
-                std::cerr << std::format("Assertion failed: {}\nIn file {} at line {}\n", msg, __FILE__, __LINE__); \
+                std::cerr << std::format("\n[ASSERTION] Assertion failed: {}\n[ASSERTION] In file {} at line {}\n", msg, __FILE__, __LINE__); \
                 assert(cond); \
             } \
         } while (0)
@@ -46,7 +46,9 @@ namespace karst {
 
     inline const double NaN = std::numeric_limits<double>::quiet_NaN();
 
-
+    inline std::string bool_to_string(bool value) {
+        return value ? "true" : "false";
+    }
 
 
     class ofstream_ps         : public std::ofstream  {};
