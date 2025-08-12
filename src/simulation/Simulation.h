@@ -85,7 +85,7 @@ namespace karst {
             log.log<LogLevel::INFO>("Initializing simulation...");
             S.init();
             state.dt = sim_conf.dt0;
-            S.save_network_state();
+            S.save_network_state("After Network.init().");
 
             // 2. Preparing reactions
             switch(confs.net_conf.reaction_set){
@@ -105,6 +105,7 @@ namespace karst {
 
         auto do_run_simulation() -> void{
 
+            if(logger_level_min<= LogLevel::DEBUG) sim_geometry.ps_for_debug();
 
             while(state.sim_state==SimulationStateType::NORMAL){
 

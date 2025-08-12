@@ -67,6 +67,14 @@ namespace karst {
         return species_factor*get_surface_tot();
     }
 
+    auto Pore::update_length() -> void{
+        Unitless l_tot_f = 0._U;
+        for(auto g : grains)
+            l_tot_f +=  1._U*pow(double(g->get_tot_v()/g->get_max_volume()),net_config.l_V_scaling_f);
+        set_l(1./double(get_grains().size())*get_l_max()*l_tot_f);
+        if(get_l()<net_config.l_min) set_l(net_config.l_min);       //pore length cannot be too small
+    }
+
 
 
 }

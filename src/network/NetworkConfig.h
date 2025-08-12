@@ -34,6 +34,8 @@ namespace karst {
         Unitless DaPe {1.0};	///< DaPe for first reaction (previous G, Diffusion across the pore)
         Unitless Pe   {1.0};	///< Peclet number for first reaction (D along pore)
 
+        Unitless X_f {0.0};    ///< Percentage of non active mineral in the rock
+
         EnumArray <SOLIDS, Unitless,enum_size_v<SOLIDS>>    gamma {1._U*NaN};	///< ratio of acid capacity numbers between first and the rest of reactions
         EnumArray<REACTION,Unitless,enum_size_v<REACTION>>  kappa {1._U*NaN};	///< ratio of Da_1/Da_2 = ratio of reaction rates
         EnumArray<REACTION,Unitless,enum_size_v<REACTION>>  theta {1._U*NaN};	///< ratio of DaPe/DaPe
@@ -52,13 +54,14 @@ namespace karst {
 
         // Reactions
         ReactionSet                              reaction_set  = ReactionSet::LINEAR_D;
-        std::array<SOLUBLES,2>                   solubleS      = {SOLUBLES::B,SOLUBLES::C};
-        std::array<SOLIDS,2>                     solidS        = {SOLIDS::A,SOLIDS::E};
+        std::array<SOLUBLES,1>                   solubleS      = {SOLUBLES::B};
+        std::array<SOLIDS,1>                     solidS        = {SOLIDS::A};
         EnumArray<SOLUBLES,Diffusion,enum_size_v<SOLUBLES>>           diffusion_rate;              ///< reaction rate for precipitation
         EnumArray<SOLUBLES,Diffusion,enum_size_v<SOLUBLES>>           transversal_diffusion_rate;  ///< reaction rate for precipitation
         EnumArray<SOLUBLES,Concentration,enum_size_v<SOLUBLES>>       inlet_c = {
                                                     {SOLUBLES::B,1._C},
-                                                    {SOLUBLES::C,0._C}};   ///< capacity number for reactions  //TODO: to musi byćdopiero wczytywane z pliku konfiguracyjnego
+                                                    {SOLUBLES::C,0._C},
+                                                    {SOLUBLES::D,0._C}};   ///< capacity number for reactions  //TODO: to musi byćdopiero wczytywane z pliku konfiguracyjnego
 
     };
 

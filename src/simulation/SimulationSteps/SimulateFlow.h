@@ -64,7 +64,13 @@ namespace karst {
                     state.Q_out += abs(p->get_q());
 
             ASSERT_MSG(state.Q_in>0._F and state.Q_out>0._F , "Q_in = "+state.Q_in+"\t Q_out = "+state.Q_out);
-            return abs(state.Q_in-state.Q_out)/abs(state.Q_in+state.Q_out) < state.eps_q;
+            log.log_state<LogLevel::DEBUG>(*this,std::format("\nIn checking the flow balance: {:2.7f} < {:2.7f}",
+                                                             double(abs(state.Q_in-state.Q_out)/abs(state.Q_in+state.Q_out))
+                                                             ,double(state.eps_q)));
+            bool success = abs(state.Q_in-state.Q_out)/abs(state.Q_in+state.Q_out) < state.eps_q;
+            if constexpr (logger_level_min<=LogLevel::DEBUG_PS)
+                if (!success) ps_for_debug("\nIn checking the flow.");
+            return success;
         }
 
         auto do_mix_states() -> void {
@@ -85,6 +91,19 @@ namespace karst {
                 "\n\t\teps_q = " + state.eps_q +
                 "\n\t\tQ_in  = " + state.Q_in +
                 "\n\t\tQ_out = " + state.Q_out;
+        }
+
+        void do_ps_for_debug(std::string& str) const{
+
+            S.io_mod.print_net_ps_with_values(
+                    get_context_info() + " " + str,
+                    S.get_nodes(),
+                    S.get_pores(),
+                    std::vector<Grain>{},
+                    [](auto& el){return std::format("{:3.2f}",double(el.get_u()));},
+                    [](auto& el){return std::format("{:3.2f}",double(el.get_q()));},
+                    [](auto& el){return "";}
+            );
         }
 
     };

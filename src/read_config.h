@@ -39,7 +39,7 @@ namespace karst {
                  }},
                  {"N_y", [&](const std::string& value) {
                      net_top_conf.N_y = std::stoi(value);
-                     net_conf.P_in = Pressure(net_top_conf.N_y);
+                     net_conf.P_in = Pressure(net_top_conf.N_y - 1);
                      log.log<LogLevel::INFO>("Setting N_y = " + std::to_string(net_top_conf.N_y));
                      log.log<LogLevel::INFO>("Additionally setting P_in = " + net_conf.P_in);
                  }},

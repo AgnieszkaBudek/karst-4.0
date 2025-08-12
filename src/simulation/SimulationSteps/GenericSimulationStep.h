@@ -46,6 +46,9 @@ namespace karst{
 //                return;      //do nth if simulation step has been already calculated for this time step
 //            }
 
+            step = step_to_be_calculated;
+            t    = t_to_be_calculate;
+
             log.log_with_context<LogLevel::INFO>( *this," is running...");
             static_cast<Step&>(*this).do_run();
             log.log_with_context<LogLevel::INFO>( *this," is being checked...");
@@ -54,11 +57,8 @@ namespace karst{
 
             log.log_state<LogLevel::DEBUG>(static_cast<Step&>(*this),"");
 
-            step = step_to_be_calculated;
-            t    = t_to_be_calculate;
-
+            if constexpr (logger_level_min <= LogLevel::DEBUG_PS) ps_for_debug();
         }
-
 
 
         auto update_old_state() -> void{
@@ -90,6 +90,11 @@ namespace karst{
         //Saving info
         std::string get_state_info() const {
             return  static_cast<const Step &>(*this).do_get_state_info();
+        }
+
+        //Saving info
+        void ps_for_debug(std::string str="") const {
+            return  static_cast<const Step &>(*this).do_ps_for_debug(str);
         }
 
 

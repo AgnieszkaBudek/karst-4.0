@@ -213,6 +213,22 @@ namespace karst {
                 (pow(u.value, N));
     }
 
+    template<typename Exp, typename M1, typename L1, typename T1, typename C1, typename T>
+    constexpr auto power(const Unit<M1, L1, T1, C1, T>& u) {
+        using std::ratio_multiply;
+        using ratio_exp = Exp;
+
+        return Unit<
+                ratio_multiply<M1, ratio_exp>,
+                ratio_multiply<L1, ratio_exp>,
+                ratio_multiply<T1, ratio_exp>,
+                ratio_multiply<C1, ratio_exp>,
+                T
+        >(
+                std::pow(u.value, static_cast<double>(ratio_exp::num) / ratio_exp::den)
+        );
+    }
+
     template<typename M1, typename L1, typename T1, typename C1, typename T>
     constexpr auto sqrt(const Unit<M1, L1, T1, C1, T>& u) {
         return Unit<

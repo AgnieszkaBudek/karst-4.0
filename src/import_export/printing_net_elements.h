@@ -17,7 +17,7 @@ namespace karst {
     struct Pore3D {
 
         const Pore&  p;
-        double name {NaN};
+        std::string name;
         Color  k    {0.5,0.5,0.5};
     };
 
@@ -25,8 +25,9 @@ namespace karst {
         Point3D  pt0 = {l.p.get_nodes()[0]->get_pos()};
         Point3D  pt1 = {l.p.get_nodes()[1]->get_pos()};
 
+        //ASSERT_MSG(! l.p.check_if_active(),l.p.get_context()+"Non active is printed.")
         // do not draw pores with d==0
-        if (l.p.get_d() == 0._L or ! l.p.check_if_active())
+        if (! l.p.check_if_active())
             return os;
 
         //do not draw pores at periodic boundary conditions
@@ -34,17 +35,17 @@ namespace karst {
             return os;
         }
 
-        //os <<"! Drukuje porek"<< l.p.config.name<<std::endl;
         os << std::setprecision(4) << l.k;
         os << l.p.get_d() << " setlinewidth" << std::endl;
         //os << "newpath " << pt0 << " moveto " << pt1 << "lineto stroke" << std::endl;
         os << pt0 << " moveto " << pt1 << "lineto stroke" << std::endl;
 
         // printing label
-        if (!std::isnan(l.name)){
-            os << "/Times-Bold findfont " << (pt0 - pt1) / 7._U << " scalefont setfont "
+        if (!l.name.empty()){
+            Length u_tmp = (pt0 - pt1) / 10.;
+            os << "/Times-Bold findfont " << u_tmp << " scalefont setfont "
                << Color(0, 0, 1) << std::endl;
-            os << pt0 * pt1 << "moveto" << std::endl;
+            os << pt0 * pt1 + Point3D{.x=-u_tmp} << "moveto" << std::endl;
             os << "0 0 (" << std::setprecision(3) << l.name << ") ashow stroke" << std::endl;
         }
 
@@ -57,7 +58,7 @@ namespace karst {
 
         const Node & n;
         Color k{NaN};
-        double name{NaN};
+        std::string name;
         Length r{0.1};
     };
 
@@ -68,21 +69,20 @@ namespace karst {
 
         if (std::isnan(k_tmp.r) or std::isnan(k_tmp.g) or std::isnan(k_tmp.b)) {
             if      (n3D.n.get_type() == NodeType::NORMAL) k_tmp = Color{0.7, 0.7, 0.7};
-            else if (n3D.n.get_type() == NodeType::INPUT ) k_tmp = Color{0.8, 0, 0};
-            else if (n3D.n.get_type() == NodeType::OUTPUT) k_tmp = Color{0, 0, 0.8};
+            else if (n3D.n.get_type() == NodeType::INPUT ) k_tmp = Color{0.8, 0.8, 0.0};
+            else if (n3D.n.get_type() == NodeType::OUTPUT) k_tmp = Color{0.4, 0.4, 0.8};
         }
 
         os << k_tmp;
         os << pos_tmp << n3D.r << " 0 360 arc fill closepath" << std::endl;
 
         // printing label
-        if (!std::isnan(n3D.name)){
-            os << Color(0.8,0,0);
+        if (!n3D.name.empty()){
+            os << Color(0.9,0.2,0.2);
             os << "/Times-Bold findfont " << n3D.r << " scalefont setfont" << std::endl;
-            os << Point3D(pos_tmp.x - n3D.r/3._U , pos_tmp.y - n3D.r/3._U) << "moveto" << std::endl;
+            os << Point3D(pos_tmp.x - n3D.r/1.3 , pos_tmp.y + n3D.r/5.) << "moveto" << std::endl;
             os << "0 0 (" << std::setprecision(5) << n3D.name << ") ashow stroke" << std::endl;
         }
-        //os << "stroke" << std::endl;
 
         return os;
     }
@@ -91,7 +91,7 @@ namespace karst {
     struct Triangle3D {
 
         const Node &n1, &n2, &n3;
-        double name{NaN};
+        std::string name;
         Color k{};
     };
 
@@ -100,7 +100,7 @@ namespace karst {
 
         Color k_tmp = tr.k;
         if (isnan(k_tmp))
-            k_tmp = Color{0,0.8,0};
+            k_tmp = Color{0.6,0.8,0.6};
 
 
         os << k_tmp;
@@ -108,7 +108,7 @@ namespace karst {
            << "lineto closepath fill stroke" << std::endl;
 
         //printing label
-        if (!std::isnan(tr.name)) {
+        if (!tr.name.empty()) {
             os << Color(0, 0, 0);
             os << "/Times-Bold findfont " << 0.1 << " scalefont setfont" << std::endl;
             os << Point3D(
@@ -124,8 +124,8 @@ namespace karst {
     // 4. Polygon
     struct Polygon3D {
 
-        const std::vector<Node *> n;       //TODO: Poprawić potem na const std::vector<const Node *> n;
-        double name {NaN};
+        const std::vector<Node *> n;
+        std::string name {};
         Color k{NaN};
 
     };
@@ -145,7 +145,7 @@ namespace karst {
         // set default color
         Color k_tmp = w.k;
         if (isnan(k_tmp))
-            k_tmp = Color{0,0.8,0};
+            k_tmp = Color{0.6,0.8,0.6};
 
         os << k_tmp;
         os << w.n[0]->get_pos() << "moveto ";
@@ -154,7 +154,7 @@ namespace karst {
         os << "closepath fill stroke" << std::endl;
 
         //printing label
-        if (!std::isnan(w.name)) {
+        if (!w.name.empty()) {
             os << Color(0, 0, 0);
             os << "/Times-Bold findfont " << 0.1 << " scalefont setfont" << std::endl;
             auto sr = Point3D{0._L, 0._L, 0._L};

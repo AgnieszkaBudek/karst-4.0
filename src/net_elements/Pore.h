@@ -34,18 +34,21 @@ namespace karst {
                         : GenericElement<Pore, PoreState>(net_conf,topo_conf0,config0){}
 
 
+        auto set_d (Length d0)  -> void  {state.d = d0; }
+        auto add_d (Length dd)  -> void  {state.d = dd + state.d; }
+        auto set_l (Length l0)  -> void  {state.l = l0; }
+        auto set_q (Flow q0  )  -> void  {state.q = q0; }
+        auto set_type     (PoreType t)     -> void  {state.type = t;};
+        auto set_geometry (PoreGeometry g) -> void  {state.geometry = g;};
 
+        auto get_d               () const -> Length       { ASSERT_MSG(state.d>=0._L,      get_context_info()); return state.d; }
+        auto get_l               () const -> Length       { ASSERT_MSG(state.l>=0._L,      get_context_info()); return state.l; }
+        auto get_q               () const -> Flow         { ASSERT_MSG(abs(state.q)>=0._F, get_context_info()); return abs(state.q); }
+        auto get_l_max           () const -> Length       { return *nodes[1] - *nodes[0];}
+        auto check_if_space_left () const -> bool         { return state.d > 0._L; }
+        auto get_type            () const -> PoreType     { return state.type;};
+        auto get_geometry        () const -> PoreGeometry { return state.geometry;};
 
-        auto set_d (Length d0) -> void  {state.d = d0; }
-        auto add_d (Length d0) -> void  {state.d += d0; }
-        auto set_l (Length l0) -> void  {state.l = l0; }
-        auto set_q (Flow q0  ) -> void  {state.q = q0; }
-
-        auto get_d               () const -> Length  { return state.d; }
-        auto get_l               () const -> Length  { return state.l; }
-        auto get_q               () const -> Flow    { return abs(state.q); }
-        auto get_l_max           () const -> Length  { return nodes[1]->get_pos()-nodes[0]->get_pos();}
-        auto check_if_space_left () const-> bool     { return state.d > 0._L; }
 
         auto get_perm            () const    {      //we can do some mixing of different regimes
             switch (state.geometry) {
@@ -59,8 +62,8 @@ namespace karst {
             return Permeability {NaN};
         }
 
-        //auto get_SH_eff    (SOLIDS sp) const  -> Unitless ;         //Rethink if needed - NIE CHCE ICH
-        //auto get_DA_eff    (SOLIDS sp) const  -> Unitless ;         //Rethink if needed
+        //auto get_SH_eff    (SOLIDS sp, Reaction R) const  -> Unitless ;         //Rethink if needed - NIE CHCE ICH
+        //auto get_DA_eff    (SOLIDS sp, Reaction R) const  -> Unitless ;         //Rethink if needed
 
         //This one will give the information about passivation (would it handel a hysteresis?)
         auto get_surface   (SOLIDS sp) const  -> Area;
@@ -77,6 +80,7 @@ namespace karst {
         }
 
 
+        auto update_length() -> void;
 
         auto get_available_volume(SOLIDS species) -> Volume;
 

@@ -121,10 +121,10 @@ namespace karst{
         auto save_topology (const std::ostream& log_file) const-> void {}
 
         std::string get_context_info() const {
-            return config.type +" [" + std::to_string(config.name) + "] ";
+            return ""+ config.type +" [" + std::to_string(config.name) + "] ";
         }
-        std::string get_state_info() const {
-            return static_cast<Element &>(*this).do_get_state_info()+"\n";
+        std::string get_state_info() {
+            return get_context_info() + " " + static_cast<Element &>(*this).do_get_state_info()+"\n";
         }
 
 
@@ -140,6 +140,7 @@ namespace karst{
         auto check_if_active () const -> bool {return active;}
 
         auto deactivate () -> void {
+            config.log.log_with_context<LogLevel::DEBUG>(*this,"is beeing deactivated.");
             active = false;
             remove_element_from_a_network();
         }

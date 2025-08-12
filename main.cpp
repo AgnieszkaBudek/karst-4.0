@@ -20,8 +20,9 @@ int main() {
     simulation.run_simulation();
 
     log.log<LogLevel::INFO>("Preparing pictures...");
-    system("ps2pdf net_pores.ps");
-    system("open net_pores.pdf");
+    system("ps2pdf *.ps");
+
+
 
 
     return 0;

@@ -64,11 +64,11 @@ namespace karst {
         auto set_pos  (Point3D p0)                   -> void      { pos = p0;    }
         auto get_pos  () const                       -> Point3D   { return pos;  }
         auto set_u    (Pressure u0)                  -> void      { state.u = u0;    }
-        auto get_u    () const                       -> Pressure  { return state.u;  }
         auto set_c    (SOLUBLES sp, Concentration c) -> void            { state.c[sp] = c;   }
-        auto get_c    (SOLUBLES sp) const            -> Concentration   { return state.c[sp];}
         auto clear_c  ()                             -> void            { state.c.fill(0._C);}
 
+        auto get_u    () const           -> Pressure        { ASSERT_MSG(state.u>=0._P,get_context_info());     return state.u;  }
+        auto get_c    (SOLUBLES sp) const-> Concentration   { ASSERT_MSG(state.c[sp]>=0._C,get_context_info()); return state.c[sp];}
 
 
         //friend ofstream_ps_pores &operator <<(ofstream_ps_pores &stream, const Node &n){}     //TODO: implement it

@@ -33,12 +33,19 @@ namespace karst{
         // 2. Check connections:
         check_network_connections();  //TODO: add a function checking network connections...
 
+        for(auto& p : pores)
+            p.state.d=0.1_L;
+        save_network_state("Before boundary cleaning1.");
 
         // 3. Disconnect inlet/outlet nodes
         for(auto& p : pores)
             if(p.nodes[0]->get_type() != NodeType::NORMAL and p.nodes[1]->get_type() != NodeType::NORMAL)
                 p.deactivate();
 
+
+        for(auto& p : pores)
+            p.state.d=0.1_L;
+        save_network_state("Before boundary cleaning2.");
 
         // 4. Add boundary conditions
         if (!t_config.do_periodic_bc) {
@@ -47,12 +54,15 @@ namespace karst{
                     p.deactivate();
         }
 
+        save_network_state("After boundary cleaning.");
 
         // 5. Delete unused elements
         if (t_config.do_clear_unused_net_el) {
             log.log<LogLevel::INFO>( "Clearing unused elements of the network:");
             clear_unused_elements();
         }
+
+        save_network_state("After all cleaning.");
 
         // 6. Check connections after deleting unused ones:
         check_network_connections();

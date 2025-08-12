@@ -24,6 +24,7 @@
 
 #include "src/all_enums.h"
 #include "src/import_export/Logger.h"
+#include "src/import_export/OutStream.h"
 
 
 
@@ -50,12 +51,6 @@ namespace karst {
         return value ? "true" : "false";
     }
 
-
-    class ofstream_ps         : public std::ofstream  {};
-    class ofstream_ps_pores   : public ofstream_ps    {};
-    class ofstream_ps_grains  : public ofstream_ps    {};   ///< output PostScript file
-    class ofstream_txt        : public std::ofstream  {};   ///< output text file
-    class log_stream          : public std::ostream   {};   ///< log files
 
 
 

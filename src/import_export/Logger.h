@@ -17,17 +17,18 @@
 
 namespace karst{
 
-    enum class LogLevel {DEBUG_FULL, DEBUG, INFO, WARNING, ERROR};
+    enum class LogLevel {DEBUG_FULL, DEBUG_PS, DEBUG, INFO, WARNING, ERROR};
     template<>
     const std::map<LogLevel, std::string> EnumToString<LogLevel>::mapping = {
             {LogLevel::DEBUG_FULL,  "DEBUG_FULL"},
+            {LogLevel::DEBUG_PS,    "DEBUG_PS"},
             {LogLevel::DEBUG,       "DEBUG"     },
             {LogLevel::INFO,        "INFO"      },
             {LogLevel::WARNING,     "WARNING"   },
             {LogLevel::ERROR,       "ERROR"     }
     };
 
-    constexpr LogLevel      logger_level_min  = LogLevel::DEBUG;
+    constexpr LogLevel      logger_level_min  = LogLevel::DEBUG_PS;
     constexpr std::ostream& logger_output     = std::cout;
 
     template<LogLevel MinLevel>

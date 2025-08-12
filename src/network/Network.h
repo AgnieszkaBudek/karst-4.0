@@ -42,7 +42,7 @@ namespace karst {
 
         ~Network() { log.log<LogLevel::INFO>("Deleting network...");}
 
-        auto save_network_state() ->void { do_save_network_state();}
+        auto save_network_state(const std::string& title) ->void { do_save_network_state(title);}
 
         auto get_nodes()      { return nodes    | std::views::filter([](const Node& n)  { return n.active; });}
         auto get_pores()      { return pores    | std::views::filter([](const Pore& p)  { return p.active; });}
@@ -152,15 +152,18 @@ namespace karst {
                 el.init();
             });
 
+            // 3. Recalculate pore lengths
+            for(auto& p : get_pores()) p.update_length();
+
         }
 
 
-        auto do_save_network_state() -> void   //TODO: zastanowić się czy nie może to być jednak funkcja const?
+        auto do_save_network_state(const std::string& title) -> void   //TODO: zastanowić się czy nie może to być jednak funkcja const?
         {
             log.log<LogLevel::INFO>("Saving network state...");
             log.log<LogLevel::INFO>("Saving print_net_ps...");
             if(io_mod.config.do_save_ps)
-                io_mod.print_net_ps(nodes, pores, grains);
+                io_mod.print_net_ps(title,nodes, pores, grains);
         }
 
 

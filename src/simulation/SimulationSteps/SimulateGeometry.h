@@ -40,6 +40,24 @@ namespace karst {
                         if(g->get_v(sp) < state.eps_V) g->set_v(sp, 0._V);
                     }
                 }
+
+            //update diameters
+            for(auto& p : S.get_pores()){
+                Volume V_tot = 0._V;
+                for(auto& sp : S.config.solidS)
+                    V_tot += R.get_delta_volume_map(sp)(p);
+                p.add_d(-2*V_tot/p.get_surface_tot());
+            }
+
+            //update lengths
+            for(auto& p : S.get_pores()){
+                Unitless l_tot_f = 0._U;
+                for(auto& g : p.get_grains())
+                    l_tot_f +=  1._U*pow(double(g->get_tot_v()/g->get_max_volume()),S.config.l_V_scaling_f);
+                p.set_l(1./double(p.get_grains().size())*p.get_l_max()*l_tot_f);
+                if(p.get_l()<S.config.l_min) p.set_l(S.config.l_min);       //pore length cannot be too small
+            }
+
         }
 
         auto do_check()-> bool {
@@ -58,40 +76,35 @@ namespace karst {
 
         }
 
-        auto do_mix_states() -> void{           //more complicated that other optwions
+        auto do_mix_states() -> void {           //more complicated that other optwions
 
-            log.log_with_context<LogLevel::WARNING>(*this,"This may not be implemented correctly.");
+            log.log_with_context<LogLevel::WARNING>(*this, "This may not be implemented correctly.");
 
-            for(auto& p : S.get_pores()){
+            for (auto &p: S.get_pores()) {
                 p.set_d(p.get_old_state().d);
                 p.set_l(p.get_old_state().l);
             }
 
             // 2. Set new volume based on both new and old states;
-            for(auto& g :S.get_grains()){
+            for (auto &g: S.get_grains()) {
                 const auto s_new = g.get_state();
                 const auto s_old = g.get_old_state();
-                for (auto sp : S.config.solidS)
-                    g.set_v(sp,(s_old.v[sp]+s_new.v[sp])/2.);           //immune to going back
-                g.set_tot_v((s_new.tot_volume+s_old.tot_volume)/2.);
+                for (auto sp: S.config.solidS)
+                    g.set_v(sp, (s_old.v[sp] + s_new.v[sp]) / 2.);           //immune to going back
+                g.set_tot_v((s_new.tot_volume + s_old.tot_volume) / 2.);
             }
 
             //3. update diameters
-            for(auto& p : S.get_pores()){
+            for (auto &p: S.get_pores()) {
                 Volume V_tot = 0._V;
-                for(auto& sp : S.config.solidS)
+                for (auto &sp: S.config.solidS)
                     V_tot += R.get_delta_volume_map(sp)(p);
-                p.add_d(2*V_tot/p.get_surface_tot());       //TODO: this wont work both state and state_old are in future now...
+                p.add_d(2 * V_tot /
+                        p.get_surface_tot());       //TODO: this wont work both state and state_old are in future now...
             }
 
             //4. update lengths
-            for(auto& p : S.get_pores()){
-                Unitless l_tot_f = 0._U;
-                for(auto& g : p.get_grains())
-                    l_tot_f +=  1._U*pow(double(g->get_tot_v()/g->get_max_volume()),S.config.l_V_scaling_f);
-                p.set_l(1./double(p.get_grains().size())*p.get_l_max()*l_tot_f);
-                if(p.get_l()<S.config.l_min) p.set_l(S.config.l_min);       //pore length cannot be too small
-            }
+            for (auto &p: S.get_pores()) p.update_length();
         }
 
 
@@ -101,6 +114,20 @@ namespace karst {
                 str  += "\n\t\tCF["+sp+"] = "+state.CF_in[sp]+" -> "+state.CF_out[sp] + "\tdelta_V["+sp+"] = "+state.Delta_V[sp];
             return str;
         }
+
+        void do_ps_for_debug(std::string& str) const{
+
+            S.io_mod.print_net_ps_with_values(
+                    get_context_info() + " " + str,
+                    S.get_nodes(),
+                    S.get_pores(),
+                    S.get_grains(),
+                    [](auto& el){return std::format("{:3.2f}",double(el.get_c(SOLUBLES::B)));},
+                    [](auto& el){return std::format("({:2.1f}, {:2.1f})",double(el.get_state().d),double(el.get_state().l));},
+                    [](auto& el){return std::format("{:3.2f}",double(el.get_v(SOLIDS::A)));}
+                    );
+        }
+
 
     };
 } // namespace karst

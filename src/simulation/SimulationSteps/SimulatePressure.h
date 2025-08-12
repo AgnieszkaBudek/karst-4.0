@@ -12,6 +12,9 @@
 #include "src/simulation//SimulationSteps/GenericSimulationStep.h"
 //#include "external_algorithms/algorithms_cc.h"
 
+
+
+
 namespace karst {
 
 
@@ -113,21 +116,25 @@ namespace karst {
 
         auto run_EIGEN()->void{
 
-
             M.setFromTriplets(triplets.begin(), triplets.end());
-
             log.log<LogLevel::DEBUG_FULL>(print_full_matrix());
 
-
             if(state.step % state.how_often_direct == 0){       // Solver: Conjugate Gradient + Incomplete Cholesky
+
+                log.log_with_context<LogLevel::DEBUG>(*this,"Running direct solver.");
                 direct_solver.compute(M);
-                if (direct_solver.info() != Eigen::Success) log.log_with_context<LogLevel::ERROR>(*this,"Eigen::SimplicialLLT Decomposition failed.");
+                if (direct_solver.info() != Eigen::Success)
+                    log.log_with_context<LogLevel::ERROR>(*this,"Eigen::SimplicialLLT Decomposition failed.");
                 x = direct_solver.solve(y);
-                if (direct_solver.info() != Eigen::Success) log.log_with_context<LogLevel::ERROR>(*this,"Eigen::SimplicialLLT Solver failed.");
+                if (direct_solver.info() != Eigen::Success)
+                    log.log_with_context<LogLevel::ERROR>(*this,"Eigen::SimplicialLLT Solver failed.");
 
             }
 
             else{           // Solver: Conjugate Gradient + Incomplete Cholesky
+
+                log.log_with_context<LogLevel::DEBUG>(*this,"Running Solver: Conjugate Gradient + Incomplete Cholesky.");
+
                 cg_solver.setTolerance(state.cg_solver_tolerance);
                 cg_solver.setMaxIterations(state.cg_solver_iterations);
                 cg_solver.compute(M);
@@ -143,6 +150,7 @@ namespace karst {
         auto prepare_matrix_for_EIGEN() -> void {
 
             triplets.clear();
+            y.setZero();
             for(auto& n : S.get_nodes()) {
                 int name_tmp = n.a_name;
                 if (n.get_type() == NodeType::NORMAL){
@@ -201,6 +209,19 @@ namespace karst {
                 out << std::endl;
             }
             return out.str();
+        }
+
+        void do_ps_for_debug(std::string& str) const{
+
+            S.io_mod.print_net_ps_with_values(
+                    get_context_info() + " " + str,
+                    S.get_nodes(),
+                    S.get_pores(),
+                    std::vector<Grain>{},
+                    [](auto& el){return std::format("{:3.2f}",double(el.get_u()));},
+                    [](auto& el){return "";},
+                    [](auto& el){return "";}
+            );
         }
 
     };

@@ -72,7 +72,7 @@ namespace karst {
                     [&](const NodePore& np) {
                         return (abs(np.p->get_q()) < state.eps_q or
                                 np.n->get_u() < n.get_u() or
-                                n.is_connected_to_percolation_cluster()
+                                np.n->is_connected_to_percolation_cluster()
                                 );
                     }
             );
@@ -86,6 +86,7 @@ namespace karst {
 
             for (auto& [nn,pp]: n.get_nodes_pores())
                 if(pp->get_q() > state.eps_q and nn->get_u() > n.get_u()){
+                    ASSERT_MSG(R.get_outlet_concentration(species)(NodePore{.n=nn,.p=pp})>=0._C,"Problem with "+pp->get_state_info());
                     Q = Q + pp->get_q();
                     QC = QC + pp->get_q()*R.get_outlet_concentration(species)(NodePore{.n=nn,.p=pp});
                 }
@@ -123,7 +124,7 @@ namespace karst {
                         set_new_concentration_full_mixing(**it, species);
                         (*it)->set_connected_to_percolation_cluster();
                         for(auto &[nn,pp] : (*it)->get_nodes_pores())
-                            if(!nn->is_checked_for_percolation() and pp->get_q()<state.eps_q){
+                            if(!nn->is_checked_for_percolation() and pp->get_q()>state.eps_q){
                                 nn->set_checked_for_percolation();
                                 to_be_checked.push_back(nn);
                             }
@@ -145,6 +146,20 @@ namespace karst {
                 str  += "\n\t\tc[" + sp + "] = "+std::to_string(state.has_been_set[sp]);
             return str;
         }
+
+        void do_ps_for_debug(std::string& str) const{
+
+            S.io_mod.print_net_ps_with_values(
+                    get_context_info() + " " + str,
+                    S.get_nodes(),
+                    S.get_pores(),
+                    std::vector<Grain>{},
+                    [](auto& el){return std::format("{:3.2f}",double(el.get_c(SOLUBLES::B)));},
+                    [](auto& el){return std::format("{:3.2f}",double(el.get_q()));},
+                    [](auto& el){return "";}
+            );
+            }
+
 
     };
 } // namespace karst
