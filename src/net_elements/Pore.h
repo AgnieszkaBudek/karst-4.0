@@ -35,7 +35,8 @@ namespace karst {
 
 
         auto set_d (Length d0)  -> void  {state.d = d0; }
-        auto add_d (Length dd)  -> void  {state.d = dd + state.d; }
+        //auto add_d (const Length& dd)  -> void  {state.d +=  dd; }
+        auto add_d (Length dd)  -> void  {state.d = state.d + dd; }
         auto set_l (Length l0)  -> void  {state.l = l0; }
         auto set_q (Flow q0  )  -> void  {state.q = q0; }
         auto set_type     (PoreType t)     -> void  {state.type = t;};
@@ -44,7 +45,7 @@ namespace karst {
         auto get_d               () const -> Length       { ASSERT_MSG(state.d>=0._L,      get_context_info()); return state.d; }
         auto get_l               () const -> Length       { ASSERT_MSG(state.l>=0._L,      get_context_info()); return state.l; }
         auto get_q               () const -> Flow         { ASSERT_MSG(abs(state.q)>=0._F, get_context_info()); return abs(state.q); }
-        auto get_l_max           () const -> Length       { return *nodes[1] - *nodes[0];}
+        auto get_l_max           () const -> Length       { return *nodes[1] - *nodes[0];} //TODO: can be a field in state changing after merging!
         auto check_if_space_left () const -> bool         { return state.d > 0._L; }
         auto get_type            () const -> PoreType     { return state.type;};
         auto get_geometry        () const -> PoreGeometry { return state.geometry;};
@@ -132,7 +133,10 @@ namespace karst {
         }
 
         std::string do_get_state_info() const{
-            return "\t.d = " + state.d + "\t .l = " + state.l + "\t.q" + state.q + "\t.geometry = " + state.geometry;
+            return  "\n.d   = " + state.d +
+                    "\n.l   = " + state.l +
+                    "\n.q   = " + state.q +
+                    "\n.geo = " + state.geometry;
         }
 
         };

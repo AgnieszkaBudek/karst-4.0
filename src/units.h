@@ -40,7 +40,7 @@ namespace karst {
         constexpr explicit operator double() const { return value; }
 
         // operator +=
-        constexpr Unit& operator+=(const Unit& other) {
+        Unit& operator+=(const Unit& other) {
             this->value += other.value;
             return *this;
         }

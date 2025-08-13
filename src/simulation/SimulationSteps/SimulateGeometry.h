@@ -29,7 +29,7 @@ namespace karst {
 
         auto do_run()  -> void {
 
-            //distribute volume to gains
+            // 1. distribute volume to gains
             for(auto& p : S.get_pores())
                 for(auto& sp : S.config.solidS){
                     Volume V_tmp = R.get_delta_volume_map(sp)(p);                       //total change of volume of species sp
@@ -40,8 +40,9 @@ namespace karst {
                         if(g->get_v(sp) < state.eps_V) g->set_v(sp, 0._V);
                     }
                 }
+            for(auto& g : S.get_grains()) g.update_v_tot();
 
-            //update diameters
+            // 2. update diameters
             for(auto& p : S.get_pores()){
                 Volume V_tot = 0._V;
                 for(auto& sp : S.config.solidS)
@@ -49,14 +50,11 @@ namespace karst {
                 p.add_d(-2*V_tot/p.get_surface_tot());
             }
 
-            //update lengths
-            for(auto& p : S.get_pores()){
-                Unitless l_tot_f = 0._U;
-                for(auto& g : p.get_grains())
-                    l_tot_f +=  1._U*pow(double(g->get_tot_v()/g->get_max_volume()),S.config.l_V_scaling_f);
-                p.set_l(1./double(p.get_grains().size())*p.get_l_max()*l_tot_f);
-                if(p.get_l()<S.config.l_min) p.set_l(S.config.l_min);       //pore length cannot be too small
-            }
+            log.log(S.get_pores().begin()->get_state_info()+" Before updating length");
+
+            //3. update lengths
+            for (auto& p: S.get_pores())
+                p.update_length();
 
         }
 
@@ -105,6 +103,7 @@ namespace karst {
 
             //4. update lengths
             for (auto &p: S.get_pores()) p.update_length();
+
         }
 
 
@@ -123,7 +122,7 @@ namespace karst {
                     S.get_pores(),
                     S.get_grains(),
                     [](auto& el){return std::format("{:3.2f}",double(el.get_c(SOLUBLES::B)));},
-                    [](auto& el){return std::format("({:2.1f}, {:2.1f})",double(el.get_state().d),double(el.get_state().l));},
+                    [](auto& el){return std::format("({:2.1f}, {:2.2f})",double(el.get_d()),double(el.get_l()));},
                     [](auto& el){return std::format("{:3.2f}",double(el.get_v(SOLIDS::A)));}
                     );
         }

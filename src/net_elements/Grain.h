@@ -40,21 +40,21 @@ namespace karst {
             auto if_species_available     (SOLIDS sp) const -> bool   { return state.v[sp] > 0._V; }        //can take into account passivation or nucleation
 
             auto get_v(SOLIDS sp)  const -> Volume {
-                ASSERT_MSG(state.v[sp]>=0._V, get_context_info());
+                //ASSERT_MSG(state.v[sp]>=0._V, get_context_info());
                 return state.v[sp];
             }
 
-            auto set_v(SOLIDS sp, Volume v_new) -> void { state.v[sp] = v_new; }
+            auto set_v(SOLIDS sp, Volume v_new) -> void { state.v[sp] =   v_new; }
             auto add_v(SOLIDS sp, Volume v_new) -> void { state.v[sp] +=  v_new; }
-            auto set_tot_v(Volume v_new) -> void { state.tot_volume =  v_new; }
+            auto set_tot_v(Volume v_new) -> void { state.tot_volume =     v_new; }
+            auto update_v_tot() -> void { state.tot_volume = calculate_tot_v();}
 
             auto calculate_tot_v () -> Volume{
                 Volume V_tot {0.};
                 for(auto v : state.v.get_data())
                     V_tot+=v;
+                ASSERT_MSG(V_tot>=0._V, get_context_info());
                 return V_tot;
-
-
             }
 
             //friend ofstream_ps_pores &operator <<(ofstream_ps_pores &stream, const Grain &g){}     //TODO: implement it
@@ -83,10 +83,32 @@ namespace karst {
         auto calculate_maximal_volume() -> Volume{      //FIXME: take into account periodic boundary conditions!!!
             Area area {0.};
             int n = int(nodes.size());
+
+            std::vector<Length> x (n);
+            std::vector<Length> y (n);
+
+            Length net_size_x = topo_config.N_x*net_config.l0;
+            Length net_size_y = topo_config.N_y*net_config.l0;
+
+            for (auto i = 0; i < n; ++i) {
+                x[i] = nodes[i]->get_pos().x;
+                y[i] = nodes[i]->get_pos().y;
+            }
+
+            if(topo_config.do_periodic_bc) {        //shift for periodic boundary condition
+                if (std::ranges::max(x) - std::ranges::min(x) > net_size_x / 2.) {
+                    for (auto &xx: x)
+                        if (xx > net_size_x / 2.) xx += -net_size_x;
+                }
+                if (std::ranges::max(y) - std::ranges::min(y) > net_size_y / 2.) {
+                    for (auto &yy: y)
+                        if (yy > net_size_y / 2.) yy += -net_size_y;
+                }
+            }
+
             for (auto i = 0; i < n; ++i) {
                 int j = (i + 1) % n;
-                area +=  nodes[i]->get_pos().x * nodes[j]->get_pos().y;  // suma x_i * y_{i+1}
-                area += -nodes[j]->get_pos().x * nodes[i]->get_pos().y;  // suma x_i * y_{i+1}
+                area += x[i]*y[j]-x[j]*y[i];  // suma x_i * y_{i+1}
             }
             return net_config.h_tot*abs(area) / 2.0;
         }

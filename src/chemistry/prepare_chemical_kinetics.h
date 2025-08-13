@@ -22,7 +22,7 @@ namespace karst {
                 .name = "dissolution",
                 .tracked_solids   = {SOLIDS::A},
                 .tracked_solubles = {SOLUBLES::B},
-                .k {1.},
+                .k {0.1},
                 .c_eq {0.},
                 .solid_mol_volume {1.}
         };

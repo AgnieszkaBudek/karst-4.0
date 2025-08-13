@@ -82,7 +82,6 @@ namespace karst {
         auto do_init() -> void {
 
             // 1. Initializing Network
-            log.log<LogLevel::INFO>("Initializing simulation...");
             S.init();
             state.dt = sim_conf.dt0;
             S.save_network_state("After Network.init().");
@@ -139,7 +138,10 @@ namespace karst {
 
         auto adapt_time_step() -> void {}  //TODO: implement later
 
-        auto save_results()             -> void {}  //TODO: implement later
+        auto save_results()             -> void {
+            if(state.sim_step%10==0)
+                S.save_network_state(std::to_string(state.sim_step)+". of simulation.");
+        }  //TODO: implement later
 
 
     };

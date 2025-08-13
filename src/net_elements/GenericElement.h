@@ -123,8 +123,8 @@ namespace karst{
         std::string get_context_info() const {
             return ""+ config.type +" [" + std::to_string(config.name) + "] ";
         }
-        std::string get_state_info() {
-            return get_context_info() + " " + static_cast<Element &>(*this).do_get_state_info()+"\n";
+        std::string get_state_info() const{
+            return get_context_info() + " " + static_cast<const Element &>(*this).do_get_state_info()+"\n";
         }
 
 

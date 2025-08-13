@@ -28,7 +28,7 @@ namespace karst{
             {LogLevel::ERROR,       "ERROR"     }
     };
 
-    constexpr LogLevel      logger_level_min  = LogLevel::DEBUG_PS;
+    constexpr LogLevel      logger_level_min  = LogLevel::INFO;
     constexpr std::ostream& logger_output     = std::cout;
 
     template<LogLevel MinLevel>
@@ -37,26 +37,26 @@ namespace karst{
         explicit Logger(std::ostream& os)
                 : out(os) {}
 
-        template<LogLevel Level>
+        template<LogLevel Level = LogLevel::INFO>
         void log(const std::string& message) {
             if constexpr (Level >= MinLevel)
                 out << "[" << Level << "] " << message << "\n";
         }
 
-        template<LogLevel Level>
+        template<LogLevel Level = LogLevel::INFO>
         void pure_log(const std::string& message) {
             if constexpr (Level >= MinLevel)
                 out << message;
         }
 
-        template<LogLevel Level, typename T>
+        template<LogLevel Level = LogLevel::INFO, typename T>
         void log_with_context(const T& obj, const std::string& message) {
             if constexpr (Level >= MinLevel)
                 out << "[" << Level << "] "
                     << obj.get_context_info() << "\t" << message << "\n";
         }
 
-        template<LogLevel Level, typename T>
+        template<LogLevel Level = LogLevel::INFO, typename T>
         void log_state(const T& obj, const std::string& message) {
             if constexpr (Level >= MinLevel) {
                 out << "[" << Level << "] "

@@ -71,7 +71,8 @@ namespace karst {
         Unitless l_tot_f = 0._U;
         for(auto g : grains)
             l_tot_f +=  1._U*pow(double(g->get_tot_v()/g->get_max_volume()),net_config.l_V_scaling_f);
-        set_l(1./double(get_grains().size())*get_l_max()*l_tot_f);
+
+        set_l(get_l_max()*l_tot_f/double(get_grains().size()));
         if(get_l()<net_config.l_min) set_l(net_config.l_min);       //pore length cannot be too small
     }
 
