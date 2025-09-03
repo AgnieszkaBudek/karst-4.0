@@ -13,7 +13,7 @@ namespace karst {
 
     struct SimulateFlowState {
         Unitless eps_q = 1.e-5_U;     ///<acceptable error for flow calculations
-        Flow     Q_in {0.};
+        Flow     Q_in  {0.};
         Flow     Q_out {0.};
     };
 

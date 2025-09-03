@@ -17,6 +17,7 @@ namespace karst {
     };
 
 
+
     class Grain : public GenericElement <Grain, GrainState> {
 
         friend  GenericElement <Grain, GrainState>;
@@ -47,6 +48,7 @@ namespace karst {
             auto set_v(SOLIDS sp, Volume v_new) -> void { state.v[sp] =   v_new; }
             auto add_v(SOLIDS sp, Volume v_new) -> void { state.v[sp] +=  v_new; }
             auto set_tot_v(Volume v_new) -> void { state.tot_volume =     v_new; }
+            auto set_v_max(Volume v_new) -> void { state.max_volume =     v_new; }
             auto update_v_tot() -> void { state.tot_volume = calculate_tot_v();}
 
             auto calculate_tot_v () -> Volume{
@@ -55,6 +57,18 @@ namespace karst {
                     V_tot+=v;
                 ASSERT_MSG(V_tot>=0._V, get_context_info());
                 return V_tot;
+            }
+
+            bool is_crossing_pbc() const{
+                //don't draw polygons crossing periodic boundary
+                auto max_l = 0._L;          //maximal distance between consecutive nodes;
+                for(auto it = nodes.begin(); it<nodes.end()-1; ++it)
+                    if((*it)->get_pos() -(*(it+1))->get_pos() > max_l )
+                        max_l = (*it)->get_pos() -(*(it+1))->get_pos();
+                if(max_l > Unitless (topo_config.N_x) * 0.5_U * net_config.l0)
+                    return true;
+                else
+                    return false;
             }
 
             //friend ofstream_ps_pores &operator <<(ofstream_ps_pores &stream, const Grain &g){}     //TODO: implement it
@@ -67,6 +81,8 @@ namespace karst {
 
         auto do_init() -> void
         {
+            if(is_state_set())  return;        //do nth is initial state is already set
+
             state.max_volume = calculate_maximal_volume();
 
             Volume tmp = calculate_initial_vol();
@@ -80,7 +96,10 @@ namespace karst {
         }
 
 
-        auto calculate_maximal_volume() -> Volume{      //FIXME: take into account periodic boundary conditions!!!
+        auto calculate_maximal_volume() -> Volume{      //only for 2D simulations, periodic boundary conditions taken into account
+
+            //if(get_nodes().size()<=2)   return state.max_volume;
+
             Area area {0.};
             int n = int(nodes.size());
 
@@ -145,6 +164,9 @@ namespace karst {
                 str  += "\tc[" + sp + "]        = "+state.v[sp];
             return str;
         }
+
+
+
 
     };
 

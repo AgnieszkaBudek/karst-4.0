@@ -15,7 +15,7 @@ namespace karst {
 
     inline void createHexagonalNetwork(Network& S, Int N_x, Int N_y) {
 
-        S.log.log<LogLevel::INFO>("Creating hexagonal network...");
+        S.log.log("Creating hexagonal network...");
 
 
         if (N_y % 2 == 1) {
@@ -125,7 +125,7 @@ namespace karst {
 
 
         //inlet/outlet nodes:
-        S.log.log<LogLevel::INFO>("Setting inlets and outlets...");
+        S.log.log("Setting inlets and outlets...");
         if (S.t_config.do_radial_geometry){
             auto& n_in = S.nodes[N_x*(N_y/2-1)+N_x/2-1];
             S.n_inlet.push_back(&n_in);
@@ -159,7 +159,7 @@ namespace karst {
 
         //adding random shift
         if(S.t_config.do_randomness_in_regular_net){
-            S.log.log<LogLevel::INFO>("Adding randomness to the network...");
+            S.log.log("Adding randomness to the network...");
             std::mt19937 gen(S.t_config.random_seed);
             std::uniform_real_distribution<double> dist(-1.0, 1.0);
             for (auto& n : S.nodes){
@@ -170,7 +170,7 @@ namespace karst {
                     n.set_pos(n.get_pos()+shift);
                 }
         }
-        S.log.log<LogLevel::INFO>("Hexagonal network has been created.");
+        S.log.log("Hexagonal network has been created.");
 
     }
 

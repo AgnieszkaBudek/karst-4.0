@@ -66,6 +66,7 @@ namespace karst {
     class EnumArray {
         static_assert(std::is_enum_v<Enum>, "EnumArray: Enum must be an enum type.");
 
+
         public:
             using value_type = T;
             using reference = T&;
@@ -74,19 +75,69 @@ namespace karst {
             using const_iterator = typename std::array<T, N>::const_iterator;
 
 
-            EnumArray() {
-                data_.fill(T{});
-            }
+        // Default constructor - tylko jeśli T jest default-constructible
+        EnumArray() requires std::is_default_constructible_v<T> {
+            for (auto& e : data_) e = T{};
+        }
 
-            explicit EnumArray(const T& value) {
-                data_.fill(value);
-            }
+        // Constructor z pojedynczą wartością - tylko dla copyable
+        explicit EnumArray(const T& value) requires std::is_copy_constructible_v<T> {
+            for (auto& e : data_) e = value;
+        }
 
-            EnumArray(std::initializer_list<std::pair<Enum, T>> init_list) : EnumArray() { // wywołujemy domyślny najpierw
-                for (const auto& [key, value] : init_list) {
-                    data_[static_cast<std::size_t>(key)] = value;
-                }
+        // Constructor z lambda / callable
+        template<typename F>
+        explicit EnumArray(F&& f)
+        requires (!std::is_same_v<std::decay_t<F>, T>)
+        {
+            for (std::size_t i = 0; i < N; ++i) {
+                data_[i] = f(static_cast<Enum>(i));
             }
+        }
+
+        // Constructor z initializer_list
+        EnumArray(std::initializer_list<std::pair<Enum, T>> init_list)
+        requires std::is_copy_constructible_v<T>
+        {
+            for (const auto& [key, value] : init_list) {
+                data_[static_cast<std::size_t>(key)] = value;
+            }
+        }
+
+//        EnumArray() requires std::is_default_constructible_v<T> {
+//            data_.fill(T{});
+//        }
+//
+//        explicit EnumArray(const T& value) requires std::is_copy_constructible_v<T> {
+//            data_.fill(value);
+//        }
+//
+//            template<typename F>
+//            explicit EnumArray(F&& f)
+//            requires (!std::is_same_v<std::decay_t<F>, T>){
+//                for (std::size_t i = 0; i < N; ++i) {
+//                    data_[i] = std::move(f(static_cast<Enum>(i)));
+//                }
+//            }
+//
+//
+//            EnumArray(std::initializer_list<std::pair<Enum, T>> init_list)
+//                requires std::is_default_constructible_v<T> && std::is_copy_constructible_v<T>
+//                : EnumArray()
+//                {
+//                for (const auto& [key, value] : init_list) {
+//                    data_[static_cast<std::size_t>(key)] = value;
+//                }
+//            }
+
+        std::vector<double> to_double_vector() const {
+            std::vector<double> result;
+            result.reserve(N);
+            for (const auto& v : data_) {
+                result.push_back(double(v));
+            }
+            return result;
+        }
 
         private:
             std::array<T, N> data_;

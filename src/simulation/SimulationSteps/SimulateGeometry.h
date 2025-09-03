@@ -50,7 +50,6 @@ namespace karst {
                 p.add_d(-2*V_tot/p.get_surface_tot());
             }
 
-            log.log(S.get_pores().begin()->get_state_info()+" Before updating length");
 
             //3. update lengths
             for (auto& p: S.get_pores())
@@ -74,7 +73,7 @@ namespace karst {
 
         }
 
-        auto do_mix_states() -> void {           //more complicated that other optwions
+        auto do_mix_states() -> void {           //more complicated that other options
 
             log.log_with_context<LogLevel::WARNING>(*this, "This may not be implemented correctly.");
 
@@ -98,7 +97,7 @@ namespace karst {
                 for (auto &sp: S.config.solidS)
                     V_tot += R.get_delta_volume_map(sp)(p);
                 p.add_d(2 * V_tot /
-                        p.get_surface_tot());       //TODO: this wont work both state and state_old are in future now...
+                        p.get_surface_tot());       //TODO: this wont work; both state and state_old are in future now...
             }
 
             //4. update lengths
@@ -121,9 +120,9 @@ namespace karst {
                     S.get_nodes(),
                     S.get_pores(),
                     S.get_grains(),
-                    [](auto& el){return std::format("{:3.2f}",double(el.get_c(SOLUBLES::B)));},
-                    [](auto& el){return std::format("({:2.1f}, {:2.2f})",double(el.get_d()),double(el.get_l()));},
-                    [](auto& el){return std::format("{:3.2f}",double(el.get_v(SOLIDS::A)));}
+                    [](auto& el){return std::format("{:3.2f}",            double(el.get_c(SOLUBLES::B)));},
+                    [](auto& el){return std::format("({:2.1f}, {:2.2f})", double(el.get_d()),double(el.get_l()));},
+                    [](auto& el){return std::format("{:3.2f}",            double(el.get_v(SOLIDS::A)));}
                     );
         }
 

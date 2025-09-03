@@ -49,9 +49,9 @@ namespace karst{
             step = step_to_be_calculated;
             t    = t_to_be_calculate;
 
-            log.log_with_context<LogLevel::INFO>( *this," is running...");
+            log.log_with_context( *this," is running...");
             static_cast<Step&>(*this).do_run();
-            log.log_with_context<LogLevel::INFO>( *this," is being checked...");
+            log.log_with_context( *this," is being checked...");
             bool success = static_cast<Step&>(*this).do_check();
             ASSERT_MSG(success,"Problem with " + get_context_info());
 
@@ -62,19 +62,19 @@ namespace karst{
 
 
         auto update_old_state() -> void{
-            log.log_with_context<LogLevel::INFO>(*this,"Updating old_state...");
+            log.log_with_context(*this,"Updating old_state...");
             S.apply_to_all_net_elements([](auto &el) {
                 el.update_old_state();
             });
         };
 
         auto mix_states(){
-            log.log_with_context<LogLevel::INFO>(*this,"Mixing state_old and state_new...");
+            log.log_with_context(*this,"Mixing state_old and state_new...");
             static_cast<Step&>(*this).do_mix_states();
         }
 
         auto go_back(){
-            log.log_with_context<LogLevel::INFO>(*this,"Reverting to state_old...");
+            log.log_with_context(*this,"Reverting to state_old...");
             static_cast<Step&>(*this).do_go_back();
         }
 

@@ -89,6 +89,7 @@ namespace karst {
                     ASSERT_MSG(R.get_outlet_concentration(species)(NodePore{.n=nn,.p=pp})>=0._C,"Problem with "+pp->get_state_info());
                     Q = Q + pp->get_q();
                     QC = QC + pp->get_q()*R.get_outlet_concentration(species)(NodePore{.n=nn,.p=pp});
+
                 }
 
             ASSERT_MSG(Q>0._F and QC>0._X , std::string("Problem for species ")+species+" for node "+ std::to_string(n.config.name)+".");
@@ -98,7 +99,7 @@ namespace karst {
 
         auto calculate_species(SOLUBLES species) -> void {
 
-            log.log<LogLevel::INFO>("Running calculate_species for "+species+"...");
+            log.log("Running calculate_species for "+species+"...");
             std::list<Node *> to_be_checked;
 
             S.apply_to_all_nodes(
@@ -135,7 +136,7 @@ namespace karst {
 
                 if(!new_action){
                     state.eps_q=state.eps_q*2;
-                    log.log<LogLevel::INFO>("Node::epsilon_for_c has been updated: "+state.eps_q);
+                    log.log("Node::epsilon_for_c has been updated: "+state.eps_q);
                 }
             }
     }

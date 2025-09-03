@@ -57,6 +57,7 @@ namespace karst{
     public:
 
         friend auto createHexagonalNetwork(Network& S, Int N_x, Int N_y)->void;
+        friend auto read_csv_H_data(Network& S)->void;
         friend Network; friend Node; friend Pore; friend Grain;
 
 

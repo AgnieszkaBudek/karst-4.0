@@ -22,10 +22,11 @@ namespace karst {
         Int N_z {0};        ///< size of regular network
 
         //type of the network
-        TypeOfNetTopology type_of_topology   {TypeOfNetTopology::HEXAGONAL};
-        std::string in_topology_file_name    {"net_0.out"};     ///< file name with input topology of the network
-        std::string in_topology_file_name_g  {"net_g_0.out"};   ///< file name with input topology of the network
-        std::string in_pore_size_file_name   {"pores_0.out"};   ///<file name with input pore sizes
+        TypeOfNetTopology type_of_topology   {TypeOfNetTopology::FROM_H_FILE};
+        std::string in_topology_file_name    {"net_0.vtu"};       ///< file name with input topology of the network
+        //read form csv files
+        std::string nodes_csv = "/Users/agnieszka/Desktop/KARST/DATA/KOREAN_ROCK/sample_1/nodes.csv";
+        std::string pores_csv = "/Users/agnieszka/Desktop/KARST/DATA/KOREAN_ROCK/sample_1/pore_throats.csv";
 
         //randomness in the network
         Int random_seed {21};                        ///< seed for generating randomness in the network

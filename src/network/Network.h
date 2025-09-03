@@ -29,6 +29,7 @@ namespace karst {
     public:
 
         friend void createHexagonalNetwork(Network&,Int,Int);
+        friend void read_csv_H_data(Network& S);
         friend Node; friend Pore; friend Grain;
 
 
@@ -40,9 +41,9 @@ namespace karst {
                           config{conf}, t_config{t_conf}, io_mod{io0}, log(log0) {}
 
 
-        ~Network() { log.log<LogLevel::INFO>("Deleting network...");}
+        ~Network() { log.log("Deleting network...");}
 
-        auto save_network_state(const std::string& title) ->void { do_save_network_state(title);}
+        auto save_network_state(const std::string title) ->void { do_save_network_state(title);}
 
         auto get_nodes()      { return nodes    | std::views::filter([](const Node& n)  { return n.active; });}
         auto get_pores()      { return pores    | std::views::filter([](const Pore& p)  { return p.active; });}
@@ -80,7 +81,7 @@ namespace karst {
         const NetworkTopologyConfig&  t_config;
         const NetworkConfig&            config;
         PrintingModule&                 io_mod;
-        Logger<logger_level_min>&      log;
+        Logger<logger_level_min>&       log;
 
     protected:
 
@@ -120,10 +121,11 @@ namespace karst {
         }
 
         auto update_active_names_of_elements() -> void{
-            int i=0; int j=0;
+            int i=0; int j=0; int b=0;
             for(auto& n : nodes) {
-                if (n.active and n.type == NodeType::NORMAL) n.a_name = i++;
-                else n.a_name = --j;
+                if(n.active) n.a_name = b++;
+                if (n.active and n.type == NodeType::NORMAL) n.m_name = i++;
+                else n.m_name = --j;
             }
             i=0;
             for(auto& p : pores) if(p.active)
@@ -136,7 +138,7 @@ namespace karst {
 
         auto do_init() -> void {
 
-            log.log<LogLevel::INFO>("Initializing network...");
+            log.log("Initializing network...");
 
             // 1. Prepare the topology
             prepare_network_topology();
@@ -158,12 +160,33 @@ namespace karst {
         }
 
 
-        auto do_save_network_state(const std::string& title) -> void   //TODO: zastanowić się czy nie może to być jednak funkcja const?
+        auto do_save_network_state(const std::string title) -> void   //TODO: zastanowić się czy nie może to być jednak funkcja const?
         {
-            log.log<LogLevel::INFO>("Saving network state...");
-            log.log<LogLevel::INFO>("Saving print_net_ps...");
-            if(io_mod.config.do_save_ps)
-                io_mod.print_net_ps(title,nodes, pores, grains);
+
+            log.log("Saving network state: "+title+"...");
+
+            if(io_mod.state.print_txt_now){
+                //info about pores
+                io_mod.print_txt(io_mod.d_out, title, get_pores(), [](const auto& p){return p.get_d();} );
+                io_mod.print_txt(io_mod.l_out, title, get_pores(), [](const auto& p){return p.get_l();} );
+                io_mod.print_txt(io_mod.q_out, title, get_pores(), [](const auto& p){return p.get_q();} );
+
+                //info about nodes
+                io_mod.print_txt(io_mod.u_out, title, get_nodes(), [](const auto& n){return n.get_u();} );
+                for (auto s : config.solubleS)
+                    io_mod.print_txt(*io_mod.C_out[s], title, get_nodes(), [s](const auto& n){return n.get_c(s);} );
+
+                //info about grains
+                for (auto s : config.solidS)
+                    io_mod.print_txt(*io_mod.V_out[s], title, get_grains(), [s](const auto& n){return n.get_v(s);} );
+            }
+
+            if(io_mod.state.print_ps_now)
+                io_mod.print_net_ps(title, nodes, pores, grains);
+
+            if(io_mod.state.print_vtk_now)
+                io_mod.save_VTU(nodes, pores, grains);
+
         }
 
 

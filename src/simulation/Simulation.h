@@ -14,7 +14,9 @@
 #include "src/chemistry/prepare_chemical_kinetics.h"
 
 #include "src/network/network_topo_generator/network_topo_generator.h"
-
+#include "src/import_export/printing_ps.h"
+#include "src/import_export/VTK_write.h"
+#include "src/network/network_topo_generator/read_from_csv.h"
 #include "src/simulation/SimulationSteps/SimulatePressure.h"
 #include "src/simulation/SimulationSteps/SimulateFlow.h"
 #include "src/simulation/SimulationSteps/SimulateConcentration.h"
@@ -68,7 +70,7 @@ namespace karst {
 
         Logger<logger_level_min>&  log;
 
-        PrintingModule   io    {confs.net_topo_conf, confs.print_conf, log};
+        PrintingModule   io    {confs.net_conf, confs.net_topo_conf, confs.print_conf, log};
         SimulationState  state {};
         Network          S     {net_conf, net_topo_conf, print_conf, log, io};
         ReactionKinetics R     {S, confs.sim_conf, state};
@@ -84,6 +86,9 @@ namespace karst {
             // 1. Initializing Network
             S.init();
             state.dt = sim_conf.dt0;
+
+            //ps data saving
+            if (S.io_mod.config.do_save_ps)  S.io_mod.state.print_ps_now = true;
             S.save_network_state("After Network.init().");
 
             // 2. Preparing reactions
@@ -109,8 +114,8 @@ namespace karst {
             while(state.sim_state==SimulationStateType::NORMAL){
 
                 log.pure_log<LogLevel::INFO>("\n\n"+std::string(50, '*')+"\n");
-                log.log<LogLevel::INFO>(std::to_string(state.sim_step)+". step of Simulation.");
-                log.log<LogLevel::INFO>("T = "+state.T+"\n");
+                log.log(std::to_string(state.sim_step)+". step of Simulation.");
+                log.log("T = "+state.T+"\n");
 
                 do_one_Euler_step();
 
@@ -132,14 +137,15 @@ namespace karst {
 
             if(state.T >= confs.sim_conf.T_max) {
                 state.sim_state = SimulationStateType::FINISHED;
-                log.log<LogLevel::INFO>( "Setting simulation state to " + state.sim_state);
+                log.log( "Setting simulation state to " + state.sim_state);
             }
         }
 
         auto adapt_time_step() -> void {}  //TODO: implement later
 
         auto save_results()             -> void {
-            if(state.sim_step%10==0)
+            io.state={true,true,true};
+            if(state.sim_step%1==0)
                 S.save_network_state(std::to_string(state.sim_step)+". of simulation.");
         }  //TODO: implement later
 

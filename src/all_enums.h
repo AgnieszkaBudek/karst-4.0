@@ -114,13 +114,14 @@ namespace karst{
 
 
     // enum class for different types of topology
-    enum class TypeOfNetTopology  {HEXAGONAL, FROM_FILE, FROM_TRIANGULATION, SIZE};
+    enum class TypeOfNetTopology  {HEXAGONAL, FROM_FILE, FROM_H_FILE, FROM_TRIANGULATION, SIZE};
 
     // Specialization of EnumToString for TypeOfNetTopology
     template<>
     const std::map<TypeOfNetTopology, std::string> EnumToString<TypeOfNetTopology>::mapping = {
             { TypeOfNetTopology::HEXAGONAL, "HEXAGONAL" },
             { TypeOfNetTopology::FROM_FILE, "FROM_FILE" },
+            { TypeOfNetTopology::FROM_H_FILE, "FROM_H_FILE" },
             { TypeOfNetTopology::FROM_TRIANGULATION, "FROM_TRIANGULATION" }
     };
 
@@ -173,13 +174,14 @@ namespace karst{
             {Pressure_Algorithm::BIG_PORES,     "BIG_PORES" },
     };
 
-    enum class PoreGeometry       {CYLINDER, THIN_A, THICK_A, U_SHAPE, SIZE};
+    enum class PoreGeometry       {CYLINDER, THIN_A, THICK_A, U_SHAPE, THROAT, SIZE};
     template<>
     const std::map<PoreGeometry, std::string> EnumToString<PoreGeometry>::mapping = {
-            {PoreGeometry::CYLINDER, "CYLINDER" },  // standard cylindrical
-            {PoreGeometry::THIN_A,   "THIN_A" },    //thin aperture
-            {PoreGeometry::THICK_A,  "THICK_A" },   //thick aperture
-            {PoreGeometry::U_SHAPE,  "U_SHAPE" },   //for experiments with Michal
+            {PoreGeometry::CYLINDER, "CYLINDER" },   // standard cylindrical
+            {PoreGeometry::THIN_A,   "THIN_A"  },    // thin aperture
+            {PoreGeometry::THICK_A,  "THICK_A" },    // thick aperture
+            {PoreGeometry::U_SHAPE,  "U_SHAPE" },    // for experiments with Michal
+            {PoreGeometry::THROAT,   "THROAT"  }     // for throat representation
     };
 
     enum class PoreType       {MATRIX, FRACTURE, SIZE};

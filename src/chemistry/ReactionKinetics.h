@@ -45,7 +45,7 @@ namespace karst {
         void prepare_linear_dissolution();
 
         auto check_implementation() -> bool{
-            S.log.log<LogLevel::INFO>("Checking ReactionKinetics implementation...");
+            S.log.log("Checking ReactionKinetics implementation...");
             for(auto sp:solubleS)
                 ASSERT_MSG(outlet_concentration_map[sp] != nullptr, "Problem with outlet_concentration_map[ "+sp+"]");
 
@@ -67,8 +67,8 @@ namespace karst {
         std::vector<SOLUBLES>  solubleS;
         std::vector<SOLIDS>    solidS;
         EnumArray <REACTION, ChemicalReaction,                        enum_size_v<REACTION>> R {ChemicalReaction{}};
-        EnumArray <SOLUBLES, std::function<Concentration(NodePore)>,  enum_size_v<SOLUBLES>> outlet_concentration_map{nullptr};
-        EnumArray <SOLIDS,   std::function<Volume(Pore&)>,            enum_size_v<SOLIDS>>   delta_volume_map{nullptr};
+        EnumArray <SOLUBLES, std::function<Concentration(NodePore)>,  enum_size_v<SOLUBLES>> outlet_concentration_map{};
+        EnumArray <SOLIDS,   std::function<Volume(Pore&)>,            enum_size_v<SOLIDS>>   delta_volume_map{};
         Network &S;
         const SimulationConfig &sim_config;
         const SimulationState  &sim_state;

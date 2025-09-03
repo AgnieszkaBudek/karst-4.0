@@ -51,6 +51,7 @@ namespace karst {
         friend  GenericElement <Node, NodeState>;
         friend Network; friend Pore; friend Grain;
         friend auto createHexagonalNetwork(Network& S, Int N_x, Int N_y)->void;
+        friend auto read_csv_H_data(Network& S)->void;
         friend auto operator - (const Node&  n1, const Node&  n2) -> Length ;
 
         explicit Node  (const NetworkConfig& net_conf0, const NetworkTopologyConfig &topo_conf0, const ElementConfig config0)
@@ -75,6 +76,7 @@ namespace karst {
         //friend ofstream_ps_grains &operator<<(ofstream_ps_grains &stream, const Node &n){}    //TODO: implement it
 
 
+        Int m_name{config.name};                       ///< element name for active subset (we numerate only amtrix nodess)
 
     protected:
 

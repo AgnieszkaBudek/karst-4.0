@@ -19,6 +19,9 @@ namespace karst{
             case TypeOfNetTopology::HEXAGONAL:
                 createHexagonalNetwork(*this,t_config.N_x,t_config.N_y);
                 break;
+            case TypeOfNetTopology::FROM_H_FILE:
+                read_csv_H_data(*this);
+                break;
             case TypeOfNetTopology::FROM_FILE:
                 log.log<LogLevel::ERROR>("TypeOfNetTopology::FROM_FILE Not implemented yet!");
                 break;
@@ -33,36 +36,31 @@ namespace karst{
         // 2. Check connections:
         check_network_connections();  //TODO: add a function checking network connections...
 
-        for(auto& p : pores)
-            p.state.d=0.1_L;
-        save_network_state("Before boundary cleaning1.");
+//        for(auto& p : pores)
+//            p.state.d=0.1_L;
 
         // 3. Disconnect inlet/outlet nodes
         for(auto& p : pores)
             if(p.nodes[0]->get_type() != NodeType::NORMAL and p.nodes[1]->get_type() != NodeType::NORMAL)
                 p.deactivate();
 
+//
+//        for(auto& p : pores)
+//            p.state.d=0.1_L;
 
-        for(auto& p : pores)
-            p.state.d=0.1_L;
-        save_network_state("Before boundary cleaning2.");
-
-        // 4. Add boundary conditions
+        // 4. Cut boundary if not periodic bc
         if (!t_config.do_periodic_bc) {
             for (auto &p: pores)
                 if (p.nodes.back()->get_pos() - p.nodes.front()->get_pos() > 10._U * config.l0)
                     p.deactivate();
         }
 
-        save_network_state("After boundary cleaning.");
 
         // 5. Delete unused elements
         if (t_config.do_clear_unused_net_el) {
-            log.log<LogLevel::INFO>( "Clearing unused elements of the network:");
+            log.log("Clearing unused elements of the network:");
             clear_unused_elements();
         }
-
-        save_network_state("After all cleaning.");
 
         // 6. Check connections after deleting unused ones:
         check_network_connections();
@@ -86,7 +84,7 @@ namespace karst{
 
     auto Network::check_network_connections() -> void{ //FIXME: finish implementing this one
 
-        log.log<LogLevel::INFO>( "Checking connections in the network...");
+        log.log( "Checking connections in the network...");
 
         apply_to_all_net_elements([&](auto& el) {
             if (!el.active)
@@ -103,7 +101,7 @@ namespace karst{
 
         });
 
-        log.log<LogLevel::INFO>("Checking networks' topology...");
+        log.log("Checking networks' topology...");
     }
 
 

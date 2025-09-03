@@ -104,7 +104,7 @@ namespace karst {
             for(auto& n : S.get_nodes()){
                 if(n.get_type()==NodeType::INPUT)  {n.set_u(S.config.P_in);  continue;}
                 if(n.get_type()==NodeType::OUTPUT) {n.set_u(S.config.P_out); continue;}
-                ASSERT_MSG(n.a_name == i_tmp,"n.a_name = "+std::to_string(n.a_name)+"\ti_tmp = "+std::to_string(i_tmp));
+                ASSERT_MSG(n.m_name == i_tmp,"n.m_name = "+std::to_string(n.m_name)+"\ti_tmp = "+std::to_string(i_tmp));
                 ASSERT_MSG(x[i_tmp] >0,"x[i_tmp] = "+std::to_string(x[i_tmp]));
                 n.set_u(Pressure(x[i_tmp]));
                 i_tmp++;
@@ -152,7 +152,7 @@ namespace karst {
             triplets.clear();
             y.setZero();
             for(auto& n : S.get_nodes()) {
-                int name_tmp = n.a_name;
+                int name_tmp = n.m_name;
                 if (n.get_type() == NodeType::NORMAL){
                     double sum_tmp = 0.0;
                     for (auto &[nn, pp]: n.get_nodes_pores()) {
@@ -160,7 +160,7 @@ namespace karst {
                         sum_tmp+=perm_v;
                         switch (nn->get_type()){
                             case NodeType::NORMAL:
-                                triplets.emplace_back(name_tmp, nn->a_name, -perm_v); break;
+                                triplets.emplace_back(name_tmp, nn->m_name, -perm_v); break;
                             case NodeType::INPUT:
                                 y[name_tmp] += double(perm_v*S.config.P_in);  break;
                             case NodeType::OUTPUT:

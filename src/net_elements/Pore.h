@@ -57,6 +57,7 @@ namespace karst {
                 case PoreGeometry::THICK_A:  return power<3>(net_config.h_tot)*state.d/state.l/net_config.mu_0;
                 case PoreGeometry::THIN_A:   return power<3>(state.d)*(net_config.h_tot)/state.l/net_config.mu_0;
                 case PoreGeometry::U_SHAPE:  return power<4>(state.d)/state.l/net_config.mu_0;
+                case PoreGeometry::THROAT:   return power<4>(state.d)/state.l/net_config.mu_0;
                 case PoreGeometry::SIZE:     return Permeability {NaN};
 
             }
@@ -75,17 +76,32 @@ namespace karst {
                 case PoreGeometry::THICK_A:  return net_config.h_tot * state.l;
                 case PoreGeometry::U_SHAPE:  return 3 * state.d * state.l;
                 case PoreGeometry::THIN_A:   return net_config.h_tot * state.l;
+                case PoreGeometry::THROAT:   return std::numbers::pi * state.d * state.l;
                 case PoreGeometry::SIZE:     return Area{NaN};
             }
             return Area{NaN};
         }
 
 
+
+        auto get_new_d_l(Area a, Permeability k) -> std::pair<Length,Length>{
+            switch (state.geometry) {
+                case PoreGeometry::CYLINDER:  return { power<std::ratio< 1,5>> (a*k*net_config.mu_0/std::numbers::pi),
+                                                       power<std::ratio<-1,5>> (k*net_config.mu_0)*power<std::ratio<4,5>>(a/std::numbers::pi)};
+                case PoreGeometry::THICK_A:   return { a*k*net_config.mu_0/(2*power<4>(net_config.h_tot)),
+                                                       a/(2*net_config.h_tot)};
+                case PoreGeometry::U_SHAPE:   return { power<std::ratio< 1,5>> (a*k*net_config.mu_0/3),
+                                                       power<std::ratio<-1,5>> (k*net_config.mu_0)*power<std::ratio<4,5>>(a/3)};
+                case PoreGeometry::THIN_A:    return { power<std::ratio< 1,3>> (a*k*net_config.mu_0/(2*net_config.h_tot*net_config.h_tot)),
+                                                       a/(2*net_config.h_tot)};
+                case PoreGeometry::THROAT:    return { power<std::ratio< 1,5>> (a*k*net_config.mu_0/std::numbers::pi),
+                                                       power<std::ratio<-1,5>> (k*net_config.mu_0)*power<std::ratio<4,5>>(a/std::numbers::pi)};
+                case PoreGeometry::SIZE:      return { Length{NaN}, Length{NaN}};
+            }
+        };
+
         auto update_length() -> void;
-
         auto get_available_volume(SOLIDS species) -> Volume;
-
-
         //friend ofstream_ps_pores  &operator <<(ofstream_ps_pores &stream, const Pore &p){}     //TODO: implement it
         //friend ofstream_ps_grains &operator<<(ofstream_ps_grains &stream, const Pore &p){}     //TODO: implement it
 
@@ -97,6 +113,8 @@ namespace karst {
         //init function
         auto do_init() -> void
         {
+            if (state.d >= 0._L and state.l >= 0._L) return;        // do nth, is state is basically set
+
             state = (PoreState{
                     .d = net_config.d0,
                     .l = *nodes[0] - *nodes[1],
@@ -118,6 +136,9 @@ namespace karst {
         }
 
         auto update_geometry() -> void{
+
+            if(state.geometry == PoreGeometry::THROAT) return;  //in throat approach we do not change the geometry
+
             if(state.type == PoreType::MATRIX){
                 if(state.d >= net_config.h_tot)
                     state.geometry = PoreGeometry::THICK_A;

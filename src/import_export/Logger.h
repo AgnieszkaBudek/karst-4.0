@@ -21,7 +21,7 @@ namespace karst{
     template<>
     const std::map<LogLevel, std::string> EnumToString<LogLevel>::mapping = {
             {LogLevel::DEBUG_FULL,  "DEBUG_FULL"},
-            {LogLevel::DEBUG_PS,    "DEBUG_PS"},
+            {LogLevel::DEBUG_PS,    "DEBUG_PS"  },
             {LogLevel::DEBUG,       "DEBUG"     },
             {LogLevel::INFO,        "INFO"      },
             {LogLevel::WARNING,     "WARNING"   },
@@ -34,6 +34,7 @@ namespace karst{
     template<LogLevel MinLevel>
     class Logger {
     public:
+
         explicit Logger(std::ostream& os)
                 : out(os) {}
 

@@ -2,8 +2,8 @@
 #  Size of the network
 
 type_of_topology = HEXAGONAL
-N_x = 100        # size of the regular network
-N_y = 100         # size of the regular network
+N_x = 40        # size of the regular network
+N_y = 40         # size of the regular network
 do_randomness_in_regular_net = true
 
 

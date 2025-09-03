@@ -75,22 +75,22 @@ namespace karst {
 
 
     // User-defined literals
-    inline Time       operator"" _T(long double v) { return Time       (static_cast<double>(v)); }
-    inline Mass       operator"" _M(long double v) { return Mass       (static_cast<double>(v)); }
-    inline Length     operator"" _L(long double v) { return Length     (static_cast<double>(v)); }
-    inline Mole       operator"" _O(long double v) { return Mole       (static_cast<double>(v)); }
+    inline Time       operator""_T(long double v) { return Time       (static_cast<double>(v)); }
+    inline Mass       operator""_M(long double v) { return Mass       (static_cast<double>(v)); }
+    inline Length     operator""_L(long double v) { return Length     (static_cast<double>(v)); }
+    inline Mole       operator""_O(long double v) { return Mole       (static_cast<double>(v)); }
 
-    inline Pressure   operator"" _P(long double v) { return Pressure   (static_cast<double>(v)); }
-    inline Force      operator"" _N(long double v) { return Force      (static_cast<double>(v)); }
-    inline Flow       operator"" _F(long double v) { return Flow       (static_cast<double>(v)); }
-    inline Velocity   operator"" _v(long double v) { return Velocity   (static_cast<double>(v)); }
-    inline Diffusion  operator"" _D(long double v) { return Diffusion  (static_cast<double>(v)); }
-    inline Area       operator"" _A(long double v) { return Area       (static_cast<double>(v)); }
-    inline Volume     operator"" _V(long double v) { return Volume     (static_cast<double>(v)); }
-    inline Viscosity  operator"" _S(long double v) { return Viscosity  (static_cast<double>(v)); }
-    inline Concentration operator"" _C(long double v) { return Concentration (static_cast<double>(v)); }
-    inline CFlux         operator"" _X(long double v) { return CFlux         (static_cast<double>(v)); }
-    inline Unitless      operator"" _U(long double v) { return Unitless      (static_cast<double>(v)); }
+    inline Pressure   operator""_P(long double v) { return Pressure   (static_cast<double>(v)); }
+    inline Force      operator""_N(long double v) { return Force      (static_cast<double>(v)); }
+    inline Flow       operator""_F(long double v) { return Flow       (static_cast<double>(v)); }
+    inline Velocity   operator""_v(long double v) { return Velocity   (static_cast<double>(v)); }
+    inline Diffusion  operator""_D(long double v) { return Diffusion  (static_cast<double>(v)); }
+    inline Area       operator""_A(long double v) { return Area       (static_cast<double>(v)); }
+    inline Volume     operator""_V(long double v) { return Volume     (static_cast<double>(v)); }
+    inline Viscosity  operator""_S(long double v) { return Viscosity  (static_cast<double>(v)); }
+    inline Concentration operator""_C(long double v) { return Concentration (static_cast<double>(v)); }
+    inline CFlux         operator""_X(long double v) { return CFlux         (static_cast<double>(v)); }
+    inline Unitless      operator""_U(long double v) { return Unitless      (static_cast<double>(v)); }
 
 
     // Unit multiplication by double
