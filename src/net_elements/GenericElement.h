@@ -108,7 +108,7 @@ namespace karst{
         auto get_old_state() const         -> const ElementState& { return s_old; }
         auto update_time_step(long step0)  -> void          { step = step0; }
         auto get_time_step () const        -> long          { return step; }
-        auto is_state_set() -> bool{ static_cast<Element&> (*this).do_is_state_set();}
+        auto is_state_set() -> bool{ return static_cast<Element&> (*this).do_is_state_set();}
 
         //Topo_config access
         auto is_connected_to_percolation_cluster() const -> bool { return topo_s.connected_to_percolation_cluster; }

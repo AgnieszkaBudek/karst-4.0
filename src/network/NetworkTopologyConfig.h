@@ -26,7 +26,7 @@ namespace karst {
         std::string in_topology_file_name    {"net_0.vtu"};       ///< file name with input topology of the network
         //read form csv files
         std::string nodes_csv = "/Users/agnieszka/Desktop/KARST/DATA/KOREAN_ROCK/sample_1/nodes.csv";
-        std::string pores_csv = "/Users/agnieszka/Desktop/KARST/DATA/KOREAN_ROCK/sample_1/pore_throats.csv";
+        std::string pores_csv = "/Users/agnieszka/Desktop/KARST/DATA/KOREAN_ROCK/sample_1/pores.csv";
 
         //randomness in the network
         Int random_seed {21};                        ///< seed for generating randomness in the network

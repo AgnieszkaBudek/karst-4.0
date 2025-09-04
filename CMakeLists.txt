@@ -1,116 +1,73 @@
+# --- Basic Project Setup ---
 cmake_minimum_required(VERSION 3.27)
 project(karst_4_0 LANGUAGES CXX)
+
+# Acknowledge that the old FindBoost module is deprecated and we are using the modern config-based approach.
+cmake_policy(SET CMP0167 NEW)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# --- Build configuration ---
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    message(STATUS "Debug build - enabling debug symbols")
-    add_compile_options(-g -O0 -ggdb)
+# Set the output directory for runtime artifacts (e.g., executables)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
-    # Sprawdź czy ASAN jest dostępny (działa tylko z Clang na macOS)
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT CMAKE_SYSTEM_NAME MATCHES "Linux")
-        message(STATUS "Enabling AddressSanitizer for Clang")
-        add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
-        add_link_options(-fsanitize=address)
-    else()
-        message(STATUS "AddressSanitizer not available for GCC on macOS")
-    endif()
-
-else()
-    message(STATUS "Release build - enabling optimizations")
-    add_compile_options(-O3 -DNDEBUG)
-endif()
-
-# --- VTK configuration ---
-set(VTK_DIR "/opt/homebrew/lib/cmake/vtk-9.4")
-message(STATUS "Using VTK from: ${VTK_DIR}")
-
-find_package(VTK REQUIRED COMPONENTS
+# --- Dependency Discovery ---
+find_package(VTK 9.5 REQUIRED COMPONENTS
         CommonCore
         CommonDataModel
         IOXML
 )
-
-if(NOT VTK_FOUND)
-    message(FATAL_ERROR "VTK not found! Check installation.")
-endif()
-
-message(STATUS "VTK version: ${VTK_VERSION}")
+message(STATUS "Found VTK version: ${VTK_VERSION}")
 
 find_package(Eigen3 REQUIRED)
-find_package(Boost 1.89 REQUIRED COMPONENTS serialization)
+message(STATUS "Found Eigen3 version: ${EIGEN3_VERSION_STRING}")
 
-# --- Include directories ---
-include_directories(
+find_package(Boost 1.81 REQUIRED COMPONENTS serialization) # Adjust version if needed
+message(STATUS "Found Boost version: ${Boost_VERSION_STRING}")
+
+find_package(cxxopts REQUIRED)
+message(STATUS "Found cxxopts version: ${cxxopts_VERSION}")
+# --- Target Definition (Executable) ---
+add_executable(karst_4_0 main.cpp)
+
+# --- Configure Include Directories for our Target ---
+target_include_directories(karst_4_0 PRIVATE
         ${CMAKE_SOURCE_DIR}
         src
         src/external_algorithms
         src/external_algorithms/triangulation
-        ${EIGEN3_INCLUDE_DIR}
-        ${Boost_INCLUDE_DIRS}
-        ${VTK_INCLUDE_DIRS}
+        # Note: Eigen3 and Boost targets will add their include paths automatically during linking
 )
 
-# --- Executable ---
-add_executable(karst_4_0 main.cpp
-#        src/import_export/VTK_by_heand.h
-#        src/import_export/read_from_csv.h
-#        src/external_algorithms/CsvParser/csv.h
-)
-
-# --- Link libraries ---
+# --- Configure Library Linking for our Target ---
 target_link_libraries(karst_4_0 PRIVATE
         VTK::CommonCore
         VTK::CommonDataModel
         VTK::IOXML
-        ${Boost_LIBRARIES}
+        Eigen3::Eigen
+        Boost::serialization
+        cxxopts::cxxopts
 )
 
-# --- Copy executable ---
-add_custom_command(TARGET karst_4_0 POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:karst_4_0> ${CMAKE_BINARY_DIR}
-        COMMENT "Copying executable to build directory"
+# --- Configure Compile Options for our Target ---
+# Generic, configuration-independent options can be placed here
+# target_compile_options(...)
+
+# Options specific to the Debug configuration
+target_compile_options(karst_4_0 PRIVATE
+        $<$<CONFIG:Debug>:-g -O0 -ggdb>
 )
 
-#cmake_minimum_required(VERSION 3.27)
-#project(karst_4_0)
-#
-#set(CMAKE_CXX_STANDARD 23)
-#
-## --- Find VTK ---
-#find_package(VTK REQUIRED)
-#message(STATUS "VTK version: ${VTK_VERSION}")
-#
-## --- Include directories ---
-#include_directories(
-#        ${CMAKE_SOURCE_DIR}
-#        src/external_algorithms
-#        src/external_algorithms/triangulation
-#        /opt/homebrew/opt/eigen/include/eigen3
-#)
-#
-## --- Executable ---
-#add_executable(karst_4_0 ./main.cpp)
-#
-## --- Link VTK with project ---
-#target_link_libraries(karst_4_0 PRIVATE ${VTK_LIBRARIES})
-#
-## (optional) check include VTK
-#target_include_directories(karst_4_0 PRIVATE ${VTK_INCLUDE_DIRS})
-#message(STATUS ${VTK_DIR})
-#
-### Debug info
-##message(STATUS "VTK Libraries: ${VTK_LIBRARIES}")
-#
-## --- Copy to build/ ---
-#set(BUILD_DIRECTORY ./build)
-#add_custom_target(copy_executable ALL
-#        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:karst_4_0> ${BUILD_DIRECTORY}
-#        DEPENDS karst_4_0
-#        COMMENT "Copying karst_4_0 to build directory"
-#)
-#
-#
+# Options specific to Release (and other release-like) configurations
+target_compile_options(karst_4_0 PRIVATE
+        $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>>:-O3 -DNDEBUG>
+)
+
+# Enable AddressSanitizer (ASan) in Debug mode if the compiler is Clang
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(karst_4_0 PRIVATE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer>)
+    target_link_options(karst_4_0 PRIVATE $<$<CONFIG:Debug>:-fsanitize=address>)
+endif()
+
+message(STATUS "Configuration for target 'karst_4_0' is complete.")

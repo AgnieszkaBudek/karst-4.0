@@ -96,7 +96,7 @@ namespace karst {
                                                        a/(2*net_config.h_tot)};
                 case PoreGeometry::THROAT:    return { power<std::ratio< 1,5>> (a*k*net_config.mu_0/std::numbers::pi),
                                                        power<std::ratio<-1,5>> (k*net_config.mu_0)*power<std::ratio<4,5>>(a/std::numbers::pi)};
-                case PoreGeometry::SIZE:      return { Length{NaN}, Length{NaN}};
+                default:      return { Length{NaN}, Length{NaN}};
             }
         };
 

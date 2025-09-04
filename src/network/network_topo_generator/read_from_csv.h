@@ -77,7 +77,7 @@ namespace karst {
             pore_tmp.set_geometry(PoreGeometry::THROAT);
 
             //setting info about effective l and d
-            auto eq_r = row["Radius"].get<double>()*0.5_L;
+            auto eq_r = row["EqRadius"].get<double>()*0.5_L;
             auto eq_l = row["Length"].get<double>()*1._L;
             auto area = 0.5*(n_area[row["N1"].get<int>()] + n_area[row["N2"].get<int>()]);
             auto d_l  = pore_tmp.get_new_d_l(area, power<4>(2*eq_r)/(eq_l*S.config.mu_0));
