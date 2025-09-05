@@ -1,5 +1,5 @@
 #ifndef KARST_4_0_CSV_H
-#define KARST_4_0_READ_H
+#define KARST_4_0_CSV_H
 /*
 CSV for C++, version 2.3.0
 https://github.com/vincentlaucsb/csv-parser

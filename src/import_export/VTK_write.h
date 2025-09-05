@@ -53,10 +53,13 @@ namespace karst {
 //            std::cout << "Number of points: " << points->GetNumberOfPoints() << std::endl;
 //        }
 
-    void PrintingModule::save_VTU(const std::vector<Node>& nodes,
-                                  const std::vector<Pore>& pores,
-                                  const std::vector<Grain>& grains,
-                                  const bool add_grain_info) {          //TODO: Add option add_grain_info, now its always true
+    template <RangeOf<Node> NodeRange, RangeOf<Pore> PoreRange, RangeOf<Grain> GrainRange>
+    void PrintingModule::save_VTU(
+                  NodeRange&& nodes,
+                  PoreRange&& pores,
+                  GrainRange&& grains,
+                  const bool add_grain_info)
+    {         //TODO: Add option add_grain_info, now its always true
 
         OutStream& file = net_out;
 
@@ -64,9 +67,9 @@ namespace karst {
         std::map<const Node*, vtkIdType> nodeIdMap;
 
         // --- Node Data ---
-        vtkSmartPointer<vtkDoubleArray> pressureArray = nullptr;
-        vtkSmartPointer<vtkDoubleArray> concentrationArray = nullptr;
-        vtkSmartPointer<vtkIntArray> nodeNameArray = nullptr;
+        vtkSmartPointer<vtkDoubleArray> pressureArray       = nullptr;
+        vtkSmartPointer<vtkDoubleArray> concentrationArray  = nullptr;
+        vtkSmartPointer<vtkIntArray>    nodeNameArray       = nullptr;
 
         if (config.do_save_data_in_vtk) {
             pressureArray = vtkSmartPointer<vtkDoubleArray>::New();
@@ -81,7 +84,7 @@ namespace karst {
         }
 
         // Adding Nodes
-        for (const Node& node : nodes) {
+        for (const auto& node : nodes) {
             auto pos = node.get_pos();
             auto x = double(pos.x), y = double(pos.y), z = double(pos.z);
             vtkIdType id = vtk_points->InsertNextPoint(x, y, z);
@@ -97,10 +100,10 @@ namespace karst {
 
         // --- Pore Data ---
         vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
-        vtkSmartPointer<vtkDoubleArray> diameterArray = nullptr;
-        vtkSmartPointer<vtkDoubleArray> lengthArray = nullptr;
-        vtkSmartPointer<vtkDoubleArray> flowArray = nullptr;
-        vtkSmartPointer<vtkIntArray> poreNameArray = nullptr;
+        vtkSmartPointer<vtkDoubleArray> diameterArray   = nullptr;
+        vtkSmartPointer<vtkDoubleArray> lengthArray     = nullptr;
+        vtkSmartPointer<vtkDoubleArray> flowArray       = nullptr;
+        vtkSmartPointer<vtkIntArray>    poreNameArray   = nullptr;
 
         if (config.do_save_data_in_vtk) {
             diameterArray = vtkSmartPointer<vtkDoubleArray>::New();

@@ -72,12 +72,37 @@ namespace karst {
         for(auto g : grains)
             l_tot_f +=  1._U*pow(double(g->get_tot_v()/g->get_max_volume()),net_config.l_V_scaling_f);
 
-        set_l(get_l_max()*l_tot_f/double(get_grains().size()));
-        if(get_l()<net_config.l_min) set_l(net_config.l_min);       //pore length cannot be too small
+        auto l_tmp = get_l_max()*l_tot_f/double(get_grains().size());
+        if(l_tmp>net_config.l_min)  set_l(l_tmp);
+        else                        set_l(net_config.l_min);       //pore length cannot be too small
     }
 
+    template < typename Element, typename ElementState>
+    bool GenericElement<Element, ElementState> :: check_if_node_connected(Node* n){
+        auto it = std::find_if(nodes.begin(), nodes.end(), [n](Node* e) {
+            return e == n;
+        });
+        return it != nodes.end();
+    }
 
+    template < typename Element, typename ElementState>
+    bool GenericElement<Element, ElementState> :: check_if_pore_connected(Pore* p){
+        auto it = std::find_if(pores.begin(), pores.end(), [p](Pore* e) {
+            return e == p;
+        });
+        return it != pores.end();
+    }
+
+    template < typename Element, typename ElementState>
+    bool GenericElement<Element, ElementState> :: check_if_grain_connected(Grain* g){
+        auto it = std::find_if(grains.begin(), grains.end(), [g](Grain* e) {
+            return e == g;
+        });
+        return it != grains.end();
+    }
 
 }
+
+
 
 #endif //KARST_4_0_GENERICELEMENT_IMPL_H

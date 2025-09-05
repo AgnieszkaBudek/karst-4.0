@@ -57,6 +57,7 @@ namespace karst{
     public:
 
         friend auto createHexagonalNetwork(Network& S, Int N_x, Int N_y)->void;
+        friend void create_cubic_network(Network&,Int,Int,Int);
         friend auto read_csv_H_data(Network& S)->void;
         friend Network; friend Node; friend Pore; friend Grain;
 
@@ -147,15 +148,11 @@ namespace karst{
         }
 
 
-        //checking the topology
-        template <typename T>
-        auto check_if_element_connected(const T& element, std::vector<const T*>& list_of_elements) ->bool {
-            auto it = std::find_if(list_of_elements.begin(), list_of_elements.end(), [element](T* e) {
-                return e->name == element.name;
-            });
-            return it != list_of_elements.end();
-        }
 
+        bool check_if_node_connected  (Node*  n);
+        bool check_if_pore_connected  (Pore*  p);
+        bool check_if_grain_connected (Grain* g);
+//        bool check_all_connections_of_element();
 
         const NetworkConfig& net_config;               ///< NetworkConfig   //zmienić potem na const Network* const S;
         const NetworkTopologyConfig& topo_config;
@@ -180,6 +177,14 @@ namespace karst{
 
 }
 
+//        //checking the topology
+//        template <typename T>
+//        auto check_if_element_connected(const T& element, std::vector<const T*>& list_of_elements) ->bool {
+//            auto it = std::find_if(list_of_elements.begin(), list_of_elements.end(), [element](T* e) {
+//                return e->name == element.name;
+//            });
+//            return it != list_of_elements.end();
+//        }
 
 
 #endif //KARST_4_0_GENERICELEMENT_H

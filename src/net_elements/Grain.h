@@ -11,8 +11,8 @@ namespace karst {
     struct GrainState {
 
         EnumArray <SOLIDS, Volume, enum_size_v<SOLIDS>> v{0._V};   ///< Volume of specific species
-        Volume max_volume {NaN};                                   ///< maximal volume of a grain (corresponding to zero porosity)
-        Volume tot_volume {NaN};                                   ///< total volume of a grain
+        Volume max_volume {0._V};                                   ///< maximal volume of a grain (corresponding to zero porosity)
+        Volume tot_volume {0._V};                                   ///< total volume of a grain
 
     };
 
@@ -99,6 +99,7 @@ namespace karst {
         auto calculate_maximal_volume() -> Volume{      //only for 2D simulations, periodic boundary conditions taken into account
 
             //if(get_nodes().size()<=2)   return state.max_volume;
+            if(topo_config.type_of_topology==TypeOfNetTopology::CUBIC) return 1._V; //todo: Implement the proper volume calculation for cubic network
 
             Area area {0.};
             int n = int(nodes.size());
@@ -134,6 +135,9 @@ namespace karst {
 
 
         auto calculate_initial_vol() -> Volume{
+
+            if(topo_config.type_of_topology==TypeOfNetTopology::CUBIC) return 1._V; //todo: Implement the proper volume calculation for cubic network
+
             auto vals = pores
                         | std::views::filter([](auto& p){ return p->get_type() == PoreType::MATRIX; })
                         | std::views::transform([](auto& p){ return p->get_d(); });

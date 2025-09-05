@@ -19,6 +19,9 @@ namespace karst{
             case TypeOfNetTopology::HEXAGONAL:
                 createHexagonalNetwork(*this,t_config.N_x,t_config.N_y);
                 break;
+            case TypeOfNetTopology::CUBIC:
+                create_cubic_network(*this,t_config.N_x,t_config.N_y,t_config.N_z);
+                break;
             case TypeOfNetTopology::FROM_H_FILE:
                 read_csv_H_data(*this);
                 break;
@@ -36,17 +39,12 @@ namespace karst{
         // 2. Check connections:
         check_network_connections();  //TODO: add a function checking network connections...
 
-//        for(auto& p : pores)
-//            p.state.d=0.1_L;
 
         // 3. Disconnect inlet/outlet nodes
         for(auto& p : pores)
             if(p.nodes[0]->get_type() != NodeType::NORMAL and p.nodes[1]->get_type() != NodeType::NORMAL)
                 p.deactivate();
 
-//
-//        for(auto& p : pores)
-//            p.state.d=0.1_L;
 
         // 4. Cut boundary if not periodic bc
         if (!t_config.do_periodic_bc) {
@@ -55,17 +53,24 @@ namespace karst{
                     p.deactivate();
         }
 
-
         // 5. Delete unused elements
         if (t_config.do_clear_unused_net_el) {
             log.log("Clearing unused elements of the network:");
+
             clear_unused_elements();
+
+            log.log(std::format("Number of active nodes:  {}",  state.N_active));
+            log.log(std::format("Number of active pores:  {}",  state.P_active));
+            log.log(std::format("Number of active grains: {}", state.G_active));
+
+            io_mod.save_VTU(get_nodes(),get_pores(),get_grains(),false);
+
         }
 
         // 6. Check connections after deleting unused ones:
         check_network_connections();
 
-
+        exit(0);
     }
 
 
@@ -80,6 +85,10 @@ namespace karst{
 
         erase_if(n_inlet,  [](auto x) { return !x->active;});
         erase_if(n_outlet, [](auto x) { return !x->active;});
+
+        update_number_of_active_nodes();
+        update_number_of_active_pores();
+        update_number_of_active_grains();
     }
 
     auto Network::check_network_connections() -> void{ //FIXME: finish implementing this one
@@ -102,6 +111,52 @@ namespace karst{
         });
 
         log.log("Checking networks' topology...");
+
+        for (auto& pore : pores)
+            for (auto n : pore.nodes)
+                if (! n->check_if_pore_connected(&pore))
+                    log.log_with_context<LogLevel::ERROR>(*n,std::format("Problem with connection pore {}",pore.config.name));
+
+        for (auto& pore : pores)
+            for (auto p : pore.pores)
+                if (! p->check_if_pore_connected(&pore))
+                    log.log_with_context<LogLevel::ERROR>(*p,std::format("Problem with connection pore {}",pore.config.name));
+
+        for (auto& pore : pores)
+            for (auto g : pore.grains)
+                if (! g->check_if_pore_connected(&pore))
+                    log.log_with_context<LogLevel::ERROR>(*g,std::format("Problem with connection pore {}",pore.config.name));
+
+        for (auto& node : nodes)
+            for (auto n : node.nodes)
+                if (! n->check_if_node_connected(&node))
+                    log.log_with_context<LogLevel::ERROR>(*n,std::format("Problem with connection node {}",node.config.name));
+
+        for (auto& node : nodes)
+            for (auto p : node.pores)
+                if (! p->check_if_node_connected(&node))
+                    log.log_with_context<LogLevel::ERROR>(*p,std::format("Problem with connection node {}",node.config.name));
+
+        for (auto& node : nodes)
+            for (auto g : node.grains)
+                if (! g->check_if_node_connected(&node))
+                    log.log_with_context<LogLevel::ERROR>(*g,std::format("Problem with connection node {}",node.config.name));
+
+        for (auto& grain : grains)
+            for (auto n : grain.nodes)
+                if (! n->check_if_grain_connected(&grain))
+                    log.log_with_context<LogLevel::ERROR>(*n,std::format("Problem with connection grain {}",grain.config.name));
+
+        for (auto& grain : grains)
+            for (auto p : grain.pores)
+                if (! p->check_if_grain_connected(&grain))
+                    log.log_with_context<LogLevel::ERROR>(*p,std::format("Problem with connection grain {}",grain.config.name));
+
+        for (auto& grain : grains)
+            for (auto g : grain.grains)
+                if (! g->check_if_grain_connected(&grain))
+                    log.log_with_context<LogLevel::ERROR>(*g,std::format("Problem with connection grain {}",grain.config.name));
+
     }
 
 

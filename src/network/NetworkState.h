@@ -21,6 +21,8 @@ namespace karst {
         Flow     Q_tot {10.};     ///< total flow through the system (if == 0 the constant pressure is kept)
 
         Long     N_active{0};               ///<number_of_active_nodes
+        Long     P_active{0};               ///<number_of_active_pores
+        Long     G_active{0};               ///<number_of_active_grains
         Long     N_active_connections{0};   ///<number_of_active_nodes
         bool     new_Topo{false};           ///< Give info if the topology has been updated
 

@@ -35,7 +35,7 @@ namespace karst {
 
     struct NodeState {
 
-        Pressure u{NaN};
+        Pressure u{0._P};
         EnumArray <SOLUBLES, Concentration,enum_size_v<SOLUBLES>> c{0._C};     ///< concentration of specific species
     };
 
@@ -51,6 +51,7 @@ namespace karst {
         friend  GenericElement <Node, NodeState>;
         friend Network; friend Pore; friend Grain;
         friend auto createHexagonalNetwork(Network& S, Int N_x, Int N_y)->void;
+        friend void create_cubic_network(Network&,Int,Int,Int);
         friend auto read_csv_H_data(Network& S)->void;
         friend auto operator - (const Node&  n1, const Node&  n2) -> Length ;
 
@@ -146,7 +147,10 @@ namespace karst {
             if (dy > n1.topo_config.N_y*n1.net_config.l0 / 2.0)
                 dy = n1.topo_config.N_y*n1.net_config.l0 - dy;
 
-        Length dz = n1.pos.z - n2.pos.z;
+        Length dz = abs(n1.pos.z - n2.pos.z);
+        if(n1.topo_config.do_periodic_bc and n1.topo_config.do_radial_geometry)
+            if (dz > n1.topo_config.N_y*n1.net_config.l0 / 2.0)
+                dz = n1.topo_config.N_y*n1.net_config.l0 - dz;
 
         return sqrt(dx*dx + dy*dy + dz*dz);
     }

@@ -29,6 +29,7 @@ namespace karst {
     public:
 
         friend void createHexagonalNetwork(Network&,Int,Int);
+        friend void create_cubic_network(Network&,Int,Int,Int);
         friend void read_csv_H_data(Network& S);
         friend Node; friend Pore; friend Grain;
 
@@ -58,6 +59,16 @@ namespace karst {
             for(auto& [n0, p0] : n1->nodePores)
                 if(n0 == n2)  return p0;
             return nullptr;
+        }
+        auto find_the_closest_node(Point3D p) -> Node*{
+            auto dist  = Length(std::numeric_limits<double>::max());
+            auto n_tmp = &nodes[0];
+            for (auto& n : nodes)
+                if(p - n.get_pos() < dist){
+                    n_tmp = &n;
+                    dist = p - n.get_pos();
+                }
+            return n_tmp;
         }
 
         template<typename Func>
@@ -104,6 +115,18 @@ namespace karst {
         auto update_number_of_active_nodes() -> void{
             state.N_active = std::ranges::count_if(nodes, [](const Node& n) {
                 return n.active;
+            });
+        }
+
+        auto update_number_of_active_pores() -> void{
+            state.P_active = std::ranges::count_if(pores, [](const Pore& p) {
+                return p.active;
+            });
+        }
+
+        auto update_number_of_active_grains() -> void{
+            state.G_active = std::ranges::count_if(grains, [](const Grain& g) {
+                return g.active;
             });
         }
 
@@ -182,10 +205,10 @@ namespace karst {
             }
 
             if(io_mod.state.print_ps_now)
-                io_mod.print_net_ps(title, nodes, pores, grains);
+                io_mod.print_net_ps(title, get_nodes(), get_pores(), get_grains());
 
             if(io_mod.state.print_vtk_now)
-                io_mod.save_VTU(nodes, pores, grains);
+                io_mod.save_VTU(get_nodes(), get_pores(), get_grains());
 
         }
 

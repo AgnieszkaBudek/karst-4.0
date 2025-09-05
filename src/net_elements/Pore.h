@@ -11,9 +11,9 @@ namespace karst {
 
     struct PoreState  {
 
-        Length d{NaN};        ///< pore diameter
-        Length l{NaN};        ///< pore length
-        Flow   q{NaN};        ///< flow through the pore
+        Length d{0._L};        ///< pore diameter
+        Length l{0._L};        ///< pore length
+        Flow   q{0._F};        ///< flow through the pore
 
         PoreGeometry geometry {PoreGeometry::CYLINDER};
         PoreType     type     {PoreType::MATRIX};

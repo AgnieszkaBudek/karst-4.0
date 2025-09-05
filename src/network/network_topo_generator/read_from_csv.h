@@ -24,6 +24,10 @@ namespace karst {
         auto N_nodes = info_nodes.n_rows;
         auto N_pores = info_pores.n_rows;
 
+        S.log.log(std::format("Total number of nodes read: {}",N_nodes));
+        S.log.log(std::format("Total number of pores read: {}",N_pores));
+
+
         S.nodes .reserve(N_nodes);
         S.pores .reserve(N_pores);
         S.grains.reserve(N_pores); //each pore has its own "grain"
@@ -64,9 +68,14 @@ namespace karst {
             if( row["Z"].get<double>()*1._L  + row["EqRadius"].get<double>()*1._L > z_max )
                 z_max =  row["Z"].get<double>()*1._L  + row["EqRadius"].get<double>()*1._L;
         }
+
         auto L_x = x_max - x_min;
         auto L_y = y_max - y_min;
         auto L_z = z_max - z_min;
+
+        for(auto& n : S.nodes){
+            n.set_pos({n.pos.x-x_min,n.pos.y-y_min,n.pos.z-z_min});
+        }
 
         //reading info about pores
         for (auto& row : csv_p) {
@@ -145,7 +154,34 @@ namespace karst {
                     if(gg!=&g_tmp)
                         g_tmp.grains.push_back(gg);
 
-        exit(1);
+
+        //Adding inlet/outlet information
+        if(S.t_config.point_inlet)
+            S.n_inlet.push_back(S.find_the_closest_node({L_x/2,L_y/2,0._L}));       //chack the orientation
+        else{
+            for (auto& n : S.nodes)
+                if(n.get_pos().z < L_z/pow(int(S.nodes.size()),0.3))
+                S.n_inlet.push_back(&n);
+        }
+        if(S.t_config.point_outlet)
+            S.n_outlet.push_back(S.find_the_closest_node({L_x/2,L_y/2,L_z}));       //chack the orientation
+        else{
+            for (auto& n : S.nodes)
+                if(n.get_pos().z >  L_z*(1-1./pow(int(S.nodes.size()),0.3)))
+                    S.n_outlet.push_back(&n);
+        }
+
+        S.log.log(std::format("Number of inlets  is equal to {}", S.n_inlet. size()));
+        S.log.log(std::format("Number of outlets is equal to {}", S.n_outlet.size()));
+
+        //temporary setting zero state
+        for(auto& n : S.nodes)
+            n.set_u(0._P);
+        for(auto& p : S.pores)
+            p.set_q(0._F);
+
+        S.io_mod.save_VTU(S.nodes,S.pores,S.grains,false);
+
 
     }
 }

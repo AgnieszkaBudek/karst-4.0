@@ -9,6 +9,19 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Print compiler info during configuration
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    message(STATUS "C++ compiler: GCC ${CMAKE_CXX_COMPILER_VERSION} (${CMAKE_CXX_COMPILER})")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    message(STATUS "C++ compiler: Clang ${CMAKE_CXX_COMPILER_VERSION} (${CMAKE_CXX_COMPILER})")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+    message(STATUS "C++ compiler: AppleClang ${CMAKE_CXX_COMPILER_VERSION} (${CMAKE_CXX_COMPILER})")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    message(STATUS "C++ compiler: MSVC ${CMAKE_CXX_COMPILER_VERSION} (${CMAKE_CXX_COMPILER})")
+else()
+    message(STATUS "C++ compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} (${CMAKE_CXX_COMPILER})")
+endif()
+
 # Set the output directory for runtime artifacts (e.g., executables)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
@@ -30,6 +43,14 @@ find_package(cxxopts REQUIRED)
 message(STATUS "Found cxxopts version: ${cxxopts_VERSION}")
 # --- Target Definition (Executable) ---
 add_executable(karst_4_0 main.cpp)
+
+# (Optional) Also print compiler info during the build phase
+set(_compiler_msg "[build] Using C++ compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} (${CMAKE_CXX_COMPILER})")
+add_custom_target(print_compiler_info ALL
+    COMMAND ${CMAKE_COMMAND} -E echo "${_compiler_msg}"
+    VERBATIM
+)
+add_dependencies(karst_4_0 print_compiler_info)
 
 # --- Configure Include Directories for our Target ---
 target_include_directories(karst_4_0 PRIVATE

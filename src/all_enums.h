@@ -114,12 +114,13 @@ namespace karst{
 
 
     // enum class for different types of topology
-    enum class TypeOfNetTopology  {HEXAGONAL, FROM_FILE, FROM_H_FILE, FROM_TRIANGULATION, SIZE};
+    enum class TypeOfNetTopology  {HEXAGONAL, CUBIC, FROM_FILE, FROM_H_FILE, FROM_TRIANGULATION, SIZE};
 
     // Specialization of EnumToString for TypeOfNetTopology
     template<>
     const std::map<TypeOfNetTopology, std::string> EnumToString<TypeOfNetTopology>::mapping = {
             { TypeOfNetTopology::HEXAGONAL, "HEXAGONAL" },
+            { TypeOfNetTopology::CUBIC, "CUBIC" },
             { TypeOfNetTopology::FROM_FILE, "FROM_FILE" },
             { TypeOfNetTopology::FROM_H_FILE, "FROM_H_FILE" },
             { TypeOfNetTopology::FROM_TRIANGULATION, "FROM_TRIANGULATION" }

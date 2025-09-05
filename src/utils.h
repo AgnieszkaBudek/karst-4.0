@@ -21,6 +21,7 @@
 #include <iterator>
 #include <utility>
 #include <string>
+#include <type_traits>
 
 #include "src/all_enums.h"
 #include "src/import_export/Logger.h"
@@ -51,6 +52,19 @@ namespace karst {
         return value ? "true" : "false";
     }
 
+
+
+
+
+    template <class R, class T>
+    concept RangeOf =
+    std::ranges::input_range<R> &&
+    std::same_as<
+            std::remove_cvref_t<
+                    std::remove_reference_t<std::ranges::range_reference_t<R>>
+            >,
+            T
+    >;
 
 
 
@@ -255,10 +269,6 @@ namespace karst {
 
 
     };
-
-
-
-
 
 
 }

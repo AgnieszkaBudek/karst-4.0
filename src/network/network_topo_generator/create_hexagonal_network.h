@@ -157,7 +157,7 @@ namespace karst {
 
 
 
-        //adding random shift
+        //adding random shift for node position
         if(S.t_config.do_randomness_in_regular_net){
             S.log.log("Adding randomness to the network...");
             std::mt19937 gen(S.t_config.random_seed);

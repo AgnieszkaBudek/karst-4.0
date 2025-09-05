@@ -10,10 +10,12 @@
 namespace karst{
 
 
-    void PrintingModule::print_net_ps(const std::string title,
-                         const std::vector<Node>  &nodes,
-                         const std::vector<Pore>  &pores,
-                         const std::vector<Grain> &grains)  {
+    template <RangeOf<Node> NodeRange, RangeOf<Pore> PoreRange, RangeOf<Grain> GrainRange>
+    void PrintingModule::print_net_ps(const std::string& title,
+                      NodeRange&& nodes,
+                      PoreRange&& pores,
+                      GrainRange&& grains){
+
 
         log.log("Printing postscript...");
 
@@ -23,16 +25,16 @@ namespace karst{
         print_ps_headlines(stream,stream.get_page_count(),title);
 
 //            for (const auto& g_tmp : grains)
-//                if(g_tmp.check_if_active())
+//                //if(g_tmp.check_if_active())
 //                    stream << Polygon3D{.n = g_tmp.get_nodes(),.name = std::to_string(g_tmp.config.name)};
 
         for (const auto& p_tmp : pores)
-            if(p_tmp.check_if_active())
+            //if(p_tmp.check_if_active())
                 //stream << Pore3D{.p = p_tmp,.name = std::to_string(p_tmp.config.name)};
                 stream << Pore3D{.p = p_tmp,.name = std::string("")};
 
 //            for (const auto& n_tmp : nodes)
-//                if(n_tmp.check_if_active())
+//                //if(n_tmp.check_if_active())
 //                    stream << Node3D{.n = n_tmp,.name = std::to_string(n_tmp.config.name)};
 
         stream << "\nshowpage\n"<<fflush;

@@ -89,10 +89,12 @@ namespace karst {
 
         void print_ps_headlines(OutStream &stream, int page_nr, const std::string &description_note);
 
-        void print_net_ps(const std::string title,
-                          const std::vector<Node> &nodes,
-                          const std::vector<Pore> &pores,
-                          const std::vector<Grain> &grains);
+        template <RangeOf<Node> NodeRange, RangeOf<Pore> PoreRange, RangeOf<Grain> GrainRange>
+        void print_net_ps(const std::string& title,
+                          NodeRange&& nodes,
+                          PoreRange&& pores,
+                          GrainRange&& grains);
+
 
 
         template<typename Nodes, typename Pores, typename Grains, typename Fn, typename Fp, typename Fg>
@@ -105,10 +107,12 @@ namespace karst {
                                       Fg &&f_g);
 
 
-        void save_VTU(const std::vector<Node> &nodes,
-                      const std::vector<Pore> &pores,
-                      const std::vector<Grain> &grains,
-                      const bool add_grain_info = true);
+        template <RangeOf<Node> NodeRange, RangeOf<Pore> PoreRange, RangeOf<Grain> GrainRange>
+        void save_VTU(NodeRange&& nodes,
+                      PoreRange&& pores,
+                      GrainRange&& grains,
+                      const bool add_grain_info=false);
+;
 
 
         template<typename Elements, typename Func>

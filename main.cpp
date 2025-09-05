@@ -6,6 +6,7 @@
 #include "src/simulation/Simulation.h"
 #include "src/simulation/euler_step.h"
 #include "src/network/network_topo_generator/create_hexagonal_network.h"
+#include "src/network/network_topo_generator/create_cubic_network.h"
 #include "src/network/network_topo_generator/read_from_csv.h"
 
 using namespace karst;

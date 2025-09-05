@@ -32,7 +32,7 @@ namespace karst {
         bool do_save_txt           {true };    ///< if true save tables with diameters, flow and concentration
         bool do_save_data_in_vtk   {true };
 
-        //printing pictures (as ps or pdf)
+        //printing pictures (as PS or PDF)
         Unitless L_out      {1. };			///< printing scale
         Int pages_tot       {100};		    ///< total nr of pages in the pictures (should be recalculated in future)
         Int pages_saved     {0  };	        ///< number of printed pages
