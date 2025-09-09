@@ -41,8 +41,13 @@ message(STATUS "Found Boost version: ${Boost_VERSION_STRING}")
 
 find_package(cxxopts REQUIRED)
 message(STATUS "Found cxxopts version: ${cxxopts_VERSION}")
+
+# CGAL
+find_package(CGAL REQUIRED)
+message(STATUS "Found CGAL version: ${CGAL_VERSION}")
 # --- Target Definition (Executable) ---
-add_executable(karst_4_0 main.cpp)
+add_executable(karst_4_0 main.cpp
+        src/network/network_topo_generator/create_2D_triangulation.h)
 
 # (Optional) Also print compiler info during the build phase
 set(_compiler_msg "[build] Using C++ compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} (${CMAKE_CXX_COMPILER})")
@@ -69,6 +74,7 @@ target_link_libraries(karst_4_0 PRIVATE
         Eigen3::Eigen
         Boost::serialization
         cxxopts::cxxopts
+        CGAL::CGAL
 )
 
 # --- Configure Compile Options for our Target ---

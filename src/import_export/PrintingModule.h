@@ -53,7 +53,7 @@ namespace karst {
             if (config.do_save_ps) {
                 net_pores_ps.init();
                 net_grains_ps.init();
-                if (logger_level_min == LogLevel::DEBUG_PS)
+                if constexpr (logger_level_min == LogLevel::DEBUG_PS)
                     net_debug_ps.init();
             }
             if (config.do_save_vtk) {

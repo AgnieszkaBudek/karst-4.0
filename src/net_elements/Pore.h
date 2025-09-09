@@ -113,7 +113,7 @@ namespace karst {
         //init function
         auto do_init() -> void
         {
-            if (state.d >= 0._L and state.l >= 0._L) return;        // do nth, is state is basically set
+            if (state.d > 0._L and state.l > 0._L) return;        // do nth, is state is basically set
 
             state = (PoreState{
                     .d = net_config.d0,

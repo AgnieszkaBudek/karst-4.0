@@ -50,7 +50,7 @@ namespace karst {
                      log.log("Additionally setting Q_tot = " + net_conf.Q_tot);
                  }},
                  {"type_of_topology", [&](const std::string& value) {
-                     net_top_conf.type_of_topology+value;
+                     net_top_conf.type_of_topology = EnumToString<TypeOfNetTopology>::from_string(value);
                      log.log("Setting net_top_conf.type_of_topology = " + net_top_conf.type_of_topology);
                  }},
                  {"in_topology_file_name", [&](const std::string& value) {
@@ -65,9 +65,9 @@ namespace karst {
                      net_top_conf.do_randomness_in_regular_net = (value == "true");
                      log.log("Setting net_top_conf.do_randomness_in_regular_net = " + bool_to_string(net_top_conf.do_randomness_in_regular_net));
                  }},
-                 {"do_clear_unused_pores", [&](const std::string& value) {
+                 {"do_clear_unused_net_el", [&](const std::string& value) {
                      net_top_conf.do_clear_unused_net_el = (value == "true");
-                     log.log("Setting net_top_conf.do_clear_unused_pores = " + bool_to_string(net_top_conf.do_clear_unused_net_el));
+                     log.log("Setting net_top_conf.do_clear_unused_net_el = " + bool_to_string(net_top_conf.do_clear_unused_net_el));
                  }},
                  {"do_periodic_bc", [&](const std::string& value) {
                      net_top_conf.do_periodic_bc = (value == "true");

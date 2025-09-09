@@ -29,6 +29,7 @@ namespace karst {
         std::string pores_csv = "/Users/agnieszka/Desktop/KARST/DATA/KOREAN_ROCK/sample_1/pores.csv";
 
         //randomness in the network
+        Length min_distance_between_nodes {0.5};
         Int random_seed {21};                        ///< seed for generating randomness in the network
         Length gauss_sigma_d {0};    	             ///< if randomness is on this give information about width of the initial diameter distribution (log normal used here)
         bool do_randomness_in_regular_net {false};  	 ///< if true randomness is added to hexagonal network (working for hexagonal net)

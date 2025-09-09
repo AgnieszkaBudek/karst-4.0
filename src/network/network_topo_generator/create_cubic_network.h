@@ -3,7 +3,7 @@
 //
 
 #ifndef KARST_4_0_CREATE_CUBIC_NETWORK_H
-#define KARST_4_0_CREATE_CUBICL_NETWORK_H
+#define KARST_4_0_CREATE_CUBIC_NETWORK_H
 
 #include <random>
 #include "src/utils.h"
@@ -165,6 +165,8 @@ namespace karst {
                 }
         }
         S.log.log("Cubic network has been created.");
+
+
 
     }
 

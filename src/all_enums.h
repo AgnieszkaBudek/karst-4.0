@@ -31,6 +31,16 @@ namespace karst{
     template<EnumType T>
     struct EnumToString {
         static const std::map<T, std::string> mapping;
+
+        static T from_string(std::string_view value) {
+            const auto& m = mapping;
+            auto it = std::find_if(m.begin(), m.end(),
+                                   [&](auto const& kv){ return kv.second == value; });
+            if (it == m.end()) {
+                throw std::invalid_argument("unknown enum string");
+            }
+            return it->first;
+        }
     };
 
     template<EnumType T>
@@ -114,7 +124,7 @@ namespace karst{
 
 
     // enum class for different types of topology
-    enum class TypeOfNetTopology  {HEXAGONAL, CUBIC, FROM_FILE, FROM_H_FILE, FROM_TRIANGULATION, SIZE};
+    enum class TypeOfNetTopology  {HEXAGONAL, CUBIC, FROM_FILE, FROM_H_FILE, TRIANGULATION_2D, TRIANGULATION_3D, SIZE};
 
     // Specialization of EnumToString for TypeOfNetTopology
     template<>
@@ -123,7 +133,8 @@ namespace karst{
             { TypeOfNetTopology::CUBIC, "CUBIC" },
             { TypeOfNetTopology::FROM_FILE, "FROM_FILE" },
             { TypeOfNetTopology::FROM_H_FILE, "FROM_H_FILE" },
-            { TypeOfNetTopology::FROM_TRIANGULATION, "FROM_TRIANGULATION" }
+            { TypeOfNetTopology::TRIANGULATION_2D, "TRIANGULATION_2D" },
+            { TypeOfNetTopology::TRIANGULATION_3D, "TRIANGULATION_3D" }
     };
 
 

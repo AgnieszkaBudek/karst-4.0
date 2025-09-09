@@ -30,6 +30,7 @@ namespace karst {
 
         friend void createHexagonalNetwork(Network&,Int,Int);
         friend void create_cubic_network(Network&,Int,Int,Int);
+        friend void create_2D_triangulation(Network& S, Int N_x, Int N_y);
         friend void read_csv_H_data(Network& S);
         friend Node; friend Pore; friend Grain;
 
@@ -54,6 +55,10 @@ namespace karst {
 
         auto get_state()   const -> const NetworkState&   { return state;}
 
+        auto is_3D () -> bool{
+            return ( t_config.type_of_topology == TypeOfNetTopology::FROM_H_FILE or
+                    t_config.type_of_topology == TypeOfNetTopology::TRIANGULATION_3D);
+        }
 
         static auto find_pore(Node *n1, Node *n2) -> Pore* {
             for(auto& [n0, p0] : n1->nodePores)
@@ -177,7 +182,10 @@ namespace karst {
                 el.init();
             });
 
+
             // 3. Recalculate pore lengths
+            for(auto&g : grains)
+                log.log_with_context(g,std::format("V_toot to {}",double(g.state.tot_volume)));
             for(auto& p : get_pores()) p.update_length();
 
         }

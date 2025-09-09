@@ -28,13 +28,25 @@ namespace karst{
             case TypeOfNetTopology::FROM_FILE:
                 log.log<LogLevel::ERROR>("TypeOfNetTopology::FROM_FILE Not implemented yet!");
                 break;
-            case TypeOfNetTopology::FROM_TRIANGULATION:
-                log.log<LogLevel::ERROR>("TypeOfNetTopology::FROM_TRIANGULATION Not implemented yet.");
+            case TypeOfNetTopology::TRIANGULATION_2D:
+                create_2D_triangulation(*this,t_config.N_x,t_config.N_y);
                 break;
             default:
                 log.log<LogLevel::ERROR>( "Unknown geometry.");
                 break;
         }
+
+        if constexpr (logger_level_min==LogLevel::DEBUG_PS)
+            io_mod.print_net_ps_with_values(
+                    "DEBUGGING in prepare_network_topology...",
+                    get_nodes(),
+                    get_pores(),
+                    std::vector<Grain>{},
+                    [](auto& el){return std::format("{:3.0f}",double(el.config.name));},
+                    [](auto& el){return std::format("{:3.0f}",double(el.config.name));},
+                    [](auto& el){return std::format("{:3.0f}",double(el.config.name));}
+            );
+
 
         // 2. Check connections:
         check_network_connections();  //TODO: add a function checking network connections...
@@ -70,7 +82,17 @@ namespace karst{
         // 6. Check connections after deleting unused ones:
         check_network_connections();
 
-        exit(0);
+        if constexpr (logger_level_min==LogLevel::DEBUG_PS)
+            io_mod.print_net_ps_with_values(
+                    "DEBUGGING after prepare_network_topology...",
+                    get_nodes(),
+                    get_pores(),
+                    std::vector<Grain>{},
+                    [](auto& el){return std::format("{:3.0f}",double(el.config.name));},
+                    [](auto& el){return std::format("{:3.0f}",double(el.config.name));},
+                    [](auto& el){return std::format("{:3.0f}",double(el.config.name));}
+            );
+
     }
 
 

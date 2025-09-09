@@ -52,6 +52,7 @@ namespace karst {
         friend Network; friend Pore; friend Grain;
         friend auto createHexagonalNetwork(Network& S, Int N_x, Int N_y)->void;
         friend void create_cubic_network(Network&,Int,Int,Int);
+        friend void create_2D_triangulation(Network& S, Int N_x, Int N_y);
         friend auto read_csv_H_data(Network& S)->void;
         friend auto operator - (const Node&  n1, const Node&  n2) -> Length ;
 

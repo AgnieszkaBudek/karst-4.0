@@ -58,6 +58,7 @@ namespace karst{
 
         friend auto createHexagonalNetwork(Network& S, Int N_x, Int N_y)->void;
         friend void create_cubic_network(Network&,Int,Int,Int);
+        friend void create_2D_triangulation(Network& S, Int N_x, Int N_y);
         friend auto read_csv_H_data(Network& S)->void;
         friend Network; friend Node; friend Pore; friend Grain;
 
@@ -90,7 +91,11 @@ namespace karst{
         }
 
 
-        auto init() -> void { static_cast<Element&>(*this).do_init(); }
+        auto init() -> void {
+            static_cast<Element&>(*this).do_init();
+            if(config.type == ElementType::GRAIN)
+                config.log.log_state<LogLevel::DEBUG>(static_cast<Element&>(*this),"Setting state:");
+        }
 
         // getting and updating element state
         auto set_state     (ElementState&& s1)               ->  void { state=std::move(s1); }
@@ -142,12 +147,10 @@ namespace karst{
         auto check_if_active () const -> bool {return active;}
 
         auto deactivate () -> void {
-            config.log.log_with_context<LogLevel::DEBUG>(*this,"is beeing deactivated.");
+            config.log.log_with_context<LogLevel::DEBUG>(*this,"is being deactivated.");
             active = false;
             remove_element_from_a_network();
         }
-
-
 
         bool check_if_node_connected  (Node*  n);
         bool check_if_pore_connected  (Pore*  p);

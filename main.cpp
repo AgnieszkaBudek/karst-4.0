@@ -7,6 +7,7 @@
 #include "src/simulation/euler_step.h"
 #include "src/network/network_topo_generator/create_hexagonal_network.h"
 #include "src/network/network_topo_generator/create_cubic_network.h"
+#include "src/network/network_topo_generator/create_2D_triangulation.h"
 #include "src/network/network_topo_generator/read_from_csv.h"
 
 using namespace karst;
@@ -18,6 +19,7 @@ int main(int argc, char** argv) {
     bool show_picture = true;
     std::string config_name = "config.txt";
 
+    // 1. Reding arguments
     try {
         cxxopts::Options options(argv[0], "Karst Simulation Program");
 
@@ -49,16 +51,14 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-
+    // 2. Main part of the simulation
     Simulation simulation{config_name,log};
     simulation.init();
     simulation.run_simulation();
 
-
+    // 3. Postprocessing (pictures)
     log.log("Preparing pictures...");
     system("ps2pdf *.ps");
-
-
 
 
     return 0;
