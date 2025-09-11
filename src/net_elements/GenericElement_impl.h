@@ -22,8 +22,8 @@ namespace karst {
             erase_if(n->nodes, [this](auto x) { return x == this; });
         for (auto p : pores)
             erase_if(p->nodes, [this](auto x) { return x == this; });
-        for (auto g: grains)
-            erase_if(g->nodes, [this](auto x) { return x == this; });
+//        for (auto g: grains) //grains need to remember of their nodes
+//            erase_if(g->nodes, [this](auto x) { return x == this; });
     }
 
     inline void Pore::do_disconnect_from_network() {

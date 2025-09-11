@@ -28,7 +28,7 @@ namespace karst{
             {LogLevel::ERROR,       "ERROR"     }
     };
 
-    constexpr LogLevel      logger_level_min  = LogLevel::DEBUG_PS;
+    constexpr LogLevel      logger_level_min  = LogLevel::INFO;//DEBUG_PS;
     constexpr std::ostream& logger_output     = std::cout;
 
     template<LogLevel MinLevel>

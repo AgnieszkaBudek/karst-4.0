@@ -20,13 +20,13 @@ namespace karst {
 
     struct SimulatePressureState {
         MatrixSolver         matrix_solver_type = MatrixSolver::EIGEN;
-        Int how_often_direct {1};       ///< how often use a direct solver instead of iterative
+        Int how_often_direct {10};       ///< how often use a direct solver instead of iterative
         Long N_active;                   ///< number of active nodes
         Long N_non_zero;                 ///< number of nonzero element of matrix M
 
         Long step {0};                   ///< step from the last update of matrix size
         Double cg_solver_tolerance {1e-8};
-        Int cg_solver_iterations   {100};
+        Int cg_solver_iterations   {200};
     };
 
 

@@ -92,7 +92,7 @@ namespace karst {
 
                 }
 
-            ASSERT_MSG(Q>0._F and QC>0._X , std::string("Problem for species ")+species+" for node "+ std::to_string(n.config.name)+".");
+            ASSERT_MSG(Q>0._F and QC>=0._X , std::string("Problem for species ")+species+" for node "+ std::to_string(n.config.name)+".");
             if(Q>0._F and QC>0._X) n.set_c(species, QC/Q);
         }
 

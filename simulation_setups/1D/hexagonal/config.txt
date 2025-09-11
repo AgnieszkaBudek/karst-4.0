@@ -2,8 +2,8 @@
 #  Size of the network
 
 type_of_topology = TRIANGULATION_2D
-N_x = 10         # size of the regular network
-N_y = 10         # size of the regular network
+N_x = 165         # size of the regular network
+N_y = 165         # size of the regular network
 N_z = 1         # size of the regular network
 do_randomness_in_regular_net = true
 do_clear_unused_net_el = true

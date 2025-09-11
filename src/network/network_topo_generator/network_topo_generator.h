@@ -57,6 +57,14 @@ namespace karst{
             if(p.nodes[0]->get_type() != NodeType::NORMAL and p.nodes[1]->get_type() != NodeType::NORMAL)
                 p.deactivate();
 
+        if(!t_config.do_periodic_bc or !t_config.point_inlet or !t_config.point_outlet)
+            for(auto& p : pores)        //disconnect
+                    if(abs(p.nodes[0]->pos.y - p.nodes[1]->pos.y) > t_config.N_y*0.5_L){
+                        log.log("DUPA22.");
+                        p.deactivate();
+                    }
+
+
 
         // 4. Cut boundary if not periodic bc
         if (!t_config.do_periodic_bc) {
@@ -64,6 +72,7 @@ namespace karst{
                 if (p.nodes.back()->get_pos() - p.nodes.front()->get_pos() > 10._U * config.l0)
                     p.deactivate();
         }
+
 
         // 5. Delete unused elements
         if (t_config.do_clear_unused_net_el) {
@@ -104,6 +113,15 @@ namespace karst{
             if (!el.topo_s.connected_to_percolation_cluster)
                 el.deactivate();
         });
+
+        //FIXME: coś tu nie działa, bo zostajęz jednym niepodłączonym porem.
+        for(auto &n : n_inlet)
+            //n_outlet will be cleaned automatically
+            if(n->pores.size()==0){
+                log.log("DUPA11.");
+                n->deactivate();
+        }
+
 
         erase_if(n_inlet,  [](auto x) { return !x->active;});
         erase_if(n_outlet, [](auto x) { return !x->active;});
